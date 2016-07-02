@@ -1,0 +1,16 @@
+#!/usr/bin/env node
+
+// TODO Use HTTPS. http://www.vinaysahni.com/best-practices-for-a-pragmatic-restful-api#ssl
+
+const app = require('../server/app');
+const http = require('http');
+
+// Store port number from environment and stores in Express.
+const port = process.env.PORT || '8080';
+app.set('port', port);
+
+// Creates HTTP server and listens on provided port.
+const server = http.createServer(app);
+server.listen(port);
+
+server.on('listening', () => console.log(`Listening on ${port}`));
