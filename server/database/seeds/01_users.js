@@ -1,6 +1,6 @@
 const faker = require('faker');
 
-exports.seed = function seed(knex, Promise) {
+exports.seed = (knex, Promise) => {
   const seedQueries = [];
 
   // Creates array of insert statements for fake user data.

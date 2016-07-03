@@ -1,6 +1,6 @@
-exports.up = function up(knex, Promise) {
+exports.up = (knex, Promise) =>
   // Users table, including house and member status.
-  return knex.schema.createTable('users', table => {
+  knex.schema.createTable('users', table => {
     table.increments('id').primary();
     table.string('first_name').defaultTo('').notNullable();
     table.string('last_name').defaultTo('').notNullable();
@@ -34,7 +34,7 @@ exports.up = function up(knex, Promise) {
   })
 
   // Pivot table for many-to-many relation between users and events.
-  .createTable('users_events', table => {
+  .createTable('attendance_records', table => {
     table.increments('id').primary();
     table.unique(['user_id', 'event_id']);
     table.boolean('valid').defaultTo(true).notNullable();
@@ -44,11 +44,9 @@ exports.up = function up(knex, Promise) {
     table.integer('event_id').unsigned().references('id')
           .inTable('events');
   });
-};
 
-exports.down = function down(knex, Promise) {
-  return knex.schema.dropTable('users_events')
-                    .dropTable('events')
-                    .dropTable('event_types')
-                    .dropTable('users');
-};
+exports.down = (knex, Promise) =>
+  knex.schema.dropTable('attendance_records')
+              .dropTable('events')
+              .dropTable('event_types')
+              .dropTable('users');

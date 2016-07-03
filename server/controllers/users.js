@@ -4,7 +4,7 @@ const users = {
   // Displays a user given a user ID.
   show(req, res) {
     User.where('id', req.params.id)
-      .fetch()
+      .fetch({ withRelated: ['events'] })
       .then(user => res.json(user.toJSON()))
       .catch(err => res.json({ message: err.message }));
   },
