@@ -6,7 +6,7 @@ This API uses the [Express framework](http://expressjs.com) along with [Bookshel
 
 Install the latest version of [Node.js](https://nodejs.org/en/).
 
-Both the `start` and `serve` scripts register `dotenv` so that the environment variables in `.env` can be loaded as quickly as possible. Copy `.env.example` to a new file, `.env`, and replace the placeholder values with the configuration for your environment.
+Copy `.env.example` to a new file, `.env`, and replace the placeholder values with the configuration for your environment. The `.env` file is loaded in `server/database/knexfile.js` so that the Knex CLI can see the environment variables while also loading `.env` as early in the application as possible.
 
 Install application dependencies.
 ```

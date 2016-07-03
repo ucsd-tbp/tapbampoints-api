@@ -1,8 +1,9 @@
 const express = require('express');
+const users = require('../controllers/users');
+
 const router = express.Router();
 
-router.get('/', (req, res) => {
-  res.json({ message: 'API root.' });
-});
+// TODO Use index.js to export router and define API routes in ./api.js.
+router.get('/users/:id', users.show);
 
 module.exports = router;
