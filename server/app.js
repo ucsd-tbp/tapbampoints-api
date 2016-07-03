@@ -1,9 +1,6 @@
-const dotenv = require('dotenv');
+// const db = require('./database/db');
 const express = require('express');
 const router = require('./routes/index');
-
-// Sets up environment file as early as possible.
-dotenv.config();
 
 // Sets up .env configuration file and initializes application.
 const app = express();

@@ -2,6 +2,7 @@
     "extends": "airbnb",
     "rules": {
         "new-cap": ["error", { "capIsNewExceptions": ["Router"] }],
+        "no-unused-vars": ["error", { "argsIgnorePattern": "^Promise$" }],
         "no-console": "off"
     }
 }
