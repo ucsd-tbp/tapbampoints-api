@@ -1,8 +1,8 @@
-#### Overview
+### Overview
 
 This API uses the [Express framework](http://expressjs.com) along with [Bookshelf](http://bookshelfjs.org) as an ORM.
 
-#### Development Setup
+### Development Setup
 
 Install the latest version of [Node.js](https://nodejs.org/en/).
 
