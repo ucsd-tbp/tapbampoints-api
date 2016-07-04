@@ -1,8 +1,10 @@
 const bookshelf = require('bookshelf');
 
 // Uses database connection info to create a Knex instance.
-const knexConfig = require('./knexfile');
-const knex = require('knex')(knexConfig);
+const config = require('./knexfile');
+const knex = require('knex')(config[process.env.NODE_ENV]);
+
+console.log(`> initialized knex instance. environment: ${process.env.NODE_ENV}`);
 
 // Uses Knex instance (database connection) to initialize Bookshelf ORM.
 const db = bookshelf(knex);

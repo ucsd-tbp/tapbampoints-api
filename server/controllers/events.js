@@ -2,7 +2,8 @@ const Event = require('../models/Event');
 
 const events = {
   /**
-   * Displays info for an event with the given ID.
+   * Displays info for an event with the given ID along with its associated
+   * users (members that signed in to the event).
    *
    * @param  {Request} req HTTP request object
    * @param  {Response} res HTTP response sent after receiving a request

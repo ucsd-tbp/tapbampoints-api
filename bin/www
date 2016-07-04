@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-// TODO Use HTTPS. http://www.vinaysahni.com/best-practices-for-a-pragmatic-restful-api#ssl
+// TODO Use HTTPS.
 
 const app = require('../server/app');
 const http = require('http');

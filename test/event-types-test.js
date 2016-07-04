@@ -1,32 +1,27 @@
-const request = require('supertest')(`http://localhost:${process.env.PORT}`);
+const request = require('supertest')(`http://localhost:${process.env.PORT}/api`);
 const should = require('chai').should();
 
 describe('Event Types', function() {
-  describe('GET /api/event-types', function() {
-    it('should return a list of event types');
+  describe('GET /event-types', function() {
+    it('returns a list of event types');
   });
 
-  describe('GET /api/event-types/:id', function() {
-    it('should respond with a 200 OK')
-    it('should return the event type with the correct ID');
-    it('should respond with a 404 NOT FOUND');
+  describe('GET /event-types/:id', function() {
+    it('returns the event type with the correct ID');
+    it('responds with a 404 NOT FOUND with a nonexistent ID');
   });
 
-  describe('POST /api/event-types', function() {
-    it('should return a 403 FORBIDDEN without appropriate authentication');
-    it('should respond with a 201 CREATED')
-    it('should create a new event-type');
+  describe('POST /event-types', function() {
+    it('responds with a 201 CREATED')
+    it('creates a new event-type');
   });
 
-  describe('PATCH /api/event-types/:id', function() {
-    it('should return a 403 FORBIDDEN without appropriate authentication');
-    it('should respond with a 200 OK')
-    it('should update the event-type\'s name and description');
+  describe('PATCH /event-types/:id', function() {
+    it('updates the event-type\'s name and description');
   });
 
-  describe('DELETE /api/event-types/:id', function() {
-    it('should return a 403 FORBIDDEN without appropriate authentication');
-    it('should respond with a 204 NO CONTENT');
-    it('should delete the event-type');
+  describe('DELETE /event-types/:id', function() {
+    it('responds with a 204 NO CONTENT');
+    it('deletes the event-type');
   });
 });

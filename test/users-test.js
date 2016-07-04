@@ -1,29 +1,45 @@
-const request = require('supertest')(`http://localhost:${process.env.PORT}`);
-const should = require('chai').should();
+const app = require('../server/app')
+const api = require('supertest')(app);
+const expect = require('chai').expect;
 
 describe('Users', function() {
-  describe('GET /api/users/:id', function() {
-    it('should respond with a 200 OK')
-    it('should return the user with the correct ID');
-    it('should respond with a 404 NOT FOUND');
-    it('should return a list of the user\'s attended events');
+  describe('GET /users/:id', function() {
+    it('returns the user with the correct ID', function(done) {
+      api.get('/api/users/1')
+        .set('Accept', 'application/json')
+        .expect(200, done);
+    });
+
+    it('responds with a 404 Not Found with a nonexistent ID', function(done) {
+      api.get('/api/users/100')
+        .set('Accept', 'application/json')
+        .expect(404, done);
+    });
+
+    it('returns a list of the user\'s attended events');
   });
 
-  describe('POST /api/users', function() {
-    it('should return a 403 FORBIDDEN without appropriate authentication');
-    it('should respond with a 201 CREATED')
-    it('should create a new user');
+  describe('POST /users', function() {
+    it('creates a new user with a 201 Created', function(done) {
+      api.post('/api/users')
+        .send({
+          first_name: 'New',
+          last_name: 'User',
+          barcode_hash: 'hash',
+          house: 'Red',
+          member_status: 'Initiate',
+        })
+        .expect(200, { first_name: 'New', last_name: 'User' }, done);
+    });
   });
 
-  describe('PATCH /api/users/:id', function() {
-    it('should return a 403 FORBIDDEN without appropriate authentication');
-    it('should respond with a 200 OK')
-    it('should update the user\'s first and last names');
+  describe('PATCH /users/:id', function() {
+    it('responds with a 404 Not Found with a nonexistent ID');
+    it('updates the user\'s first and last names');
   });
 
-  describe('DELETE /api/users/:id', function() {
-    it('should return a 403 FORBIDDEN without appropriate authentication');
-    it('should respond with a 204 NO CONTENT');
-    it('should delete the user');
+  describe('DELETE /users/:id', function() {
+    it('responds with a 204 No Content');
+    it('deletes the user');
   });
 });
