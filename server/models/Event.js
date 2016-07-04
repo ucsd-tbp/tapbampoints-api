@@ -6,12 +6,20 @@ const Event = db.model('Event', {
   tableName: 'events',
 
   /**
-   * Creates many-to-many relationship with users through attendance_records
-   * as an intermediary table.
-   * @return {Collection} Users associated with this event.
+   * Creates many-to-many relation with users through attendance_records as an
+   * intermediary table.
+   * @return {Collection<User>} Users associated with this event.
    */
   users() {
     return this.belongsToMany('User', 'attendance_records');
+  },
+
+  /**
+   * Creates many-to-one relation between events and event types.
+   * @return {EventType} Event type associated with this event.
+   */
+  type() {
+    return this.belongsTo('EventType');
   },
 });
 
