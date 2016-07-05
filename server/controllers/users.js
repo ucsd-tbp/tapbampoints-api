@@ -7,13 +7,13 @@ const users = {
    *
    * @param  {Request} req HTTP request object
    * @param  {Response} res HTTP response sent after receiving a request
-   * @return {Promise<User>} User with given ID.
+   * @return {Promise<User>} Resolves to the retrieved user.
    */
   show(req, res) {
     User.where('id', req.params.id)
-      .fetch({ withRelated: ['events'] })
+      .fetch({ withRelated: ['events'], require: true })
       .then(user => res.json(user.toJSON()))
-      .catch(err => res.json({ message: err.message }));
+      .catch(User.NotFoundError, () => res.status(404).json({ error: 'User not found.' }))
   },
 
   /**
@@ -21,13 +21,12 @@ const users = {
    *
    * @param  {Request} req HTTP request object
    * @param  {Response} res HTTP response sent after receiving a request
-   * @return {Promise<Collection>} List of all users.
+   * @return {Promise<Collection>} Resolves to a list of all users.
    */
   index(req, res) {
-    // TODO Add pagination data via the Link header
+    // TODO Add pagination data via the Link header.
     User.fetchAll({ withRelated: ['events'] })
       .then(userCollection => res.json(userCollection.toJSON()))
-      .catch(err => res.json({ message: err.message }));
   },
 
   /**
@@ -35,27 +34,41 @@ const users = {
    *
    * @param  {Request} req HTTP request object
    * @param  {Response} res HTTP response sent after receiving a request
-   * @return {Promise<User>} Newly created user.
+   * @return {Promise<User>} Resolves to the newly created user.
    */
   create(req, res) {
     // TODO Include a Location header pointing to URL of the new resource.
     new User().save(req.body)
-      .then(user => res.json(user.toJSON()))
-      .catch(err => res.json({ message: err.message }));
+      .then(user => res.status(201).json(user.toJSON()))
+      .catch(User.NoRowsUpdatedError, () => res.status(404).json({ error: 'No records were saved.' }));
   },
 
   /**
-   * Updates a user.
+   * Updates user with specified ID.
    *
    * @param  {Request} req HTTP request object
    * @param  {Response} res HTTP response sent after receiving a request
-   * @return {Promise<Collection>} List of all users.
+   * @return {Promise<User>} Resolves to the newly updated user.
    */
   update(req, res) {
     User.where({ id: req.params.id })
       .save(req.body, { patch: true })
       .then(user => res.json(user.toJSON()))
-      .catch(err => res.json({ message: err.message }));
+      .catch(User.NoRowsUpdatedError, () => res.status(404).json({ error: 'No records were updated.' }));
+  },
+
+  /**
+   * Deletes user with specified ID.
+   *
+   * @param  {Request} req HTTP request object
+   * @param  {Response} res HTTP response sent after receiving a request
+   * @return {Promise<User>} Resolves to destroyed and "empty" model.
+   */
+  delete(req, res) {
+    User.where({ id: req.params.id })
+      .destroy({ require: true })
+      .then(() => res.sendStatus(204))
+      .catch(User.NoRowsDeletedError, () => res.status(404).json({ error: 'No records were deleted.' }))
   },
 };
 

@@ -10,6 +10,10 @@ const router = express.Router();
 
 // User routes.
 router.get('/users/:id', users.show);
+router.get('/users', users.index);
+router.post('/users', users.create);
+router.patch('/users/:id', users.update);
+router.delete('/users/:id', users.delete);
 
 // Event type routes.
 router.get('/event-types', eventTypes.index);

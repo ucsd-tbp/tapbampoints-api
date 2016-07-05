@@ -40,9 +40,11 @@ exports.up = (knex, Promise) =>
     table.boolean('valid').defaultTo(true).notNullable();
 
     table.integer('user_id').unsigned().references('id')
-          .inTable('users');
+          .inTable('users')
+          .onDelete('CASCADE');
     table.integer('event_id').unsigned().references('id')
-          .inTable('events');
+          .inTable('events')
+          .onDelete('CASCADE');
   });
 
 exports.down = (knex, Promise) =>
