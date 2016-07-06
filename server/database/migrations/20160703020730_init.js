@@ -2,9 +2,13 @@ exports.up = (knex, Promise) =>
   // Users table, including house and member status.
   knex.schema.createTable('users', table => {
     table.increments('id').primary();
+
+    // Can be null if a user authenticates via the barcode hash.
+    table.string('email');
+    table.string('password');
+
     table.string('first_name').defaultTo('').notNullable();
     table.string('last_name').defaultTo('').notNullable();
-    table.boolean('valid').defaultTo(true).notNullable();
     table.string('barcode_hash').defaultTo('').notNullable();
     table.enu('house', ['Red', 'Green', 'Blue']).notNullable();
     table.enu('member_status', ['Initiate', 'Member', 'Officer']).notNullable();
@@ -22,7 +26,6 @@ exports.up = (knex, Promise) =>
   // Events table.
   .createTable('events', table => {
     table.increments('id').primary();
-    table.boolean('valid').defaultTo(true).notNullable();
     table.string('name').defaultTo('').notNullable();
     table.text('description').defaultTo('').notNullable();
     table.integer('points').defaultTo(0).notNullable();
@@ -35,9 +38,7 @@ exports.up = (knex, Promise) =>
 
   // Pivot table for many-to-many relation between users and events.
   .createTable('attendance_records', table => {
-    table.increments('id').primary();
     table.unique(['user_id', 'event_id']);
-    table.boolean('valid').defaultTo(true).notNullable();
 
     table.integer('user_id').unsigned().references('id')
           .inTable('users')
@@ -45,6 +46,10 @@ exports.up = (knex, Promise) =>
     table.integer('event_id').unsigned().references('id')
           .inTable('events')
           .onDelete('CASCADE');
+
+    table.integer('points_earned').unsigned()
+          .defaultTo(0)
+          .notNullable();
   });
 
 exports.down = (knex, Promise) =>

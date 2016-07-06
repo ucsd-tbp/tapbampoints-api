@@ -23,3 +23,5 @@ const AttendanceRecord = db.model('AttendanceRecord', {
     return this.belongsTo('User');
   },
 });
+
+module.exports = AttendanceRecord;

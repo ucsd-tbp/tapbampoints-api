@@ -1,7 +1,9 @@
-const knex = require('../server/database').knex;
-const config = { directory: 'server/database/migrations', transaction: false };
-
 // Root-level hooks that run before Mocha tests. See: http://mochajs.org/#hooks
+
+const knex = require('../server/database').knex;
+const config = { directory: 'server/database/migrations' };
+
+// Migrates all tables and inserts test data for tests to use.
 before('migrating test database', function(done) {
   return knex.migrate.latest(config)
     .then(() => {
@@ -17,6 +19,8 @@ before('migrating test database', function(done) {
     .then(() => done());
 });
 
+// Rolls back database after all tests to avoid previous test suite runs
+// affecting the behavior of next test runs.
 after('rolling back test database', function(done) {
   knex.migrate.rollback(config)
     .then(() => done());

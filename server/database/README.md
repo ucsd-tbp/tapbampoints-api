@@ -29,6 +29,11 @@ knex seed:run
 ```
 Each seed file, located in `seeds/`, is prefixed with a number that's used to determine the order of seeders when `seed:run` is used.
 
+A npm script that resets the database by rolling it back, migrating to the latest migration, and running the seeders is also provided:
+```
+npm run resetdb
+```
+
 More details on the Knex CLI can be found by running:
 ```
 knex --help

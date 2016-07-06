@@ -12,6 +12,7 @@ const config = {
       database: process.env.DB_NAME,
       charset: 'utf8',
     },
+    tableName: 'migrations',
   },
 
   // Uses mock test database for testing.
@@ -24,6 +25,7 @@ const config = {
       database: process.env.TEST_DB_NAME,
       charset: 'utf8',
     },
+    tableName: 'migrations',
   },
 };
 

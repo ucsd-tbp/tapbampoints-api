@@ -5,7 +5,7 @@
 const app = require('../server/app');
 const http = require('http');
 
-// Store port number from environment and stores in Express.
+// Gets port number from environment and stores in Express.
 const port = process.env.PORT || '8080';
 app.set('port', port);
 

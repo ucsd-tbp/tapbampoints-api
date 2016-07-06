@@ -10,13 +10,14 @@ describe('Users', function() {
         .expect('Content-Type', 'application/json; charset=utf-8')
         .expect(200, {
           id: 1,
+          email: null,
+          password: null,
           first_name: 'Test',
           last_name: 'User',
           barcode_hash: 'hash',
           house: 'Green',
           member_status: 'Member',
           events: [],
-          valid: true,
         }, done);
     });
 
@@ -52,13 +53,14 @@ describe('Users', function() {
       api.get('/api/users/2')
         .expect(200, {
           id: 2,
+          email: null,
+          password: null,
           first_name: 'New',
           last_name: 'User',
           barcode_hash: 'hash',
           house: 'Red',
           member_status: 'Initiate',
           events: [],
-          valid: true,
         }, done);
     });
   });
