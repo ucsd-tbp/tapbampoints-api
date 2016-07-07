@@ -3,6 +3,7 @@
 // TODO Use HTTPS.
 
 const app = require('../server/app');
+const debug = require('debug')('tbp:www');
 const http = require('http');
 
 // Gets port number from environment and stores in Express.
@@ -13,4 +14,4 @@ app.set('port', port);
 const server = http.createServer(app);
 server.listen(port);
 
-server.on('listening', () => console.log(`Listening on ${port}`));
+server.on('listening', () => debug(`listening on port ${port}`));

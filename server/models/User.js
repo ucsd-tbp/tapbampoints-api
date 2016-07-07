@@ -4,6 +4,7 @@ const db = require('../database');
 // Defines User model.
 const User = db.model('User', {
   tableName: 'users',
+  hidden: ['id', 'password'],
 
   /**
    * Creates many-to-many relation with events through attendance_records as an

@@ -2,7 +2,19 @@
 require('dotenv').config({ path: `${__dirname}/../../.env` });
 
 const config = {
-  // Uses development database.
+  production: {
+    client: 'mysql',
+    connection: {
+      host: process.env.DB_HOST,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASS,
+      database: process.env.DB_NAME,
+      charset: 'utf8',
+    },
+    tableName: 'migrations',
+  },
+
+
   development: {
     client: 'mysql',
     connection: {
@@ -15,7 +27,6 @@ const config = {
     tableName: 'migrations',
   },
 
-  // Uses mock test database for testing.
   test: {
     client: 'mysql',
     connection: {

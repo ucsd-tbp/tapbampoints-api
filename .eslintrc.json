@@ -3,6 +3,7 @@
     "rules": {
         "new-cap": ["error", { "capIsNewExceptions": ["Router"] }],
         "no-unused-vars": ["error", { "argsIgnorePattern": "^Promise$" }],
-        "no-console": "off"
+        "no-param-reassign": "off",
+        "consistent-return": "off"
     }
 }

@@ -4,12 +4,13 @@ exports.up = (knex, Promise) =>
     table.increments('id').primary();
 
     // Can be null if a user authenticates via the barcode hash.
-    table.string('email');
+    table.string('email').unique();
     table.string('password');
 
     table.string('first_name').defaultTo('').notNullable();
     table.string('last_name').defaultTo('').notNullable();
-    table.string('barcode_hash').defaultTo('').notNullable();
+    table.string('barcode_hash').unique().defaultTo('')
+          .notNullable();
     table.enu('house', ['Red', 'Green', 'Blue']).notNullable();
     table.enu('member_status', ['Initiate', 'Member', 'Officer']).notNullable();
   })
