@@ -19,7 +19,7 @@ const auth = {
    * not present or invalid. The decoded user is placed in req.user for
    * following request handlers.
    *
-   * To make authenticated requests, the header must be formatted:
+   * To make authenticated requests, the header must be formatted like:
    * Authorization: Bearer {token}
    *
    * @param  {Request} req HTTP request
