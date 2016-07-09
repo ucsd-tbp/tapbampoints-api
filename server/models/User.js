@@ -8,7 +8,7 @@ const db = require('../database');
 
 const User = db.model('User', {
   tableName: 'users',
-  hidden: ['id', 'password'],
+  hidden: ['id', 'password', 'barcode'],
   outputVirtuals: false,
 
   virtuals: {
@@ -24,7 +24,7 @@ const User = db.model('User', {
     },
   },
 
-  /** Constructs User model by registering event listeners. */
+  /** Registers event listeners. */
   initialize() {
     this.on('creating', this.hashPass, this);
   },
@@ -47,15 +47,29 @@ const User = db.model('User', {
    * @return {Promise} resolves to the hash computed from the pass
    */
   hashPass(user) {
-    return new Promise((resolve, reject) => {
-      const pass = user.attributes.password ? user.attributes.password : user.attributes.barcode;
+    debug('hashing pass values');
 
-      bcrypt.hash(pass, 10, (err, hash) => {
+    const barcodeHash = new Promise((resolve, reject) => {
+      bcrypt.hash(user.attributes.barcode, 10, (err, hash) => {
         if (err) reject(err);
+        debug(`hashed barcode: ${hash}`);
+        user.set('barcode', hash);
+        resolve(hash);
+      });
+    });
+
+    const passwordHash = new Promise((resolve, reject) => {
+      bcrypt.hash(user.attributes.password, 10, (err, hash) => {
+        if (err) reject(err);
+        debug(`hashed password: ${hash}`);
         user.set('password', hash);
         resolve(hash);
       });
     });
+
+    const promises = user.attributes.password ? [barcodeHash, passwordHash] : [barcodeHash];
+
+    return Promise.all(promises);
   },
 
   /**
@@ -71,19 +85,22 @@ const User = db.model('User', {
    *                   matched.
    */
   login(search, pass) {
+    debug(`logging in with ${search.email} and ${pass}`);
+
     return new Promise((resolve, reject) => {
-      this.where(search)
+      User.where(search)
         .fetch({ require: true })
         .then(user => {
-          debug(`plaintext [${pass}] hashed [${user.password}]`);
+          debug(`plaintext [${pass}] hashed [${user.get('password')}]`);
 
           bcrypt.compare(pass, user.get('password'), (err, result) => {
-            if (err || !result) return reject();
-
-            debug(`password matches password of ${search}`);
+            if (err || !result) return reject(new Error('Password did not match.'));
 
             resolve(user.id);
           });
+        })
+        .catch(User.NotFoundError, () => {
+          reject(new Error('Couldn\'t find a user with the given email.'));
         });
     });
   },

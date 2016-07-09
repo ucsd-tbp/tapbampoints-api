@@ -5,7 +5,7 @@ const eventTypes = require('../controllers/event-types');
 const events = require('../controllers/events');
 const auth = require('../controllers/authentication');
 
-// TODO Use index.js to export router and define API routes in ./api.js.
+// TODO Use index.js to export router and define sets of routes and router.use.
 const router = express.Router();
 
 const requireAdmin = [
@@ -16,7 +16,7 @@ const requireAdmin = [
 // TODO Use express-validator for request validation.
 
 // Authentication routes.
-router.post('/users', auth.register);
+router.post('/auth/register', auth.register);
 router.post('/auth/login', auth.login);
 router.get('/auth/me', auth.validate, auth.currentUser);
 

@@ -74,7 +74,7 @@ const auth = {
           res.status(201).json({ token });
         });
       })
-      .catch(User.NoRowsUpdatedError, () => res.status(500).json({ error: 'User was not saved!' }))
+      .catch(User.NoRowsUpdatedError, () => res.status(400).json({ error: 'User was not saved!' }))
       .catch((err) => res.status(400).json({ error: err.message }));
   },
 
@@ -94,20 +94,19 @@ const auth = {
 
     new User().login(search, pass)
       .then(id => {
-        jwt.sign({ id }, process.env.JWT_SECRET, options, (jwtErr, token) => {
-          if (jwtErr) return res.status(400).json({ error: jwtErr.message });
+        debug(`signing JWT with id ${id}`);
+        jwt.sign({ id }, process.env.JWT_SECRET, options, (err, token) => {
+          if (err) return res.status(400).json({ error: err.message });
           res.json({ token });
         });
       })
-      .catch(User.NotFoundError, () => res.status(400).json({ error: 'User not found.' }))
-      .catch(() => res.status(400).json({ error: 'Login failed. Check your credentials.'}));
+      .catch((err) => res.status(401).json({ error: err.message }));
   },
 
   /**
-   * Parses token to retrieve the user associated with the token. At this
-   * point, the JWT validation middleware has already been applied, so there's
-   * no need to re-verify the token since it's guaranteed to be valid and the
-   * user ID has already been stored in req.user.
+   * Returns the logged in user. By this point the JWT validation middleware
+   * had finished verifying the token, so the current user has already been set
+   * in req.user.
    *
    * @param  {Request} req HTTP request, contains a valid JWT
    * @param  {Response} res HTTP response, contains user from decoded JWT

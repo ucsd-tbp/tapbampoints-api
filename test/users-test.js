@@ -1,75 +1,135 @@
+
+const knex = require('../server/database').knex;
+const config = { directory: 'server/database/migrations' };
+
 const app = require('../server/app')
 const api = require('supertest')(app);
 const expect = require('chai').expect;
+const bcrypt = require('bcrypt');
 
 describe('Users', function() {
+  before('migrates test database and creates a user', function(done) {
+    return knex.migrate.latest(config)
+      .then(() => {
+        return knex('users').insert({
+          id: 1,
+          first_name: 'Test',
+          last_name: 'User',
+          email: 'test@test.com',
+          password: bcrypt.hashSync('password', 0),
+          barcode: bcrypt.hashSync('barcode', 0),
+        });
+      })
+      .then(() => done());
+  });
+
+  after('rolls back test database', function(done) {
+    knex.migrate.rollback(config)
+      .then(() => done());
+  });
+
   describe('GET /users/:id', function() {
     it('returns the user with the correct info', function(done) {
       api.get('/api/users/1')
         .set('Accept', 'application/json')
         .expect('Content-Type', 'application/json; charset=utf-8')
         .expect(200, {
-          id: 1,
-          email: null,
-          password: null,
+          email: 'test@test.com',
           first_name: 'Test',
           last_name: 'User',
-          barcode_hash: 'hash',
-          house: 'Green',
-          member_status: 'Member',
+          house: 'None',
+          member_status: 'Initiate',
           events: [],
         }, done);
     });
 
     it('responds with a 404 Not Found when trying to get a nonexistent user', function(done) {
       api.get('/api/users/100')
-        .expect(404, done);
+        .expect(404, {
+          error: 'User not found.',
+        }, done)
     });
   });
 
-  describe('POST /users', function() {
-    it('creates a new user with a 201 Created', function(done) {
-      api.post('/api/users')
+  describe('POST /auth/register', function() {
+    it('returns a 400 Bad Request if an email exists without a password');
+    it('returns a 400 Bad Request if a password exists without an email');
+    it('returns a 400 Bad Request if an email and password pair exists but not a barcode');
+    it('returns a 422 Unprocessable Entity if the email is invalid');
+
+    it('responds with a token and a 201 Created with valid input', function(done) {
+      api.post('/api/auth/register')
         .set('Accept', 'application/json')
         .expect('Content-Type', 'application/json; charset=utf-8')
         .send({
           first_name: 'New',
           last_name: 'User',
-          barcode_hash: 'hash',
+          email: 'newuser@test.com',
+          password: 'password',
+          barcode: 'barcode',
           house: 'Red',
-          member_status: 'Initiate',
+          member_status: 'Member',
         })
-        .expect(201, {
-          id: 2,
-          first_name: 'New',
-          last_name: 'User',
-          barcode_hash: 'hash',
-          house: 'Red',
-          member_status: 'Initiate',
-        }, done);
+        .expect(201, function(err, res) {
+          expect(res.body.token).to.exist;
+          done();
+        });
     });
 
-    it('saved the new user after creation', function(done) {
+    it('created a new user', function(done) {
       api.get('/api/users/2')
         .expect(200, {
-          id: 2,
-          email: null,
-          password: null,
           first_name: 'New',
           last_name: 'User',
-          barcode_hash: 'hash',
+          email: 'newuser@test.com',
           house: 'Red',
-          member_status: 'Initiate',
+          member_status: 'Member',
           events: [],
         }, done);
     });
   });
 
-  describe('PATCH /users/:id', function() {
-    it('updates the user\'s first and last names', function(done) {
-      api.patch('/api/users/1')
+  describe('POST /auth/login', function() {
+    it('returns a 400 Bad Request a registered user tries to login with a barcode');
+    it('returns a 400 Bad Request if an email, password, and barcode are all provided');
+
+    it('returns a 401 Unauthorized if the password was incorrect', function(done) {
+      api.post('/api/auth/login')
+        .send({ email: 'test@test.com', password: 'wrongpassword' })
+        .expect(401, { error: 'Password did not match.' }, done);
+    });
+
+    it('returns a 401 Unauthorized if a user with the given email does not exist', function(done) {
+      api.post('/api/auth/login')
+        .send({ email: 'nonexistentuser@test.com', password: 'password' })
+        .expect(401, { error: 'Couldn\'t find a user with the given email.' }, done);
+    });
+
+    it('returns a 200 OK when logging in with valid credentials', function(done) {
+      api.post('/api/auth/login')
+        .send({ email: 'test@test.com', password: 'password' })
+        .expect(200, function(err, res) {
+          expect(res.body.token).to.exist;
+          done();
+        });
+    });
+  });
+
+  describe.skip('PATCH /users/:id', function() {
+    it('updates the user\'s first and last names when logged in', function(done) {
+      let token = '';
+      api.post('/api/auth/login')
         .set('Accept', 'application/json')
         .expect('Content-Type', 'application/json; charset=utf-8')
+        .send({
+          email: 'test@test.com',
+          password: 'password',
+        })
+        .expect(200, function(err, res) {
+          expect(res.body.token).to.exist;
+          token = res.body.token;
+        });
+      api.patch('/api/users/1')
         .send({ first_name: 'Updated', last_name: 'Name' })
         .expect({ first_name: 'Updated', last_name: 'Name' }, done);
     });
@@ -81,7 +141,7 @@ describe('Users', function() {
     });
   });
 
-  describe('DELETE /users/:id', function() {
+  describe.skip('DELETE /users/:id', function() {
     it('responds with a 204 No Content', function(done) {
       api.get('/api/users/2')
         .expect(200);

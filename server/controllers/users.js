@@ -13,7 +13,8 @@ const users = {
     User.where('id', req.params.id)
       .fetch({ withRelated: ['events'], require: true })
       .then(user => res.json(user.toJSON()))
-      .catch(User.NotFoundError, () => res.status(404).json({ error: 'User not found.' }));
+      .catch(User.NotFoundError, () => res.status(404).json({ error: 'User not found.' })
+    );
   },
 
   /**
@@ -39,7 +40,8 @@ const users = {
       .save(req.body, { patch: true })
       .then(user => res.json(user.toJSON()))
       .catch(User.NoRowsUpdatedError, () =>
-        res.status(404).json({ error: 'No records were updated.' }));
+        res.status(404).json({ error: 'No records were updated.' })
+      );
   },
 
   /**
@@ -53,7 +55,8 @@ const users = {
       .destroy({ require: true })
       .then(() => res.sendStatus(204))
       .catch(User.NoRowsDeletedError, () =>
-        res.status(404).json({ error: 'No records were deleted.' }));
+        res.status(404).json({ error: 'No records were deleted.' })
+      );
   },
 };
 
