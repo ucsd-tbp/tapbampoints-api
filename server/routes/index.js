@@ -17,6 +17,8 @@ const requireAdmin = [
 
 // Authentication routes.
 router.post('/users', auth.register);
+router.post('/auth/login', auth.login);
+router.get('/auth/me', auth.validate, auth.currentUser);
 
 // Other user routes.
 router.get('/users/:id', users.show);

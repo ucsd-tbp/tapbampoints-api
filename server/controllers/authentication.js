@@ -12,12 +12,13 @@ const options = {
   expiresIn: '2 days',
 };
 
+// TODO Add JWT refresh middleware and JWT blacklisting.
 const auth = {
   /**
    * Middleware that checks the Authorization header for a token, and attempts
    * to decode the token if it's there. Rejects the request if the token is
-   * not present or invalid. The decoded user is placed in req.user for
-   * following request handlers.
+   * not present or invalid. Decoded token contains the ID of the authenticated
+   * user, who is placed in req.user.
    *
    * To make authenticated requests, the header must be formatted like:
    * Authorization: Bearer {token}
@@ -27,16 +28,27 @@ const auth = {
    * @param  {Function} next callback that passes control to the next handler
    */
   validate(req, res, next) {
-    const authHeader = req.header('Authorization');
-    if (!authHeader) return res.status(403).json({ error: 'Token not provided.' });
+    const authorization = req.header.authorization;
+    if (!authorization) return res.status(403).json({ error: 'Authorization header not present.' });
 
-    const token = authHeader.split(' ')[1];
+    const [scheme, token] = authorization.split(' ');
+
+    if (scheme !== 'Bearer') {
+      return res.status(403).json({
+        error: 'Incorrect authentication scheme. Required format: "Authorization: Bearer {token}".'
+      });
+    }
+
     jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-      if (err) return res.status(403).json({ error: 'Unable to authenticate token.' });
+      if (err) return res.status(403).json({ error: err.message });
 
-      req.user = decoded;
-      debug(`decoded user with id ${req.user.id}`);
-      next();
+      User.where('id', decoded.id)
+        .fetch({ withRelated: ['events'], require: true })
+        .then(user => {
+          req.user = user;
+          next();
+        })
+        .catch(User.NotFoundError, () => res.status(404).json({ error: 'User not found.' }));
     });
   },
 
@@ -53,11 +65,12 @@ const auth = {
   register(req, res) {
     new User().save(req.body)
       .then(user => {
-        jwt.sign(user, process.env.JWT_SECRET, options, (err, token) => {
+        jwt.sign({ id: user.id }, process.env.JWT_SECRET, options, (err, token) => {
           if (err) return res.status(500).json({ error: err.message });
 
-          res.setHeader('Authorization', `Bearer: ${token}`);
           debug(`successfully registered user with id ${user.id}`);
+
+          res.setHeader('Authorization', `Bearer: ${token}`);
           res.status(201).json(user.toJSON());
         });
       })
@@ -74,7 +87,7 @@ const auth = {
    * @param  {Response} res HTTP response containing the generated token
    */
   login(req, res) {
-    // TODO Add validation for email/password vs. barcode hash bodies.
+    // TODO Extract validation for email/password vs. barcode hash bodies.
     let searchFields = {};
 
     if (req.body.barcode_hash) {
@@ -89,14 +102,15 @@ const auth = {
   /**
    * Parses token to retrieve the user associated with the token. At this
    * point, the JWT validation middleware has already been applied, so there's
-   * no need to re-verify the token since it's guaranteed to be valid.
+   * no need to re-verify the token since it's guaranteed to be valid and the
+   * user ID has already been stored in req.user.
    *
    * @param  {Request} req HTTP request, contains a valid JWT
    * @param  {Response} res HTTP response, contains user from decoded JWT
    * @see {@link auth.validate}
    */
   currentUser(req, res) {
-
+    res.json(req.user.toJSON());
   },
 };
 
