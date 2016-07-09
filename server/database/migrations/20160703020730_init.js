@@ -11,8 +11,9 @@ exports.up = (knex, Promise) =>
     table.string('last_name').defaultTo('').notNullable();
     table.string('barcode_hash').unique().defaultTo('')
           .notNullable();
-    table.enu('house', ['Red', 'Green', 'Blue']).notNullable();
-    table.enu('member_status', ['Initiate', 'Member', 'Officer']).notNullable();
+    table.enu('house', ['Red', 'Green', 'Blue', 'None']).defaultTo('None').notNullable();
+    table.enu('member_status', ['Initiate', 'Member', 'Officer']).defaultTo('Initiate')
+          .notNullable();
   })
 
   // Reference table for event types (academic, social, community, wildcard).

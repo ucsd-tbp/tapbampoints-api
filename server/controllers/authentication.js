@@ -28,14 +28,16 @@ const auth = {
    * @param  {Function} next callback that passes control to the next handler
    */
   validate(req, res, next) {
-    const authorization = req.header.authorization;
+    debug('firing token validation middleware');
+
+    const authorization = req.headers.authorization;
     if (!authorization) return res.status(403).json({ error: 'Authorization header not present.' });
 
     const [scheme, token] = authorization.split(' ');
 
     if (scheme !== 'Bearer') {
       return res.status(403).json({
-        error: 'Incorrect authentication scheme. Required format: "Authorization: Bearer {token}".'
+        error: 'Incorrect authentication scheme. Required format: "Authorization: Bearer {token}".',
       });
     }
 
@@ -54,27 +56,26 @@ const auth = {
 
   /**
    * Registers a user by creating a new user and generating a new token
-   * using the newly created user as the payload for signing the JWT.
+   * using the newly created user as the payload for signing the JWT. password
+   * from request body is also encrypted via bcrypt before saving the user.
    *
    * @param  {Request} HTTP request, must contain required data for creating a
    *                  new user
-   * @param  {Response} res HTTP response containing the generated token in the
-   *                        Authorization header and the newly created user in
-   *                        the body
+   * @param  {Response} res HTTP response containing newly generated token
    */
   register(req, res) {
     new User().save(req.body)
       .then(user => {
         jwt.sign({ id: user.id }, process.env.JWT_SECRET, options, (err, token) => {
-          if (err) return res.status(500).json({ error: err.message });
+          if (err) return res.status(400).json({ error: err.message });
 
           debug(`successfully registered user with id ${user.id}`);
 
-          res.setHeader('Authorization', `Bearer: ${token}`);
-          res.status(201).json(user.toJSON());
+          res.status(201).json({ token });
         });
       })
-      .catch(User.NoRowsUpdatedError, () => res.status(500).json({ error: 'User was not saved!' }));
+      .catch(User.NoRowsUpdatedError, () => res.status(500).json({ error: 'User was not saved!' }))
+      .catch((err) => res.status(400).json({ error: err.message }));
   },
 
   /**
@@ -87,16 +88,19 @@ const auth = {
    * @param  {Response} res HTTP response containing the generated token
    */
   login(req, res) {
-    // TODO Extract validation for email/password vs. barcode hash bodies.
-    let searchFields = {};
+    // TODO Add validation for email/password vs. barcode hash bodies.
+    const search = { email: req.body.email };
+    const pass = req.body.password;
 
-    if (req.body.barcode_hash) {
-      searchFields = { barcode_hash: req.body.barcode_hash };
-    } else {
-      searchFields = { email: req.body.email, password: req.body.password };
-    }
-
-    return searchFields;
+    new User().login(search, pass)
+      .then(id => {
+        jwt.sign({ id }, process.env.JWT_SECRET, options, (jwtErr, token) => {
+          if (jwtErr) return res.status(400).json({ error: jwtErr.message });
+          res.json({ token });
+        });
+      })
+      .catch(User.NotFoundError, () => res.status(400).json({ error: 'User not found.' }))
+      .catch(() => res.status(400).json({ error: 'Login failed. Check your credentials.'}));
   },
 
   /**

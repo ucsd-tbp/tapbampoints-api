@@ -29,20 +29,6 @@ const users = {
   },
 
   /**
-   * Creates a user.
-   *
-   * @param  {Request} req HTTP request object
-   * @param  {Response} res HTTP response sent after receiving a request
-   */
-  create(req, res) {
-    // TODO Include a Location header pointing to URL of the new resource.
-    new User().save(req.body)
-      .then(user => res.status(201).json(user.toJSON()))
-      .catch(User.NoRowsUpdatedError, () =>
-        res.status(404).json({ error: 'No records were saved.' }));
-  },
-
-  /**
    * Updates user with ID given in request parameters.
    *
    * @param  {Request} req HTTP request object

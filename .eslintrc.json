@@ -4,6 +4,7 @@
         "new-cap": ["error", { "capIsNewExceptions": ["Router"] }],
         "no-unused-vars": ["error", { "argsIgnorePattern": "^Promise$" }],
         "no-param-reassign": "off",
-        "consistent-return": "off"
+        "consistent-return": "off",
+        "max-nested-callbacks": ["error", 3]
     }
 }
