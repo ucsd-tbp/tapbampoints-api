@@ -31,18 +31,18 @@ const auth = {
     debug('firing token validation middleware');
 
     const authorization = req.headers.authorization;
-    if (!authorization) return res.status(403).json({ error: 'Authorization header not present.' });
+    if (!authorization) return res.status(401).json({ error: 'Authorization header not present.' });
 
     const [scheme, token] = authorization.split(' ');
 
     if (scheme !== 'Bearer') {
-      return res.status(403).json({
+      return res.status(400).json({
         error: 'Incorrect authentication scheme. Required format: "Authorization: Bearer {token}".',
       });
     }
 
     jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-      if (err) return res.status(403).json({ error: err.message });
+      if (err) return res.status(400).json({ error: err.message });
 
       User.where('id', decoded.id)
         .fetch({ withRelated: ['events'], require: true })
@@ -50,7 +50,7 @@ const auth = {
           req.user = user;
           next();
         })
-        .catch(User.NotFoundError, () => res.status(404).json({ error: 'User not found.' }));
+        .catch((err) => res.status(400).json({ error: err.message }));
     });
   },
 

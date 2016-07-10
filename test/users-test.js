@@ -28,6 +28,51 @@ describe('Users', function() {
       .then(() => done());
   });
 
+  describe('/auth middleware', function() {
+    let token = null;
+
+    before(function(done) {
+      api.post('/api/auth/login')
+      .set('Accept', 'application/json')
+      .expect('Content-Type', 'application/json; charset=utf-8')
+      .send({
+        email: 'test@test.com',
+        password: 'password',
+      })
+      .end(function(err, res) {
+        token = res.body.token;
+        done();
+      });
+    });
+
+    it('returns a 401 Unauthorized without an Authorization header', function(done) {
+      api.get('/api/auth/me')
+        .expect(401, { error: 'Authorization header not present.' }, done);
+    });
+
+    it('returns a 400 Bad Request with missing authentication scheme', function(done) {
+      api.get('/api/auth/me')
+        .set('Authorization', 'Token')
+        .expect(400, {
+          error: 'Incorrect authentication scheme. Required format: "Authorization: Bearer {token}".',
+        }, done);
+    });
+
+    it('returns the currently logged in user with a valid token', function(done) {
+      api.get('/api/auth/me')
+        .set('Authorization', `Bearer ${token}`)
+        .expect(200, {
+          email: 'test@test.com',
+          first_name: 'Test',
+          last_name: 'User',
+          house: 'None',
+          member_status: 'Initiate',
+          events: [],
+        }, done);
+    });
+  });
+
+
   describe('GET /users/:id', function() {
     it('returns the user with the correct info', function(done) {
       api.get('/api/users/1')
@@ -55,7 +100,7 @@ describe('Users', function() {
     it('returns a 400 Bad Request if an email exists without a password');
     it('returns a 400 Bad Request if a password exists without an email');
     it('returns a 400 Bad Request if an email and password pair exists but not a barcode');
-    it('returns a 422 Unprocessable Entity if the email is invalid');
+    it('returns a 422 Unprocessable Entity if the email is formatted incorrectly');
 
     it('responds with a token and a 201 Created with valid input', function(done) {
       api.post('/api/auth/register')
@@ -115,33 +160,41 @@ describe('Users', function() {
     });
   });
 
-  describe.skip('PATCH /users/:id', function() {
-    it('updates the user\'s first and last names when logged in', function(done) {
-      let token = '';
+  describe('PATCH /users/:id', function() {
+    let token = null;
+
+    before(function(done) {
       api.post('/api/auth/login')
-        .set('Accept', 'application/json')
-        .expect('Content-Type', 'application/json; charset=utf-8')
-        .send({
-          email: 'test@test.com',
-          password: 'password',
-        })
-        .expect(200, function(err, res) {
-          expect(res.body.token).to.exist;
-          token = res.body.token;
-        });
+      .set('Accept', 'application/json')
+      .expect('Content-Type', 'application/json; charset=utf-8')
+      .send({
+        email: 'test@test.com',
+        password: 'password',
+      })
+      .end(function(err, res) {
+        token = res.body.token;
+        done();
+      });
+    });
+
+    it('updates the user\'s first and last names when logged in', function(done) {
       api.patch('/api/users/1')
+        .set('Authorization', `Bearer ${token}`)
         .send({ first_name: 'Updated', last_name: 'Name' })
         .expect({ first_name: 'Updated', last_name: 'Name' }, done);
     });
 
     it('responds with a 404 Not Found when trying to update a nonexistent user', function(done) {
       api.patch('/api/users/10')
+        .set('Authorization', `Bearer ${token}`)
         .send({ first_name: 'NonexistentUserName' })
-        .expect(404, done)
+        .expect(404, done);
     });
   });
 
   describe.skip('DELETE /users/:id', function() {
+    it('responds with 401 Unauthorized ')
+
     it('responds with a 204 No Content', function(done) {
       api.get('/api/users/2')
         .expect(200);
@@ -159,4 +212,6 @@ describe('Users', function() {
         .expect(404, { error: 'No records were deleted.' }, done);
     });
   });
+
+
 });
