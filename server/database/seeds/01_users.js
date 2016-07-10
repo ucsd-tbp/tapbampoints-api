@@ -11,7 +11,7 @@ exports.seed = (knex, Promise) => {
     password: bcrypt.hashSync('password', 0),
     first_name: faker.name.firstName(),
     last_name: faker.name.lastName(),
-    barcode: bcrypt.hashSync('barcode', 0),
+    barcode: faker.random.uuid(),
     house: faker.helpers.randomize(['Red', 'Green', 'Blue']),
     member_status: faker.helpers.randomize(['Initiate', 'Member', 'Officer']),
   }));
@@ -22,7 +22,7 @@ exports.seed = (knex, Promise) => {
       id: i,
       first_name: faker.name.firstName(),
       last_name: faker.name.lastName(),
-      barcode: bcrypt.hashSync('barcode', 0),
+      barcode: faker.random.uuid(),
       house: faker.helpers.randomize(['Red', 'Green', 'Blue']),
       member_status: faker.helpers.randomize(['Initiate', 'Member', 'Officer']),
     });

@@ -140,12 +140,13 @@ describe('Authentication', function() {
           last_name: 'User',
           email: 'newuser@test.com',
           password: 'password',
-          barcode: 'barcode',
+          barcode: 'barcode2',
           house: 'Red',
           member_status: 'Member',
         })
         .expect(201, function(err, res) {
           expect(res.body.token).to.exist;
+
           api.get('/api/users/2')
             .expect(200, {
               first_name: 'New',
@@ -163,7 +164,7 @@ describe('Authentication', function() {
         .send({
           first_name: 'New',
           last_name: 'User with just barcode',
-          barcode: 'barcode',
+          barcode: 'barcode2',
           house: 'Blue',
         })
         .expect(201, function(err, res) {

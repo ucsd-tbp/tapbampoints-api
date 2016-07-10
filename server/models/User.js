@@ -26,7 +26,7 @@ const User = db.model('User', {
 
   /** Registers event listeners. */
   initialize() {
-    this.on('creating', this.hashPass, this);
+    if (this.attributes.password) this.on('creating', this.hashPassword, this);
   },
 
   /**
@@ -40,23 +40,13 @@ const User = db.model('User', {
   },
 
   /**
-   * Event listener that hashes a user's pass when a user is created. The pass
-   * can either be a barcode or a password.
+   * Event listener that hashes a user's pass when a user is created.
    *
    * @param {Model} contains attributes that were sent in POST request
-   * @return {Promise} resolves to the hash computed from the pass
+   * @return {Promise} resolves to the hash computed from the password
    */
-  hashPass(user) {
-    const barcodeHash = new Promise((resolve, reject) => {
-      bcrypt.hash(user.attributes.barcode, 10, (err, hash) => {
-        if (err) reject(err);
-        debug(`hashed barcode: ${hash}`);
-        user.set('barcode', hash);
-        resolve(hash);
-      });
-    });
-
-    const passwordHash = new Promise((resolve, reject) => {
+  hashPassword(user) {
+    return new Promise((resolve, reject) => {
       bcrypt.hash(user.attributes.password, 10, (err, hash) => {
         if (err) reject(err);
         debug(`hashed password: ${hash}`);
@@ -64,10 +54,6 @@ const User = db.model('User', {
         resolve(hash);
       });
     });
-
-    const promises = user.attributes.password ? [barcodeHash, passwordHash] : [barcodeHash];
-
-    return Promise.all(promises);
   },
 
   /**

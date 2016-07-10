@@ -14,7 +14,7 @@ const helpers = {
           last_name: 'User',
           email: 'test@test.com',
           password: bcrypt.hashSync('password', 0),
-          barcode: bcrypt.hashSync('barcode', 0),
+          barcode: 'barcode1',
         });
       })
       .then(() => done());
