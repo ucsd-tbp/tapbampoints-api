@@ -1,35 +1,31 @@
 const express = require('express');
 
-const users = require('../controllers/users');
-const eventTypes = require('../controllers/event-types');
-const events = require('../controllers/events');
-const auth = require('../controllers/authentication');
+const controllers = require('../controllers');
+const validators = require('../validators');
 
 // TODO Use index.js to export router and define sets of routes and router.use.
 const router = express.Router();
 
 const requireAdmin = [
-  auth.validate,
+  controllers.auth.verify,
   // TODO Add middleware to allow only admins.
 ];
 
-// TODO Use express-validator for request validation.
-
 // Authentication routes.
-router.post('/auth/register', auth.register);
-router.post('/auth/login', auth.login);
-router.get('/auth/me', auth.validate, auth.currentUser);
+router.post('/auth/register', validators.auth.register, controllers.auth.register);
+router.post('/auth/login', controllers.auth.login);
+router.get('/auth/me', requireAdmin, controllers.auth.currentUser);
 
 // Other user routes.
-router.get('/users/:id', users.show);
-router.get('/users', users.index);
-router.patch('/users/:id', requireAdmin, users.update);
-router.delete('/users/:id', requireAdmin, users.delete);
+router.get('/users/:id', controllers.users.show);
+router.get('/users', controllers.users.index);
+router.patch('/users/:id', validators.users.update, requireAdmin, controllers.users.update);
+router.delete('/users/:id', requireAdmin, controllers.users.delete);
 
 // Event type routes.
-router.get('/event-types', eventTypes.index);
+router.get('/event-types', controllers.eventTypes.index);
 
 // Event routes.
-router.get('/events/:id', events.show);
+router.get('/events/:id', controllers.events.show);
 
 module.exports = router;

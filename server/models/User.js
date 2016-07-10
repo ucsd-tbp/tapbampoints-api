@@ -47,8 +47,6 @@ const User = db.model('User', {
    * @return {Promise} resolves to the hash computed from the pass
    */
   hashPass(user) {
-    debug('hashing pass values');
-
     const barcodeHash = new Promise((resolve, reject) => {
       bcrypt.hash(user.attributes.barcode, 10, (err, hash) => {
         if (err) reject(err);

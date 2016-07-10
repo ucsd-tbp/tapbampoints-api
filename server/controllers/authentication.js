@@ -27,8 +27,8 @@ const auth = {
    * @param  {Response} res HTTP response
    * @param  {Function} next callback that passes control to the next handler
    */
-  validate(req, res, next) {
-    debug('firing token validation middleware');
+  verify(req, res, next) {
+    debug('firing token verification middleware');
 
     const authorization = req.headers.authorization;
     if (!authorization) return res.status(401).json({ error: 'Authorization header not present.' });
@@ -41,8 +41,8 @@ const auth = {
       });
     }
 
-    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-      if (err) return res.status(400).json({ error: err.message });
+    jwt.verify(token, process.env.JWT_SECRET, (jwtErr, decoded) => {
+      if (jwtErr) return res.status(400).json({ error: jwtErr.message });
 
       User.where('id', decoded.id)
         .fetch({ withRelated: ['events'], require: true })
@@ -110,7 +110,7 @@ const auth = {
    *
    * @param  {Request} req HTTP request, contains a valid JWT
    * @param  {Response} res HTTP response, contains user from decoded JWT
-   * @see {@link auth.validate}
+   * @see {@link auth.verify}
    */
   currentUser(req, res) {
     res.json(req.user.toJSON());

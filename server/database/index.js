@@ -4,6 +4,9 @@
  */
 
 const bookshelf = require('bookshelf');
+const debug = require('debug')('tbp:database');
+
+debug('initializing knex and bookshelf instances');
 
 const config = require('./knexfile');
 const knex = require('knex')(config[process.env.NODE_ENV]);
