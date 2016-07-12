@@ -5,6 +5,7 @@ const api = require('supertest')(app);
 
 const { migrateWithTestUser, rollback } = require('./helpers');
 
+// TODO Speed up tests by not mgirating and rolling back between each it block.
 describe('Authentication', function() {
   describe('token verification middleware', function() {
     before(migrateWithTestUser);
@@ -49,7 +50,6 @@ describe('Authentication', function() {
         });
     });
   });
-
 
   describe('POST /auth/register', function() {
     beforeEach(migrateWithTestUser);
@@ -133,7 +133,7 @@ describe('Authentication', function() {
         }], done);
     });
 
-    it('responds with a token and a 201 Created given an email, password, and barcode', function(done) {
+    it('returns a 201 Created and a token given a valid email, password, and barcode', function(done) {
       api.post('/api/auth/register')
         .send({
           first_name: 'New',
@@ -159,7 +159,7 @@ describe('Authentication', function() {
         });
     });
 
-    it('responds with a token and a 201 Created with just the barcode', function(done) {
+    it('returns a 201 Created when registering with just the barcode', function(done) {
       api.post('/api/auth/register')
         .send({
           first_name: 'New',
@@ -182,28 +182,54 @@ describe('Authentication', function() {
         });
     });
 
-    it.skip('returns a 400 Bad Request if a user with a duplicate email is registered', function(done) {
+    it('returns a 400 Bad Request if a user with a duplicate email is registered', function(done) {
       api.post('/api/auth/register')
         .send({
           first_name: 'Unique',
           last_name: 'User',
           email: 'uniqueuser@test.com',
           password: 'password',
-          barcode: 'firstbarcode',
+          barcode: 'barcode2',
         })
-        .expect(201);
-      api.post('/api/auth/register')
-        .send({
-          first_name: 'Duplicate',
-          last_name: 'User',
-          email: 'uniqueuser@test.com',
-          password: 'password',
-          barcode: 'secondbarcode',
-        })
-        .expect(400, done);
+        .expect(201, function(err, res) {
+
+          api.post('/api/auth/register')
+            .send({
+              first_name: 'Duplicate',
+              last_name: 'User',
+              email: 'uniqueuser@test.com',
+              password: 'password',
+              barcode: 'barcode3',
+            })
+            .expect(400, [{
+              param: 'email',
+              msg: 'This email has already been registered.',
+              value: 'uniqueuser@test.com',
+            }], done);
+        });
     });
 
-    it('returns a 400 Bad Request if a user with a duplicate barcode is registered');
+    it('returns a 400 Bad Request if a user with a duplicate barcode is registered', function(done) {
+      api.post('/api/auth/register')
+        .send({
+          first_name: 'Unique Barcode',
+          last_name: 'User',
+          barcode: 'barcode2',
+        })
+        .expect(201, function(err, res) {
+          api.post('/api/auth/register')
+            .send({
+              first_name: 'Duplicate Barcode',
+              last_name: 'User',
+              barcode: 'barcode2',
+            })
+            .expect(400, [{
+              param: 'barcode',
+              msg: 'This barcode has already been registered.',
+              value: 'barcode2',
+            }], done);
+        });
+    });
   });
 
   describe.skip('POST /auth/login', function() {

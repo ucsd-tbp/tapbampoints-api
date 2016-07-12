@@ -1,5 +1,3 @@
-const debug = require('debug')('tbp:validators');
-
 const users = require('./users');
 const auth = require('./authentication');
 const User = require('../models/User');
@@ -17,8 +15,24 @@ const custom = {
     return new Promise((resolve, reject) => {
       User.where('email', email)
         .fetch({ require: true })
-        .then(user => reject(new Error('Email is not available.')))
-        .catch(err => resolve('Email is available'));
+        .then(() => reject(new Error('Email is not available.')))
+        .catch(() => resolve('Email is available'));
+    });
+  },
+
+  /**
+   * Checks whether a barcode has already been taken, similar to
+   * {%link #isEmailAvailable}.
+   *
+   * @param  {String}  barcode barcode to check existence of
+   * @return {Promise<User>} resolves when barcode was not found
+   */
+  isBarcodeAvailable(barcode) {
+    return new Promise((resolve, reject) => {
+      User.where('barcode', barcode)
+        .fetch({ require: true })
+        .then(() => reject(new Error('Barcode is not available.')))
+        .catch((err) => resolve('Barcode is available.'));
     });
   },
 };

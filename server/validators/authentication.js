@@ -33,6 +33,8 @@ const auth = {
       req.check('email', 'This email has already been registered.').isEmailAvailable();
     }
 
+    req.check('barcode', 'This barcode has already been registered.').isBarcodeAvailable();
+
     req.asyncValidationErrors()
       .then(() => next())
       .catch((errors) => res.status(400).json(errors));
