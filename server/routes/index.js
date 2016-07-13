@@ -1,7 +1,7 @@
 const express = require('express');
 
 const controllers = require('../controllers');
-const validators = require('../validators');
+const validators = require('../controllers/validators');
 
 // TODO Use index.js to export router and define sets of routes and router.use.
 const router = express.Router();

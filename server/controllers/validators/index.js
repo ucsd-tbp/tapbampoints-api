@@ -1,6 +1,6 @@
 const users = require('./users');
 const auth = require('./authentication');
-const User = require('../models/User');
+const User = require('../../models/User');
 
 const custom = {
   /**

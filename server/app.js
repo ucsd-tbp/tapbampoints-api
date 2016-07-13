@@ -12,7 +12,7 @@ const validator = require('express-validator');
 const debug = require('debug')('tbp:app');
 
 const routes = require('./routes');
-const validators = require('./validators');
+const validators = require('./controllers/validators');
 
 const app = express();
 
