@@ -19,7 +19,7 @@ router.get('/auth/me', requireAdmin, controllers.auth.currentUser);
 // Other user routes.
 router.get('/users/:id', controllers.users.show);
 router.get('/users', controllers.users.index);
-router.patch('/users/:id', validators.users.update, requireAdmin, controllers.users.update);
+router.patch('/users/:id', requireAdmin, validators.users.update, controllers.users.update);
 router.delete('/users/:id', requireAdmin, controllers.users.delete);
 
 // Event type routes.

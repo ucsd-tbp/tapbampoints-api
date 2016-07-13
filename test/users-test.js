@@ -49,23 +49,95 @@ describe('Users', function() {
       });
     });
 
-    it('updates the user\'s first and last names when logged in', function(done) {
+    it('returns a 400 Bad Request when the first name is empty', function(done) {
+      api.patch('/api/users/1')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ first_name: '', last_name: 'Empty First Name' })
+        .expect(400, [{
+          param: 'first_name',
+          msg: 'Your first name can\'t be empty.',
+          value: '',
+        }], done);
+    });
+
+    it('returns a 400 Bad Request when the last name is empty', function(done) {
+      api.patch('/api/users/1')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ first_name: 'Empty Last Name', last_name: '' })
+        .expect(400, [{
+          param: 'last_name',
+          msg: 'Your last name can\'t be empty.',
+          value: '',
+        }], done);
+    });
+
+    it('returns a 400 Bad Request when the barcode is empty', function(done) {
+      api.patch('/api/users/1')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ barcode: '' })
+        .expect(400, [{
+          param: 'barcode',
+          msg: 'The barcode can\'t be empty.',
+          value: '',
+        }], done);
+    });
+
+    it('returns a 400 Bad Request when the house is not of Red, Green, or Blue', function(done) {
+      api.patch('/api/users/1')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ house: 'Orange' })
+        .expect(400, [{
+          param: 'house',
+          msg: 'The house must be Red, Green, or Blue.',
+          value: 'Orange',
+        }], done);
+    });
+
+    it('returns a 400 Bad Request when the member status is not of Initiate, Member, or Officer', function(done) {
+      api.patch('/api/users/1')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ member_status: 'None' })
+        .expect(400, [{
+          param: 'member_status',
+          msg: 'The member status must be Initiate, Member, or Officer.',
+          value: 'None',
+        }], done);
+    });
+
+    it('updates the user\'s first and last names with valid input', function(done) {
       api.patch('/api/users/1')
         .set('Authorization', `Bearer ${token}`)
         .send({ first_name: 'Updated', last_name: 'Name' })
         .expect({ first_name: 'Updated', last_name: 'Name' }, done);
     });
 
-    it('responds with a 404 Not Found when trying to update a nonexistent user', function(done) {
+    it('responds with a 401 Unauthorized when trying to update a nonexistent user', function(done) {
       api.patch('/api/users/10')
         .set('Authorization', `Bearer ${token}`)
         .send({ first_name: 'NonexistentUserName' })
-        .expect(404, done);
+        .expect(401, { error: 'You can\'t update this user\'s profile.'}, done);
+    });
+
+    it('responds with a 401 Unauthorized when a logged in user tries to update a different user', function(done) {
+      api.post('/api/auth/register')
+        .send({
+          first_name: 'Second',
+          last_name: 'User',
+          barcode: 'barcode2',
+        })
+        .expect(201, function(err, res) {
+          expect(res.body.token).to.exist;
+
+        api.patch('/api/users/1')
+          .set('Authorization', `Bearer ${res.body.token}`)
+          .send({ first_name: 'Updated', last_name: 'Name' })
+          .expect(401, { error: 'You can\'t update this user\'s profile.' }, done);
+        });
     });
   });
 
   describe.skip('DELETE /users/:id', function() {
-    it('responds with 401 Unauthorized ')
+    it('responds with 401 Unauthorized ');
 
     it('responds with a 204 No Content', function(done) {
       api.get('/api/users/2')
@@ -84,6 +156,4 @@ describe('Users', function() {
         .expect(404, { error: 'No records were deleted.' }, done);
     });
   });
-
-
 });

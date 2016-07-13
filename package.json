@@ -8,7 +8,7 @@
     "serve": "NODE_ENV=production node bin/www",
     "resetdb": "cd server/database; knex migrate:rollback; knex migrate:latest; knex seed:run",
     "lint": "eslint server/; exit 0",
-    "test": "NODE_ENV=test mocha --slow 10"
+    "test": "NODE_ENV=test mocha --slow 10 --growl"
   },
   "author": "Brian Tan",
   "license": "MIT",

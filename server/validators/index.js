@@ -32,7 +32,7 @@ const custom = {
       User.where('barcode', barcode)
         .fetch({ require: true })
         .then(() => reject(new Error('Barcode is not available.')))
-        .catch((err) => resolve('Barcode is available.'));
+        .catch(() => resolve('Barcode is available.'));
     });
   },
 };
