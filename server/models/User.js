@@ -8,7 +8,7 @@ const db = require('../database');
 
 const User = db.model('User', {
   tableName: 'users',
-  hidden: ['id', 'password', 'barcode'],
+  hidden: ['id', 'password', 'barcode', 'is_admin'],
   outputVirtuals: false,
 
   virtuals: {
@@ -26,7 +26,7 @@ const User = db.model('User', {
 
   /** Registers event listeners. */
   initialize() {
-    if (this.attributes.password) this.on('creating', this.hashPassword, this);
+    this.on('creating', this.hashPassword);
   },
 
   /**
@@ -40,17 +40,22 @@ const User = db.model('User', {
   },
 
   /**
-   * Event listener that hashes a user's pass when a user is created.
+   * Event listener that hashes a user's password when a user is created.
    *
    * @param {Model} contains attributes that were sent in POST request
    * @return {Promise} resolves to the hash computed from the password
    */
-  hashPassword(user) {
+  hashPassword() {
+    // Avoids hashing the password if the barcode is used to register.
+    if (!this.attributes.password) return;
+
     return new Promise((resolve, reject) => {
-      bcrypt.hash(user.attributes.password, 10, (err, hash) => {
+      bcrypt.hash(this.attributes.password, 10, (err, hash) => {
         if (err) reject(err);
+
         debug(`hashed password: ${hash}`);
-        user.set('password', hash);
+        this.set('password', hash);
+
         resolve(hash);
       });
     });
@@ -65,8 +70,7 @@ const User = db.model('User', {
    * @param  {String} search used to find the desired user to login as, either
    *                         email or barcode
    * @param {String} auth used as a password, either the password or barcode
-   * @return {Promise} Resolves to the ID of the logged in user if pass values
-   *                   matched.
+   * @return {Promise} Resolves to the logged in user if pass values matched.
    */
   login(search, pass) {
     debug(`logging in with ${search.email} and ${pass}`);
@@ -80,7 +84,7 @@ const User = db.model('User', {
           bcrypt.compare(pass, user.get('password'), (err, result) => {
             if (err || !result) return reject(new Error('Password did not match.'));
 
-            resolve(user.id);
+            resolve(user);
           });
         })
         .catch(User.NotFoundError, () => {

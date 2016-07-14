@@ -7,10 +7,29 @@ const debug = require('debug')('tbp:auth');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
-// TODO Add a function for generating registered claims, as per the JWT spec.
-const options = {
-  expiresIn: '2 days',
-};
+/**
+ * Creates registered claims and signs the JWT with claims and the user's admin
+ * status in the payload. Used to return a JWT in the response when registering
+ * or logging in a user.
+ *
+ * @param  {User} user user to create token for
+ * @return {Promise<String>} resolves to newly created token.
+ * @see {@link https://tools.ietf.org/html/rfc7519#section-4.1 the JWT spec concerning claims}
+ */
+function makeJWT(user) {
+  // TODO Generate additional registered claims, as per the JWT spec.
+  const options = {
+    expiresIn: '2 days',
+    subject: user.id.toString(),
+  };
+
+  return new Promise((resolve, reject) => {
+    jwt.sign({ admin: user.is_admin }, process.env.JWT_SECRET, options, (err, token) => {
+      if (err) reject(err);
+      resolve(token);
+    });
+  });
+}
 
 // TODO Add JWT refresh middleware and JWT blacklisting.
 const auth = {
@@ -44,7 +63,7 @@ const auth = {
     jwt.verify(token, process.env.JWT_SECRET, (jwtErr, decoded) => {
       if (jwtErr) return res.status(400).json({ error: jwtErr.message });
 
-      User.where('id', decoded.id)
+      User.where('id', decoded.sub)
         .fetch({ withRelated: ['events'], require: true })
         .then(user => {
           req.user = user;
@@ -65,17 +84,10 @@ const auth = {
    */
   register(req, res) {
     new User().save(req.body)
-      .then(user => {
-        jwt.sign({ id: user.id }, process.env.JWT_SECRET, options, (err, token) => {
-          if (err) return res.status(400).json({ error: err.message });
-
-          debug(`successfully registered user with id ${user.id}`);
-
-          res.status(201).json({ token });
-        });
-      })
+      .then(makeJWT)
+      .then(token => res.status(201).json({ token }))
       .catch(User.NoRowsUpdatedError, () => res.status(400).json({ error: 'User was not saved!' }))
-      .catch((err) => res.status(400).json({ error: err.message }));
+      .catch(err => res.status(400).json({ error: err.message }));
   },
 
   /**
@@ -93,13 +105,8 @@ const auth = {
     const pass = req.body.password;
 
     new User().login(search, pass)
-      .then(id => {
-        debug(`signing JWT with id ${id}`);
-        jwt.sign({ id }, process.env.JWT_SECRET, options, (err, token) => {
-          if (err) return res.status(400).json({ error: err.message });
-          res.json({ token });
-        });
-      })
+      .then(makeJWT)
+      .then(token => res.json({ token }))
       .catch((err) => res.status(401).json({ error: err.message }));
   },
 

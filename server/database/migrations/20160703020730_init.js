@@ -10,6 +10,7 @@ exports.up = (knex, Promise) =>
     table.string('first_name').defaultTo('').notNullable();
     table.string('last_name').defaultTo('').notNullable();
     table.string('barcode').unique().notNullable();
+    table.boolean('is_admin').defaultTo(false).notNullable();
     table.enu('house', ['Red', 'Green', 'Blue', 'None']).defaultTo('None').notNullable();
     table.enu('member_status', ['Initiate', 'Member', 'Officer']).defaultTo('Initiate')
           .notNullable();

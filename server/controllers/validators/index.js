@@ -1,5 +1,7 @@
+/** @file Defines custom validators for use in other controller validations. */
+
 const users = require('./users');
-const auth = require('./authentication');
+const auth = require('./auth');
 const User = require('../../models/User');
 
 const custom = {
@@ -22,7 +24,7 @@ const custom = {
 
   /**
    * Checks whether a barcode has already been taken, similar to
-   * {%link #isEmailAvailable}.
+   * {@link #isEmailAvailable}.
    *
    * @param  {String}  barcode barcode to check existence of
    * @return {Promise<User>} resolves when barcode was not found
