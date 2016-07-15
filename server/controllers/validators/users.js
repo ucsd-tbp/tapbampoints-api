@@ -44,11 +44,6 @@ const users = {
     const errors = req.validationErrors();
     if (errors) return res.status(400).json(errors);
 
-    // Allows currently logged in users to only update their own profiles.
-    if (req.user.id !== parseInt(req.params.id, 10)) {
-      return res.status(401).json({ error: 'You can\'t update this user\'s profile.' });
-    }
-
     next();
   },
 };

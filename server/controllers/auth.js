@@ -12,6 +12,7 @@ const User = require('../models/User');
  * status in the payload. Used to return a JWT in the response when registering
  * or logging in a user.
  *
+ * @private
  * @param  {User} user user to create token for
  * @return {Promise<String>} resolves to newly created token.
  * @see {@link https://tools.ietf.org/html/rfc7519#section-4.1 the JWT spec concerning claims}
@@ -69,7 +70,7 @@ const auth = {
           req.user = user;
           next();
         })
-        .catch((err) => res.status(400).json({ error: err.message }));
+        .catch(err => res.status(400).json({ error: err.message }));
     });
   },
 
@@ -107,7 +108,7 @@ const auth = {
     new User().login(search, pass)
       .then(makeJWT)
       .then(token => res.json({ token }))
-      .catch((err) => res.status(401).json({ error: err.message }));
+      .catch(err => res.status(401).json({ error: err.message }));
   },
 
   /**

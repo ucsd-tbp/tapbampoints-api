@@ -115,7 +115,7 @@ describe('Users', function() {
       api.patch('/api/users/10')
         .set('Authorization', `Bearer ${token}`)
         .send({ first_name: 'NonexistentUserName' })
-        .expect(401, { error: 'You can\'t update this user\'s profile.'}, done);
+        .expect(401, { error: 'Not authorized to access this route.'}, done);
     });
 
     it('responds with a 401 Unauthorized when a logged in user tries to update a different user', function(done) {
@@ -131,7 +131,7 @@ describe('Users', function() {
         api.patch('/api/users/1')
           .set('Authorization', `Bearer ${res.body.token}`)
           .send({ first_name: 'Updated', last_name: 'Name' })
-          .expect(401, { error: 'You can\'t update this user\'s profile.' }, done);
+          .expect(401, { error: 'Not authorized to access this route.' }, done);
         });
     });
   });
