@@ -27,6 +27,7 @@ const User = db.model('User', {
   /** Registers event listeners. */
   initialize() {
     this.on('creating', this.hashPassword);
+    // TODO Register listener that prevents mass assignment.
   },
 
   /**
@@ -62,28 +63,47 @@ const User = db.model('User', {
   },
 
   /**
-   * Logs a user in given a search field for finding the desired user to login
-   * as and an authentication field to use as a password. Users can login with
-   * just the barcode as both the search and auth field, or an email as the
-   * search field and their password as the auth field.
+   * Logs in a user by searching for the user given a set of credentials. Users
+   * can login with an email and password, or with just the barcode only if
+   * their email and password have not yet been set. Both these options
+   * corresponds to a credentials set.
    *
-   * @param  {String} search used to find the desired user to login as, either
-   *                         email or barcode
-   * @param {String} auth used as a password, either the password or barcode
-   * @return {Promise} Resolves to the logged in user if pass values matched.
+   * Logging in with just a barcode:
+   * credentials = { key: 'barcode', search: barcodeValue, pass: undefined }
+   *
+   * Logging in with an email and password combination:
+   * credentials = { key: 'email', search: emailValue, pass: passwordValue }
+   *
+   * @param  {Object} credentials an object containing properties key, search, and pass.
+   * @return {Promise<User>} resolves to newly logged in user if login was
+   *                         successful.
    */
-  login(search, pass) {
-    debug(`logging in with ${search.email} and ${pass}`);
-
+  login(credentials) {
     return new Promise((resolve, reject) => {
-      User.where(search)
+      User.where(credentials.key, credentials.search)
         .fetch({ require: true })
         .then(user => {
-          debug(`plaintext [${pass}] hashed [${user.get('password')}]`);
+          if (credentials.key === 'barcode') {
+            // Login fails if users with non-empty email and password fields
+            // try to login with just their barcode.
+            if (user.is_registered) {
+              return reject(
+                new Error('Login via barcode is disabled with a registered email and password.')
+              );
+            }
 
-          bcrypt.compare(pass, user.get('password'), (err, result) => {
-            if (err || !result) return reject(new Error('Password did not match.'));
+            // Logging in with just the barcode is valid provided the user has
+            // not registered an email and password.
+            return resolve(user);
+          }
 
+          debug(`plaintext [${credentials.pass}] hashed [${user.get('password')}]`);
+
+          // If not logging in by barcode, then the user is logging in with
+          // both email and password, so checks for password correctness.
+          bcrypt.compare(credentials.pass, user.get('password'), (err, result) => {
+            if (err) return reject(err);
+            if (!result) return reject(new Error('Password did not match.'));
             resolve(user);
           });
         })

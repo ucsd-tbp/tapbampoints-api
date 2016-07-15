@@ -5,7 +5,7 @@ const api = require('supertest')(app);
 
 const { migrateWithTestUser, rollback } = require('./helpers');
 
-// TODO Speed up tests by not mgirating and rolling back between each it block.
+// TODO Speed up tests by not migrating and rolling back between each it block.
 describe('Authentication', function() {
   describe('token verification middleware', function() {
     before(migrateWithTestUser);
@@ -24,7 +24,7 @@ describe('Authentication', function() {
         }, done);
     });
 
-    it('returns the currently logged in user with a valid token', function(done) {
+    it('returns a token when logging in a registered user with a valid email and password', function(done) {
       let token = null;
 
       api.post('/api/auth/login')
@@ -192,7 +192,6 @@ describe('Authentication', function() {
           barcode: 'barcode2',
         })
         .expect(201, function(err, res) {
-
           api.post('/api/auth/register')
             .send({
               first_name: 'Duplicate',
@@ -233,8 +232,17 @@ describe('Authentication', function() {
   });
 
   describe.skip('POST /auth/login', function() {
-    it('returns a 400 Bad Request a registered user tries to login with a barcode');
-    it('returns a 400 Bad Request if an email, password, and barcode are all provided');
+    it('returns a 400 Bad Request when the passwords do not match');
+
+    it('returns a 404 Not Found when the user with the given email could not be found');
+    it('returns a 404 Not Found when the user with the given barcode could not be found');
+
+    it('returns a 400 Bad Request when trying to login with email, password, and barcode all present in request body');
+    it('returns a 400 Bad Request when trying to login with an email and barcode present in request body');
+    it('returns a 400 Bad Request when trying to login with a password and barcode present in request body');
+
+    it('returns a 400 Bad Request when trying to login with a barcode when a user has a registered email and password');
+    it('returns a token when logging in a non-registered user with just the barcode');
 
     it('returns a 401 Unauthorized if the password was incorrect', function(done) {
       api.post('/api/auth/login')

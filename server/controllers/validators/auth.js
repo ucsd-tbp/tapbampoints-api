@@ -3,6 +3,7 @@
 const debug = require('debug')('tbp:auth-validator');
 
 const auth = {
+  /** Validates POST requests to /auth/register. */
   register(req, res, next) {
     debug('firing auth.register validation middleware');
 
@@ -13,7 +14,7 @@ const auth = {
       },
     });
 
-    // Checks that if either an email or password is specified, then both hte
+    // Checks that if either an email or password is specified, then both the
     // email and password must exist.
     if (req.body.email || req.body.password) {
       req.checkBody({
@@ -38,6 +39,24 @@ const auth = {
     req.asyncValidationErrors()
       .then(() => next())
       .catch((errors) => res.status(400).json(errors));
+  },
+
+  /** Validates POST requests to /auth/login. */
+  login(req, res, next) {
+    debug('firing auth.login validation middleware');
+
+    // Users can only login with just the barcode, or with an email and password
+    // combination.
+    if (req.body.barcode && (req.body.email || req.body.password)) {
+      return res.status(400).json({
+        error: 'Login is only allowed via barcode, or via an email and password combination.',
+      });
+    }
+
+    const errors = req.validationErrors();
+    if (errors) return res.status(400).json(errors);
+
+    next();
   },
 };
 

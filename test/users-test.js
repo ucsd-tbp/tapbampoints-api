@@ -104,6 +104,9 @@ describe('Users', function() {
         }], done);
     });
 
+    it('returns a 400 Bad Request when trying to update the is_admin field');
+    it('returns a 400 Bad Request when trying to update the id field');
+
     it('updates the user\'s first and last names with valid input', function(done) {
       api.patch('/api/users/1')
         .set('Authorization', `Bearer ${token}`)

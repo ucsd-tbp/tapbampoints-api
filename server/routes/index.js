@@ -35,7 +35,7 @@ const requireOwner = [
 
 // Authentication routes.
 router.post('/auth/register', validators.auth.register, controllers.auth.register);
-router.post('/auth/login', controllers.auth.login);
+router.post('/auth/login', validators.auth.login, controllers.auth.login);
 router.get('/auth/me', controllers.auth.verify, controllers.auth.currentUser);
 
 // Other user routes.

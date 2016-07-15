@@ -21,4 +21,5 @@ db.plugin('visibility');
 // Allows defining of virtual properties.
 db.plugin('virtuals');
 
+// TODO Add a model for attendance records.
 module.exports = db;

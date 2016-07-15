@@ -1,4 +1,4 @@
-*Still a work in progress! Working on documentation, JWT authentication, permission groups, tests, and eventually some front-end framework.*
+*Still a work in progress! Working on documentation, tests, and eventually some front-end framework.*
 
 ### Overview
 

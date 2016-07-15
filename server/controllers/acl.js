@@ -18,8 +18,7 @@ const acl = {
             if (req.user.is_admin) return next();
             break;
           case 'owner':
-            // TODO Add a check for resources that the user creates where the
-            // ID in the URL doesn't match the user's ID but is still valid.
+            // TODO Add a check for resources that the user creates.
             if (req.user.id === parseInt(req.params.id, 10)) return next();
             break;
           default:

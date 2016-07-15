@@ -101,11 +101,13 @@ const auth = {
    * @param  {Response} res HTTP response containing the generated token
    */
   login(req, res) {
-    // TODO Add validation for email/password vs. barcode hash bodies.
-    const search = { email: req.body.email };
-    const pass = req.body.password;
+    const credentials = {
+      key: req.body.barcode ? 'barcode' : 'email',
+      search: req.body.barcode ? req.body.barcode : req.body.email,
+      pass: req.body.barcode ? undefined : req.body.password,
+    };
 
-    new User().login(search, pass)
+    new User().login(credentials)
       .then(makeJWT)
       .then(token => res.json({ token }))
       .catch(err => res.status(401).json({ error: err.message }));

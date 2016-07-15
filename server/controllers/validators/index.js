@@ -4,6 +4,7 @@ const users = require('./users');
 const auth = require('./auth');
 const User = require('../../models/User');
 
+// TODO Define custom error class for custom validation errors.
 const custom = {
   /**
    * Checks whether an email has already been taken. Resolves when a user with
