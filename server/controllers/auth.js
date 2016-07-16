@@ -99,6 +99,7 @@ const auth = {
    * @param  {Request} req HTTP request, must contain either a barcode hash or
    *                   an email and password pair
    * @param  {Response} res HTTP response containing the generated token
+   * @see User#login
    */
   login(req, res) {
     const credentials = {
@@ -110,6 +111,10 @@ const auth = {
     new User().login(credentials)
       .then(makeJWT)
       .then(token => res.json({ token }))
+      .catch(User.NotFoundError, () =>
+        res.status(404).json({
+          error: `An account with that ${credentials.key} has not been registered.`,
+        }))
       .catch(err => res.status(401).json({ error: err.message }));
   },
 

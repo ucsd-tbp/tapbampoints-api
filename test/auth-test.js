@@ -231,29 +231,77 @@ describe('Authentication', function() {
     });
   });
 
-  describe.skip('POST /auth/login', function() {
-    it('returns a 400 Bad Request when the passwords do not match');
+  describe('POST /auth/login', function() {
+    before(migrateWithTestUser);
+    after(rollback);
 
-    it('returns a 404 Not Found when the user with the given email could not be found');
-    it('returns a 404 Not Found when the user with the given barcode could not be found');
+    it('returns a 400 Bad Request when trying to login with email, password, and barcode all present in request body', function(done) {
+      api.post('/api/auth/login')
+        .send({ email: 'test@test.com', password: 'password', barcode: 'barcode1' })
+        .expect(400, {
+          error: 'Login is only allowed via barcode, or via an email and password combination.'
+        }, done);
+    });
 
-    it('returns a 400 Bad Request when trying to login with email, password, and barcode all present in request body');
-    it('returns a 400 Bad Request when trying to login with an email and barcode present in request body');
-    it('returns a 400 Bad Request when trying to login with a password and barcode present in request body');
+    it('returns a 400 Bad Request when trying to login with an email and barcode present in request body', function(done) {
+      api.post('/api/auth/login')
+        .send({ email: 'test@test.com', barcode: 'barcode1' })
+        .expect(400, {
+          error: 'Login is only allowed via barcode, or via an email and password combination.'
+        }, done);
+    });
 
-    it('returns a 400 Bad Request when trying to login with a barcode when a user has a registered email and password');
-    it('returns a token when logging in a non-registered user with just the barcode');
+    it('returns a 400 Bad Request when trying to login with a password and barcode present in request body', function(done) {
+      api.post('/api/auth/login')
+        .send({ password: 'password', barcode: 'barcode1' })
+        .expect(400, {
+          error: 'Login is only allowed via barcode, or via an email and password combination.'
+        }, done);
+    });
+
+    it('returns a 400 Bad Request when trying to login with a barcode when a user has a registered email and password', function(done) {
+      api.post('/api/auth/login')
+        .send({ barcode: 'barcode1' })
+        .expect(401, {
+          error: 'Login via barcode is disabled with a registered email and password.'
+        }, done);
+    });
+
+    it('returns a token when logging in a non-registered user with just the barcode', function(done) {
+      api.post('/api/auth/register')
+        .send({
+          first_name: 'New',
+          last_name: 'User with just barcode',
+          barcode: 'barcode2',
+        })
+        .expect(201, function(err, res) {
+          expect(res.body.token).to.exist;
+
+          api.post('/api/auth/login')
+            .send({ barcode: 'barcode2' })
+            .expect(200, function(err, res) {
+              expect(res.body.token).to.exist;
+              done();
+            });
+        });
+    });
 
     it('returns a 401 Unauthorized if the password was incorrect', function(done) {
       api.post('/api/auth/login')
         .send({ email: 'test@test.com', password: 'wrongpassword' })
-        .expect(401, { error: 'Password did not match.' }, done);
+        .expect(401, { error: 'The email and password entered don\'t match.' }, done);
     });
 
-    it('returns a 401 Unauthorized if a user with the given email does not exist', function(done) {
+    it('returns a 404 Not Found if a user with the given email does not exist', function(done) {
       api.post('/api/auth/login')
         .send({ email: 'nonexistentuser@test.com', password: 'password' })
-        .expect(401, { error: 'Couldn\'t find a user with the given email.' }, done);
+        .expect(404, { error: 'An account with that email has not been registered.' }, done);
+    });
+
+    it('returns a 404 Not Found if a user with the given barcode does not exist', function(done) {
+      api.post('/api/auth/login')
+        .send({ barcode: 'nonexistentbarcode' })
+        .expect(404, { error: 'An account with that barcode has not been registered.' }, done);
     });
 
     it('returns a 200 OK when logging in with valid credentials', function(done) {

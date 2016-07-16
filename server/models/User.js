@@ -79,10 +79,10 @@ const User = db.model('User', {
    *                         successful.
    */
   login(credentials) {
-    return new Promise((resolve, reject) => {
-      User.where(credentials.key, credentials.search)
-        .fetch({ require: true })
-        .then(user => {
+    return User.where(credentials.key, credentials.search)
+      .fetch({ require: true })
+      .then(user =>
+        new Promise((resolve, reject) => {
           if (credentials.key === 'barcode') {
             // Login fails if users with non-empty email and password fields
             // try to login with just their barcode.
@@ -97,20 +97,16 @@ const User = db.model('User', {
             return resolve(user);
           }
 
-          debug(`plaintext [${credentials.pass}] hashed [${user.get('password')}]`);
-
           // If not logging in by barcode, then the user is logging in with
           // both email and password, so checks for password correctness.
           bcrypt.compare(credentials.pass, user.get('password'), (err, result) => {
             if (err) return reject(err);
-            if (!result) return reject(new Error('Password did not match.'));
+            if (!result) return reject(new Error('The email and password entered don\'t match.'));
+
             resolve(user);
           });
         })
-        .catch(User.NotFoundError, () => {
-          reject(new Error('Couldn\'t find a user with the given email.'));
-        });
-    });
+      );
   },
 });
 
