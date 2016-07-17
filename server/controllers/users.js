@@ -40,8 +40,9 @@ const users = {
       .save(req.body, { patch: true })
       .then(user => res.json(user.toJSON()))
       .catch(User.NoRowsUpdatedError, () =>
-        res.status(404).json({ error: 'No records were updated.' })
-      );
+        res.status(404).json({ error: 'User could not be updated.' })
+      )
+      .catch(err => res.status(400).json({ error: err.message }));
   },
 
   /**

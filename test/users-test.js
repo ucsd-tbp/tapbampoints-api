@@ -104,8 +104,18 @@ describe('Users', function() {
         }], done);
     });
 
-    it('does not update the is_admin field');
-    it('does not update the id field');
+    it('does not update the is_admin field', function(done) {
+      api.patch('/api/users/1')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ first_name: 'Updated', is_admin: true })
+        .expect(400, { error: 'Couldn\'t save model! Attributes are invalid.' }, done);
+    });
+    it('does not update the id field', function(done) {
+      api.patch('/api/users/1')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ first_name: 'Updated', id: true })
+        .expect(400, { error: 'Couldn\'t save model! Attributes are invalid.' }, done);
+    });
 
     it('updates the user\'s first and last names with valid input', function(done) {
       api.patch('/api/users/1')

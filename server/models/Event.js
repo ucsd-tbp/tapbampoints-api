@@ -5,6 +5,10 @@ const db = require('../database');
 const Event = db.model('Event', {
   tableName: 'events',
 
+  hidden: ['id'],
+
+  fillable: ['name', 'description', 'points', 'officer', 'type_id'],
+
   /**
    * Creates many-to-many relation with users through attendance_records as an
    * intermediary table.

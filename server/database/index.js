@@ -21,8 +21,8 @@ db.plugin('visibility');
 // Allows defining of virtual properties.
 db.plugin('virtuals');
 
-// Adds fillable and hidden option properties for mass-assignment prevention.
-db.plugin(require('./plugins/mass-assignment'));
+// Provides fillable and guarded properties for mass-assignment protection.
+db.plugin('bookshelf-mass-assignment');
 
 // TODO Add a model for attendance records.
 module.exports = db;

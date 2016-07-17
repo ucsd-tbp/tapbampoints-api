@@ -5,6 +5,10 @@ const db = require('../database');
 const EventType = db.model('EventType', {
   tableName: 'event_types',
 
+  hidden: ['id'],
+
+  fillable: ['name', 'description'],
+
   /**
    * Creates one-to-many relation between event types and events.
    * @return {Collection<Event>} Events associated with this event type.
