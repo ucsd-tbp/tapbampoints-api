@@ -1,0 +1,17 @@
+language: node_js
+node_js:
+  - "6"
+env:
+  - CXX=g++-4.8 DB_HOST=127.0.0.1 DB_USER=travis TEST_DB_NAME=test JWT_SECRET=secret
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-4.8
+services:
+  - mysql
+before_install:
+  - mysql -e "create database IF NOT EXISTS test;" -uroot
+notifications:
+  email: false

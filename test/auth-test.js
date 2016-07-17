@@ -20,8 +20,8 @@ describe('Authentication', function() {
       api.get('/api/auth/me')
         .set('Authorization', 'Token')
         .expect(400, {
-          error: `Incorrect authentication scheme.
-                  Required format: "Authorization: Bearer {token}".`,
+          error: 'Incorrect authentication scheme. ' +
+                 'Required format: "Authorization: Bearer {token}".',
         }, done);
     });
 

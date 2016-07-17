@@ -1,10 +1,12 @@
-*Still a work in progress! Working on documentation, tests, and eventually some front-end framework.*
+## tapbampoints
 
-### Overview
+[![Build Status](https://travis-ci.org/ucsd-tbp/tapbampoints-api.svg?branch=master)](https://travis-ci.org/ucsd-tbp/tapbampoints-api)
 
 This project is an API written in Node.js for keeping track of event attendance between members and initiates at UCSD TBP. The API uses the [Express framework](http://expressjs.com) along with [Bookshelf](http://bookshelfjs.org) as an ORM for a familiar MVC structure to help with code maintainability.
 
-### Development Setup
+*Still a work in progress! Working on documentation, tests, and integrating some front-end framework.*
+
+### Setup
 
 Install the latest version of [Node.js](https://nodejs.org/en/).
 
