@@ -1,5 +1,9 @@
 {
     "extends": "airbnb",
+    "env": {
+      "node": true,
+      "es6": true
+    },
     "rules": {
         "new-cap": ["error", { "capIsNewExceptions": ["Router"] }],
         "no-unused-vars": ["error", { "argsIgnorePattern": "^Promise$" }],

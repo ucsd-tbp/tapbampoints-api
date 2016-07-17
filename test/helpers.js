@@ -7,16 +7,16 @@ const config = { directory: 'server/database/migrations' };
 const helpers = {
   migrateWithTestUser(done) {
     return knex.migrate.latest(config)
-      .then(() => {
-        return knex('users').insert({
+      .then(() =>
+        knex('users').insert({
           id: 1,
           first_name: 'Test',
           last_name: 'User',
           email: 'test@test.com',
           password: bcrypt.hashSync('password', 0),
           barcode: 'barcode1',
-        });
-      })
+        })
+      )
       .then(() => done());
   },
 
@@ -24,6 +24,6 @@ const helpers = {
     knex.migrate.rollback(config)
       .then(() => done());
   },
-}
+};
 
 module.exports = helpers;

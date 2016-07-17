@@ -1,6 +1,6 @@
 const expect = require('chai').expect;
 
-const app = require('../server/app')
+const app = require('../server/app');
 const api = require('supertest')(app);
 
 const { migrateWithTestUser, rollback } = require('./helpers');
@@ -93,16 +93,17 @@ describe('Users', function() {
         }], done);
     });
 
-    it('returns a 400 Bad Request when the member status is not of Initiate, Member, or Officer', function(done) {
-      api.patch('/api/users/1')
-        .set('Authorization', `Bearer ${token}`)
-        .send({ member_status: 'None' })
-        .expect(400, [{
-          param: 'member_status',
-          msg: 'The member status must be Initiate, Member, or Officer.',
-          value: 'None',
-        }], done);
-    });
+    it('returns a 400 Bad Request when the member status is not of Initiate, Member, or Officer',
+      function(done) {
+        api.patch('/api/users/1')
+          .set('Authorization', `Bearer ${token}`)
+          .send({ member_status: 'None' })
+          .expect(400, [{
+            param: 'member_status',
+            msg: 'The member status must be Initiate, Member, or Officer.',
+            value: 'None',
+          }], done);
+      });
 
     it('does not update the is_admin field', function(done) {
       api.patch('/api/users/1')
@@ -128,25 +129,26 @@ describe('Users', function() {
       api.patch('/api/users/10')
         .set('Authorization', `Bearer ${token}`)
         .send({ first_name: 'NonexistentUserName' })
-        .expect(401, { error: 'Not authorized to access this route.'}, done);
+        .expect(401, { error: 'Not authorized to access this route.' }, done);
     });
 
-    it('responds with a 401 Unauthorized when a logged in user tries to update a different user', function(done) {
-      api.post('/api/auth/register')
-        .send({
-          first_name: 'Second',
-          last_name: 'User',
-          barcode: 'barcode2',
-        })
-        .expect(201, function(err, res) {
-          expect(res.body.token).to.exist;
+    it('responds with a 401 Unauthorized when a logged in user tries to update a different user',
+      function(done) {
+        api.post('/api/auth/register')
+          .send({
+            first_name: 'Second',
+            last_name: 'User',
+            barcode: 'barcode2',
+          })
+          .expect(201, function(err, res) {
+            expect(res.body.token).to.exist;
 
-        api.patch('/api/users/1')
-          .set('Authorization', `Bearer ${res.body.token}`)
-          .send({ first_name: 'Updated', last_name: 'Name' })
-          .expect(401, { error: 'Not authorized to access this route.' }, done);
-        });
-    });
+            api.patch('/api/users/1')
+              .set('Authorization', `Bearer ${res.body.token}`)
+              .send({ first_name: 'Updated', last_name: 'Name' })
+              .expect(401, { error: 'Not authorized to access this route.' }, done);
+          });
+      });
   });
 
   describe.skip('DELETE /users/:id', function() {

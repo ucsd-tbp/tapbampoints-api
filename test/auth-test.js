@@ -1,6 +1,6 @@
 const expect = require('chai').expect;
 
-const app = require('../server/app')
+const app = require('../server/app');
 const api = require('supertest')(app);
 
 const { migrateWithTestUser, rollback } = require('./helpers');
@@ -20,35 +20,37 @@ describe('Authentication', function() {
       api.get('/api/auth/me')
         .set('Authorization', 'Token')
         .expect(400, {
-          error: 'Incorrect authentication scheme. Required format: "Authorization: Bearer {token}".',
+          error: `Incorrect authentication scheme.
+                  Required format: "Authorization: Bearer {token}".`,
         }, done);
     });
 
-    it('returns a token when logging in a registered user with a valid email and password', function(done) {
-      let token = null;
+    it('returns a token when logging in a registered user with a valid email and password',
+      function(done) {
+        let token = null;
 
-      api.post('/api/auth/login')
-        .set('Accept', 'application/json')
-        .expect('Content-Type', 'application/json; charset=utf-8')
-        .send({
-          email: 'test@test.com',
-          password: 'password',
-        })
-        .end(function(err, res) {
-          token = res.body.token;
+        api.post('/api/auth/login')
+          .set('Accept', 'application/json')
+          .expect('Content-Type', 'application/json; charset=utf-8')
+          .send({
+            email: 'test@test.com',
+            password: 'password',
+          })
+          .end(function(err, res) {
+            token = res.body.token;
 
-          api.get('/api/auth/me')
-            .set('Authorization', `Bearer ${token}`)
-            .expect(200, {
-              email: 'test@test.com',
-              first_name: 'Test',
-              last_name: 'User',
-              house: 'None',
-              member_status: 'Initiate',
-              events: [],
-            }, done);
-        });
-    });
+            api.get('/api/auth/me')
+              .set('Authorization', `Bearer ${token}`)
+              .expect(200, {
+                email: 'test@test.com',
+                first_name: 'Test',
+                last_name: 'User',
+                house: 'None',
+                member_status: 'Initiate',
+                events: [],
+              }, done);
+          });
+      });
   });
 
   describe('POST /auth/register', function() {
@@ -133,31 +135,32 @@ describe('Authentication', function() {
         }], done);
     });
 
-    it('returns a 201 Created and a token given a valid email, password, and barcode', function(done) {
-      api.post('/api/auth/register')
-        .send({
-          first_name: 'New',
-          last_name: 'User',
-          email: 'newuser@test.com',
-          password: 'password',
-          barcode: 'barcode2',
-          house: 'Red',
-          member_status: 'Member',
-        })
-        .expect(201, function(err, res) {
-          expect(res.body.token).to.exist;
+    it('returns a 201 Created and a token given a valid email, password, and barcode',
+      function(done) {
+        api.post('/api/auth/register')
+          .send({
+            first_name: 'New',
+            last_name: 'User',
+            email: 'newuser@test.com',
+            password: 'password',
+            barcode: 'barcode2',
+            house: 'Red',
+            member_status: 'Member',
+          })
+          .expect(201, function(err, res) {
+            expect(res.body.token).to.exist;
 
-          api.get('/api/users/2')
-            .expect(200, {
-              first_name: 'New',
-              last_name: 'User',
-              email: 'newuser@test.com',
-              house: 'Red',
-              member_status: 'Member',
-              events: [],
-            }, done);
-        });
-    });
+            api.get('/api/users/2')
+              .expect(200, {
+                first_name: 'New',
+                last_name: 'User',
+                email: 'newuser@test.com',
+                house: 'Red',
+                member_status: 'Member',
+                events: [],
+              }, done);
+          });
+      });
 
     it('returns a 201 Created when registering with just the barcode', function(done) {
       api.post('/api/auth/register')
@@ -191,7 +194,7 @@ describe('Authentication', function() {
           password: 'password',
           barcode: 'barcode2',
         })
-        .expect(201, function(err, res) {
+        .expect(201, function() {
           api.post('/api/auth/register')
             .send({
               first_name: 'Duplicate',
@@ -208,83 +211,92 @@ describe('Authentication', function() {
         });
     });
 
-    it('returns a 400 Bad Request if a user with a duplicate barcode is registered', function(done) {
-      api.post('/api/auth/register')
-        .send({
-          first_name: 'Unique Barcode',
-          last_name: 'User',
-          barcode: 'barcode2',
-        })
-        .expect(201, function(err, res) {
-          api.post('/api/auth/register')
-            .send({
-              first_name: 'Duplicate Barcode',
-              last_name: 'User',
-              barcode: 'barcode2',
-            })
-            .expect(400, [{
-              param: 'barcode',
-              msg: 'This barcode has already been registered.',
-              value: 'barcode2',
-            }], done);
-        });
-    });
+    it('returns a 400 Bad Request if a user with a duplicate barcode is registered',
+      function(done) {
+        api.post('/api/auth/register')
+          .send({
+            first_name: 'Unique Barcode',
+            last_name: 'User',
+            barcode: 'barcode2',
+          })
+          .expect(201, function() {
+            api.post('/api/auth/register')
+              .send({
+                first_name: 'Duplicate Barcode',
+                last_name: 'User',
+                barcode: 'barcode2',
+              })
+              .expect(400, [{
+                param: 'barcode',
+                msg: 'This barcode has already been registered.',
+                value: 'barcode2',
+              }], done);
+          });
+      });
   });
 
   describe('POST /auth/login', function() {
     before(migrateWithTestUser);
     after(rollback);
 
-    it('returns a 400 Bad Request when trying to login with email, password, and barcode all present in request body', function(done) {
-      api.post('/api/auth/login')
-        .send({ email: 'test@test.com', password: 'password', barcode: 'barcode1' })
-        .expect(400, {
-          error: 'Login is only allowed via barcode, or via an email and password combination.'
-        }, done);
-    });
+    it(`returns a 400 Bad Request when trying to login with email, password, and barcode
+        all present in request body`,
+      function(done) {
+        api.post('/api/auth/login')
+          .send({ email: 'test@test.com', password: 'password', barcode: 'barcode1' })
+          .expect(400, {
+            error: 'Login is only allowed via barcode, or via an email and password combination.',
+          }, done);
+      });
 
-    it('returns a 400 Bad Request when trying to login with an email and barcode present in request body', function(done) {
-      api.post('/api/auth/login')
-        .send({ email: 'test@test.com', barcode: 'barcode1' })
-        .expect(400, {
-          error: 'Login is only allowed via barcode, or via an email and password combination.'
-        }, done);
-    });
+    it(`returns a 400 Bad Request when trying to login with an email and barcode present in request
+        body`,
+      function(done) {
+        api.post('/api/auth/login')
+          .send({ email: 'test@test.com', barcode: 'barcode1' })
+          .expect(400, {
+            error: 'Login is only allowed via barcode, or via an email and password combination.',
+          }, done);
+      });
 
-    it('returns a 400 Bad Request when trying to login with a password and barcode present in request body', function(done) {
-      api.post('/api/auth/login')
-        .send({ password: 'password', barcode: 'barcode1' })
-        .expect(400, {
-          error: 'Login is only allowed via barcode, or via an email and password combination.'
-        }, done);
-    });
+    it(`returns a 400 Bad Request when trying to login with a password and barcode present in
+        request body`,
+      function(done) {
+        api.post('/api/auth/login')
+          .send({ password: 'password', barcode: 'barcode1' })
+          .expect(400, {
+            error: 'Login is only allowed via barcode, or via an email and password combination.',
+          }, done);
+      });
 
-    it('returns a 400 Bad Request when trying to login with a barcode when a user has a registered email and password', function(done) {
+    it(`returns a 400 Bad Request when trying to login with a barcode when a user has a registered
+        email and password`, function(done) {
       api.post('/api/auth/login')
         .send({ barcode: 'barcode1' })
         .expect(401, {
-          error: 'Login via barcode is disabled with a registered email and password.'
+          error: 'Login via barcode is disabled with a registered email and password.',
         }, done);
     });
 
-    it('returns a token when logging in a non-registered user with just the barcode', function(done) {
-      api.post('/api/auth/register')
-        .send({
-          first_name: 'New',
-          last_name: 'User with just barcode',
-          barcode: 'barcode2',
-        })
-        .expect(201, function(err, res) {
-          expect(res.body.token).to.exist;
+    it('returns a token when logging in a non-registered user with just the barcode',
+      function(done) {
+        api.post('/api/auth/register')
+          .send({
+            first_name: 'New',
+            last_name: 'User with just barcode',
+            barcode: 'barcode2',
+          })
+          .expect(201, function(err, res) {
+            expect(res.body.token).to.exist;
 
-          api.post('/api/auth/login')
-            .send({ barcode: 'barcode2' })
-            .expect(200, function(err, res) {
-              expect(res.body.token).to.exist;
-              done();
-            });
-        });
-    });
+            api.post('/api/auth/login')
+              .send({ barcode: 'barcode2' })
+              .expect(200, function(loginErr, loginRes) {
+                expect(loginRes.body.token).to.exist;
+                done();
+              });
+          });
+      });
 
     it('returns a 401 Unauthorized if the password was incorrect', function(done) {
       api.post('/api/auth/login')

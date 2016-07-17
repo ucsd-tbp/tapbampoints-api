@@ -1,6 +1,3 @@
-const request = require('supertest')(`http://localhost:${process.env.PORT}/api`);
-const should = require('chai').should();
-
 describe('Events', function() {
   describe('GET /events', function() {
     it('returns a list of events');
@@ -14,7 +11,7 @@ describe('Events', function() {
 
   describe('PATCH /events/:id', function() {
     it('updates the event\'s title and description');
-    it('updates the event\'s type')
+    it('updates the event\'s type');
     it('responds with a 404 NOT FOUND with a nonexistent ID');
   });
 });

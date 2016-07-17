@@ -1,4 +1,4 @@
-exports.up = (knex, Promise) =>
+exports.up = knex =>
   // Users table, including house and member status.
   knex.schema.createTable('users', table => {
     table.increments('id').primary();
@@ -54,7 +54,7 @@ exports.up = (knex, Promise) =>
           .notNullable();
   });
 
-exports.down = (knex, Promise) =>
+exports.down = knex =>
   knex.schema.dropTable('attendance_records')
               .dropTable('events')
               .dropTable('event_types')

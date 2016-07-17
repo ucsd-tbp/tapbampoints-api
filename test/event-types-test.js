@@ -1,6 +1,3 @@
-const request = require('supertest')(`http://localhost:${process.env.PORT}/api`);
-const should = require('chai').should();
-
 describe('Event Types', function() {
   describe('GET /event-types', function() {
     it('returns a list of event types');
@@ -12,7 +9,7 @@ describe('Event Types', function() {
   });
 
   describe('POST /event-types', function() {
-    it('responds with a 201 CREATED')
+    it('responds with a 201 CREATED');
     it('creates a new event-type');
   });
 
