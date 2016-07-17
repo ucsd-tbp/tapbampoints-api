@@ -1,5 +1,7 @@
 /** @file Defines User model. */
 
+// TODO Refactor Promises to use Bluebird and update JSDocs.
+
 const bcrypt = require('bcrypt');
 const debug = require('debug')('tbp:user-model');
 
@@ -8,9 +10,13 @@ const db = require('../database');
 
 const User = db.model('User', {
   tableName: 'users',
-  hidden: ['id', 'password', 'barcode', 'is_admin'],
-  outputVirtuals: false,
 
+  // Attributes that aren't serialized when converting a User to JSON.
+  hidden: ['id', 'password', 'barcode', 'is_admin'],
+
+  fillable: ['email', 'password', 'barcode'],
+
+  outputVirtuals: false,
   virtuals: {
     /**
      * Users can be created just via a barcode, so some users don't have an
@@ -27,7 +33,6 @@ const User = db.model('User', {
   /** Registers event listeners. */
   initialize() {
     this.on('creating', this.hashPassword);
-    // TODO Register listener that prevents mass assignment.
   },
 
   /**
