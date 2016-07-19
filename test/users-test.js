@@ -12,8 +12,6 @@ describe('Users', function() {
   describe('GET /users/:id', function() {
     it('returns the user with the correct info', function(done) {
       api.get('/api/users/1')
-        .set('Accept', 'application/json')
-        .expect('Content-Type', 'application/json; charset=utf-8')
         .expect(200, {
           email: 'test@test.com',
           first_name: 'Test',
@@ -37,8 +35,6 @@ describe('Users', function() {
 
     before(function(done) {
       api.post('/api/auth/login')
-      .set('Accept', 'application/json')
-      .expect('Content-Type', 'application/json; charset=utf-8')
       .send({
         email: 'test@test.com',
         password: 'password',
@@ -151,24 +147,47 @@ describe('Users', function() {
       });
   });
 
-  describe.skip('DELETE /users/:id', function() {
-    it('responds with 401 Unauthorized ');
+  describe('DELETE /users/:id', function() {
+    let token = null;
+    let adminToken = null;
+
+    before(function(done) {
+      api.post('/api/auth/login')
+      .send({
+        email: 'test@test.com',
+        password: 'password',
+      })
+      .end(function(err, res) {
+        token = res.body.token;
+
+        api.post('/api/auth/login')
+        .send({
+          email: 'admin@test.com',
+          password: 'admin',
+        })
+        .end(function(adminErr, adminRes) {
+          adminToken = adminRes.body.token;
+          done();
+        });
+      });
+    });
+
+    it('responds with a 401 Unauthorized when the logged in user isn\'t an admin', function(done) {
+      api.delete('/api/users/1')
+        .set('Authorization', `Bearer ${token}`)
+        .expect(401, { error: 'Not authorized to access this route.' }, done);
+    });
 
     it('responds with a 204 No Content', function(done) {
-      api.get('/api/users/2')
-        .expect(200);
-      api.delete('/api/users/2')
+      api.delete('/api/users/1')
+        .set('Authorization', `Bearer ${adminToken}`)
         .expect(204, {}, done);
     });
 
-    it('deleted the user', function(done) {
-      api.get('/api/users/2')
-        .expect(404, { error: 'User not found.' }, done);
-    });
-
     it('responds with a 404 Not Found when trying to delete a nonexistent user', function(done) {
-      api.delete('/api/users/2')
-        .expect(404, { error: 'No records were deleted.' }, done);
+      api.delete('/api/users/10')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .expect(404, { error: 'User not found.' }, done);
     });
   });
 });

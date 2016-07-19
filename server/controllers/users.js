@@ -56,7 +56,7 @@ const users = {
       .destroy({ require: true })
       .then(() => res.sendStatus(204))
       .catch(User.NoRowsDeletedError, () =>
-        res.status(404).json({ error: 'No records were deleted.' })
+        res.status(404).json({ error: 'User not found.' })
       );
   },
 };

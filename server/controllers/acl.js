@@ -15,7 +15,7 @@ const acl = {
       for (const role of roles) {
         switch (role) {
           case 'admin':
-            if (req.user.is_admin) return next();
+            if (req.user.get('is_admin')) return next();
             break;
           case 'owner':
             // TODO Add a check for resources that the user creates.

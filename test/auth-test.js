@@ -30,8 +30,6 @@ describe('Authentication', function() {
         let token = null;
 
         api.post('/api/auth/login')
-          .set('Accept', 'application/json')
-          .expect('Content-Type', 'application/json; charset=utf-8')
           .send({
             email: 'test@test.com',
             password: 'password',
@@ -150,7 +148,7 @@ describe('Authentication', function() {
           .expect(201, function(err, res) {
             expect(res.body.token).to.exist;
 
-            api.get('/api/users/2')
+            api.get('/api/users/3')
               .expect(200, {
                 first_name: 'New',
                 last_name: 'User',
@@ -173,7 +171,7 @@ describe('Authentication', function() {
         .expect(201, function(err, res) {
           expect(res.body.token).to.exist;
 
-          api.get('/api/users/3')
+          api.get('/api/users/4')
             .expect(200, {
               first_name: 'New',
               last_name: 'User with just barcode',
