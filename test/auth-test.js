@@ -54,8 +54,8 @@ describe('Authentication', function() {
   });
 
   describe('POST /auth/register', function() {
-    beforeEach(migrateWithTestUser);
-    afterEach(rollback);
+    before(migrateWithTestUser);
+    after(rollback);
 
     it('returns a 400 Bad Request if the email is formatted incorrectly', function(done) {
       api.post('/api/auth/register')
@@ -167,13 +167,13 @@ describe('Authentication', function() {
         .send({
           first_name: 'New',
           last_name: 'User with just barcode',
-          barcode: 'barcode2',
+          barcode: 'barcode3',
           house: 'Blue',
         })
         .expect(201, function(err, res) {
           expect(res.body.token).to.exist;
 
-          api.get('/api/users/2')
+          api.get('/api/users/3')
             .expect(200, {
               first_name: 'New',
               last_name: 'User with just barcode',
@@ -192,7 +192,7 @@ describe('Authentication', function() {
           last_name: 'User',
           email: 'uniqueuser@test.com',
           password: 'password',
-          barcode: 'barcode2',
+          barcode: 'barcode4',
         })
         .expect(201, function() {
           api.post('/api/auth/register')
@@ -201,7 +201,7 @@ describe('Authentication', function() {
               last_name: 'User',
               email: 'uniqueuser@test.com',
               password: 'password',
-              barcode: 'barcode3',
+              barcode: 'barcode5',
             })
             .expect(400, [{
               param: 'email',
