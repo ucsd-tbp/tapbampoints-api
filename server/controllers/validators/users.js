@@ -1,8 +1,12 @@
-/** @file Request validation middleware for users routes. */
+/**
+ * @file Request validation for user routes on /users.
+ * @see auth.js for related user authentication route validation.
+ */
 
 const debug = require('debug')('tbp:users-validator');
 
 const users = {
+  /** Validates PATCH requests to /api/users/:id. */
   update(req, res, next) {
     debug('firing users.update validation middleware');
 

@@ -1,7 +1,8 @@
+/** @file Defines Event model. */
+
 require('./User');
 const db = require('../database');
 
-// Defines Event model.
 const Event = db.model('Event', {
   tableName: 'events',
 
@@ -12,6 +13,7 @@ const Event = db.model('Event', {
   /**
    * Creates many-to-many relation with users through attendance_records as an
    * intermediary table.
+   *
    * @return {Collection<User>} Users associated with this event.
    */
   users() {
@@ -20,6 +22,7 @@ const Event = db.model('Event', {
 
   /**
    * Creates many-to-one relation between events and event types.
+   *
    * @return {EventType} Event type associated with this event.
    */
   type() {

@@ -1,4 +1,4 @@
-/** @file Request validation for the authentication routes. */
+/** @file Request validation for the authentication routes on /api/auth. */
 
 const debug = require('debug')('tbp:auth-validator');
 

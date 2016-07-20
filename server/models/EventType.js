@@ -1,7 +1,10 @@
+/**
+ * @file Defines EventType model. Used to specify point types of events, e.g.
+ * academic, social, community service or outreach, and wilcard event types.
+ */
+
 const db = require('../database');
 
-// Defines EventType model. Used to specify point types of events, e.g.
-// academic, social, community service or outreach, and wildcard.
 const EventType = db.model('EventType', {
   tableName: 'event_types',
 
@@ -11,6 +14,7 @@ const EventType = db.model('EventType', {
 
   /**
    * Creates one-to-many relation between event types and events.
+   *
    * @return {Collection<Event>} Events associated with this event type.
    */
   events() {
@@ -18,5 +22,4 @@ const EventType = db.model('EventType', {
   },
 });
 
-// Loads EventType model into Bookshelf registry.
 module.exports = EventType;

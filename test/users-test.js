@@ -30,6 +30,30 @@ describe('Users', function() {
     });
   });
 
+  describe('GET /users', function() {
+    it('returns a list of users', function(done) {
+      api.get('/api/users')
+        .expect(200, [
+          {
+            email: 'test@test.com',
+            first_name: 'Test',
+            last_name: 'User',
+            house: 'None',
+            member_status: 'Initiate',
+            events: [],
+          },
+          {
+            email: 'admin@test.com',
+            first_name: 'Admin',
+            last_name: 'User',
+            house: 'None',
+            member_status: 'Initiate',
+            events: [],
+          },
+        ], done);
+    });
+  });
+
   describe('PATCH /users/:id', function() {
     let token = null;
 
@@ -178,10 +202,15 @@ describe('Users', function() {
         .expect(401, { error: 'Not authorized to access this route.' }, done);
     });
 
-    it('responds with a 204 No Content', function(done) {
+    it('responds with a 204 No Content and deletes the user', function(done) {
       api.delete('/api/users/1')
         .set('Authorization', `Bearer ${adminToken}`)
-        .expect(204, {}, done);
+        .expect(204, {}, function() {
+          api.get('/api/users/1')
+            .expect(404, {
+              error: 'User not found.',
+            }, done);
+        });
     });
 
     it('responds with a 404 Not Found when trying to delete a nonexistent user', function(done) {

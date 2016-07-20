@@ -1,12 +1,13 @@
+/** @file Contains endpoints for event type routes on /api/event-types. */
+
 const EventType = require('../models/EventType');
 
 const eventTypes = {
   /**
    * Lists all event types.
    *
-   * @param  {Request} req HTTP request object
-   * @param  {Response} res HTTP response sent after receiving a request
-   * @return {Promise<Collection>} List of EventTypes.
+   * @param  {Request} req HTTP request object.
+   * @param  {Response} res HTTP response object.
    */
   index(req, res) {
     EventType.fetchAll()

@@ -1,7 +1,5 @@
 /** @file Defines User model. */
 
-// TODO Refactor Promises to use Bluebird and update JSDocs.
-
 const bcrypt = require('bcrypt');
 const debug = require('debug')('tbp:user-model');
 
@@ -47,10 +45,9 @@ const User = db.model('User', {
   },
 
   /**
-   * Event listener that hashes a user's password when a user is created.
+   * Event listener that hashes the  password when a user is created.
    *
-   * @param {Model} contains attributes that were sent in POST request
-   * @return {Promise} resolves to the hash computed from the password
+   * @return {Promise<string>} Resolves to hashed password.
    */
   hashPassword() {
     // Avoids hashing the password if the barcode is used to register.
@@ -75,14 +72,21 @@ const User = db.model('User', {
    * corresponds to a credentials set.
    *
    * Logging in with just a barcode:
-   * credentials = { key: 'barcode', search: barcodeValue, pass: undefined }
+   * `credentials = { key: 'barcode', search: barcodeValue, pass: undefined }`
    *
    * Logging in with an email and password combination:
-   * credentials = { key: 'email', search: emailValue, pass: passwordValue }
+   * `credentials = { key: 'email', search: emailValue, pass: passwordValue }`
    *
-   * @param  {Object} credentials an object containing properties key, search, and pass.
+   * @param {Object} credentials An object containing properties key, search,
+   * and pass.
+   * @param {string} credentials.key Name of field to search for the user
+   * with, either `'email'` or `'barcode'`.
+   * @param {string} credentials.search Value of field used to search.
+   * @param {string} pass Value of field to authenticate user with. Is the
+   * password when an email and password combination is passed in. Otherwise,
+   * both `credentials.search` and `credentials.pass` is the barcode value.
    * @return {Promise<User>} resolves to newly logged in user if login was
-   *                         successful.
+   * successful.
    */
   login(credentials) {
     return User.where(credentials.key, credentials.search)

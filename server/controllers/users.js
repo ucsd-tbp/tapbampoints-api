@@ -1,4 +1,4 @@
-/** @file Defines CRUD controller operations on the User model. */
+/** @file Contaisn endpoints for user routes on /api/users. */
 
 const User = require('../models/User');
 

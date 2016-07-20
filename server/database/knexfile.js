@@ -1,3 +1,5 @@
+/** @file Defines database connection variables for each environment. */
+
 // Loads environment variables when using Knex CLI.
 require('dotenv').config({ path: `${__dirname}/../../.env` });
 
@@ -13,7 +15,6 @@ const config = {
     },
     tableName: 'migrations',
   },
-
 
   development: {
     client: 'mysql',

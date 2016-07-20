@@ -1,3 +1,5 @@
+/** @file Contains endpoints for event routes on /api/events. */
+
 const Event = require('../models/Event');
 
 const events = {
@@ -5,9 +7,8 @@ const events = {
    * Displays info for an event with the given ID along with its associated
    * users (members that signed in to the event).
    *
-   * @param  {Request} req HTTP request object
-   * @param  {Response} res HTTP response sent after receiving a request
-   * @return {Promise<Event>} Event with given ID.
+   * @param  {Request} req HTTP request object.
+   * @param  {Response} res HTTP responseo bject.
    */
   show(req, res) {
     Event.where('id', req.params.id)

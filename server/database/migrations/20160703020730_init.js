@@ -1,3 +1,5 @@
+/** @file Initial migration */
+
 exports.up = knex =>
   // Users table, including house and member status.
   knex.schema.createTable('users', table => {

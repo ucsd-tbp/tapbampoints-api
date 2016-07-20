@@ -8,14 +8,16 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
 /**
- * Creates registered claims and signs the JWT with claims and the user's admin
+ * Creates registered claims to sign the JWT with and places the user's admin
  * status in the payload. Used to return a JWT in the response when registering
  * or logging in a user.
  *
  * @private
- * @param  {User} user user to create token for
- * @return {Promise<String>} resolves to newly created token.
- * @see {@link https://tools.ietf.org/html/rfc7519#section-4.1 the JWT spec concerning claims}
+ * @param  {User} user User to create token for.
+ * @return {Promise<String>} Resolves to newly created token. Returns a Promise
+ * to chain calls in controllers, e.g. `.then(makeJWT).then(token => ...)`.
+ * @see {@link https://tools.ietf.org/html/rfc7519#section-4.1 the JWT spec
+ * concerning claims.}
  */
 function makeJWT(user) {
   // TODO Generate additional registered claims, as per the JWT spec.
@@ -25,7 +27,7 @@ function makeJWT(user) {
   };
 
   return new Promise((resolve, reject) => {
-    jwt.sign({ admin: user.is_admin }, process.env.JWT_SECRET, options, (err, token) => {
+    jwt.sign({ email: user.get('email') }, process.env.JWT_SECRET, options, (err, token) => {
       if (err) reject(err);
       resolve(token);
     });
@@ -37,15 +39,14 @@ const auth = {
   /**
    * Middleware that checks the Authorization header for a token, and attempts
    * to decode the token if it's there. Rejects the request if the token is
-   * not present or invalid. Decoded token contains the ID of the authenticated
-   * user, who is placed in req.user.
+   * not present or invalid. Places the authenticated user in `req.user`.
    *
    * To make authenticated requests, the header must be formatted like:
    * Authorization: Bearer {token}
    *
-   * @param  {Request} req HTTP request
-   * @param  {Response} res HTTP response
-   * @param  {Function} next callback that passes control to the next handler
+   * @param  {Request} req HTTP request object.
+   * @param  {Response} res HTTP response object.
+   * @param  {Function} next Callback that passes control to the next handler.
    */
   verify(req, res, next) {
     debug('firing token verification middleware');
@@ -75,13 +76,11 @@ const auth = {
   },
 
   /**
-   * Registers a user by creating a new user and generating a new token
-   * using the newly created user as the payload for signing the JWT. password
-   * from request body is also encrypted via bcrypt before saving the user.
+   * Registers a user by creating a new user and generating new token to place
+   * in the response body.
    *
-   * @param  {Request} HTTP request, must contain required data for creating a
-   *                  new user
-   * @param  {Response} res HTTP response containing newly generated token
+   * @param  {Request} req Contains valid fields to save a User with.
+   * @param  {Response} res Contains newly generated token.
    */
   register(req, res) {
     new User().save(req.body)
@@ -96,10 +95,16 @@ const auth = {
    * in the request. Users can login via their barcode hash only if the email
    * and password have not been set.
    *
-   * @param  {Request} req HTTP request, must contain either a barcode hash or
-   *                   an email and password pair
+   * @param  {Request} req Must contain an email and password combination if
+   * the user has registered an email or password. Otherwise, the user can
+   * login with just the barcode.
+   * @param {string} req.body.email Email to search for the user with.
+   * @param {string} req.body.password Password to authenticate email against.
+   * @param {string} req.body.barcode If user has not registered an email and
+   * password yet, then just the barcode can be used to log in.
    * @param  {Response} res HTTP response containing the generated token
-   * @see User#login
+   *
+   * @see `User.login(credentials)`
    */
   login(req, res) {
     const credentials = {
@@ -119,12 +124,12 @@ const auth = {
   },
 
   /**
-   * Returns the logged in user. By this point the JWT validation middleware
+   * Returns the logged in user. At this point the JWT validation middleware
    * had finished verifying the token, so the current user has already been set
-   * in req.user.
+   * in `req.user`.
    *
-   * @param  {Request} req HTTP request, contains a valid JWT
-   * @param  {Response} res HTTP response, contains user from decoded JWT
+   * @param  {Request} req Contains a valid JWT in the Authorization header.
+   * @param  {Response} res Contains user found from verified JWT.
    * @see {@link auth.verify}
    */
   currentUser(req, res) {

@@ -7,8 +7,10 @@ const acl = {
    * events) and routes that only allow the owner to access (i.e. users should
    * only be able to update their own profiles).
    *
-   * @param  {Array} roles a list of roles for this middleware to check in the logged in user.
-   * @return {[type]}       [description]
+   * @param  {Array} roles A list of roles to check against the currently
+   * logged in user.
+   * @return {Function|Response} If the user satisfies all roles, then
+   * continues down the middleware stack.
    */
   allow(roles) {
     const aclMiddleware = (req, res, next) => {
