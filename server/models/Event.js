@@ -8,7 +8,7 @@ const Event = db.model('Event', {
 
   hidden: ['id'],
 
-  fillable: ['name', 'description', 'points', 'officer', 'type_id'],
+  fillable: ['name', 'description', 'points', 'officer_id', 'type_id'],
 
   /**
    * Creates many-to-many relation with users through attendance_records as an

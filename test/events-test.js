@@ -5,6 +5,7 @@ describe('Events', function() {
 
   describe('GET /events/:id', function() {
     it('returns the event with the correct info');
+
     it('responds with a 404 NOT FOUND with a nonexistent ID');
     it('returns a list of users that have attended this event');
   });

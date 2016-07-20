@@ -33,11 +33,12 @@ exports.up = knex =>
     table.string('name').defaultTo('').notNullable();
     table.text('description').defaultTo('').notNullable();
     table.integer('points').defaultTo(0).notNullable();
-    table.string('officer').defaultTo('').notNullable();
     table.timestamps();
 
     table.integer('type_id').unsigned().references('id')
           .inTable('event_types');
+    table.integer('officer_id').unsigned().references('id')
+          .inTable('users');
   })
 
   // Pivot table for many-to-many relation between users and events.

@@ -10,22 +10,53 @@ const config = { directory: 'server/database/migrations' };
  * @see helpers.migrateWithQueries
  */
 const queries = {
-  users: [knex('users').insert({
-    id: 1,
-    first_name: 'Test',
-    last_name: 'User',
-    email: 'test@test.com',
-    password: bcrypt.hashSync('password', 0),
-    barcode: 'barcode1',
-  }), knex('users').insert({
-    id: 2,
-    first_name: 'Admin',
-    last_name: 'User',
-    email: 'admin@test.com',
-    password: bcrypt.hashSync('admin', 0),
-    barcode: 'adminbarcode',
-    is_admin: true,
-  })],
+  users: [
+    knex('users').insert({
+      id: 1,
+      first_name: 'Test',
+      last_name: 'User',
+      email: 'test@test.com',
+      password: bcrypt.hashSync('password', 0),
+      barcode: 'barcode1',
+    }),
+
+    knex('users').insert({
+      id: 2,
+      first_name: 'Admin',
+      last_name: 'User',
+      email: 'admin@test.com',
+      password: bcrypt.hashSync('admin', 0),
+      barcode: 'adminbarcode',
+      is_admin: true,
+    }),
+  ],
+
+  events: [
+    knex('users').insert({
+      id: 1,
+      first_name: 'Officer',
+      last_name: 'User',
+      email: 'officer@test.com',
+      password: bcrypt.hashSync('officer', 0),
+      barcode: 'officerbarcode',
+      is_admin: true,
+    }),
+
+    knex('event_types').insert({
+      id: 1,
+      name: 'Social',
+      description: 'Socialize!',
+    }),
+
+    knex('events').insert({
+      id: 1,
+      type_id: 1,
+      officer_id: 1,
+      name: 'An Off the Record Social',
+      description: 'Lit af',
+      points: 3,
+    }),
+  ],
 };
 
 const helpers = {

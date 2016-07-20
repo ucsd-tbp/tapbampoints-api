@@ -10,7 +10,7 @@ exports.seed = (knex, Promise) => {
       name: faker.lorem.words(),
       description: faker.lorem.lines(),
       points: faker.random.number({ min: 1, max: 6 }),
-      officer: faker.name.findName(),
+      officer_id: 1,
       type_id: faker.random.number({ min: 1, max: 4 }),
     });
 
