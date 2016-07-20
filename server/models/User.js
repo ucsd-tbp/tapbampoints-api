@@ -32,6 +32,9 @@ const User = db.model('User', {
   /** Registers event listeners. */
   initialize() {
     this.on('creating', this.hashPassword);
+
+    // TODO Write unit tests for hashing password on update.
+    this.on('updating', this.hashPassword);
   },
 
   /**

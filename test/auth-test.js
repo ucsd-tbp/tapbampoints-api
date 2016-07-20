@@ -3,13 +3,16 @@ const expect = require('chai').expect;
 const app = require('../server/app');
 const api = require('supertest')(app);
 
-const { migrateWithTestUser, rollback } = require('./helpers');
+const { helpers, queries } = require('./helpers');
 
 // TODO Speed up tests by not migrating and rolling back between each it block.
 describe('Authentication', function() {
   describe('token verification middleware', function() {
-    before(migrateWithTestUser);
-    after(rollback);
+    before('inserts a regular and admin user into the database', function(done) {
+      return helpers.migrateWithQueries(queries.users).then(() => done());
+    });
+
+    after(helpers.rollback);
 
     it('returns a 401 Unauthorized without an Authorization header', function(done) {
       api.get('/api/auth/me')
@@ -52,8 +55,11 @@ describe('Authentication', function() {
   });
 
   describe('POST /auth/register', function() {
-    before(migrateWithTestUser);
-    after(rollback);
+    before('inserts a regular and admin user into the database', function(done) {
+      return helpers.migrateWithQueries(queries.users).then(() => done());
+    });
+
+    after(helpers.rollback);
 
     it('returns a 400 Bad Request if the email is formatted incorrectly', function(done) {
       api.post('/api/auth/register')
@@ -234,8 +240,11 @@ describe('Authentication', function() {
   });
 
   describe('POST /auth/login', function() {
-    before(migrateWithTestUser);
-    after(rollback);
+    before('inserts a regular and admin user into the database', function(done) {
+      return helpers.migrateWithQueries(queries.users).then(() => done());
+    });
+
+    after(helpers.rollback);
 
     it(`returns a 400 Bad Request when trying to login with email, password, and barcode
         all present in request body`,

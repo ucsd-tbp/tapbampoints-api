@@ -3,11 +3,14 @@ const expect = require('chai').expect;
 const app = require('../server/app');
 const api = require('supertest')(app);
 
-const { migrateWithTestUser, rollback } = require('./helpers');
+const { helpers, queries } = require('./helpers');
 
 describe('Users', function() {
-  before(migrateWithTestUser);
-  after(rollback);
+  before('inserts a regular and admin user into the database', function(done) {
+    return helpers.migrateWithQueries(queries.users).then(() => done());
+  });
+
+  after(helpers.rollback);
 
   describe('GET /users/:id', function() {
     it('returns the user with the correct info', function(done) {
