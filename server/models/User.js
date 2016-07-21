@@ -41,9 +41,9 @@ const User = db.model('User', {
    * Creates many-to-many relation with events through attendance_records as an
    * intermediary table.
    *
-   * @return {Collection<Event>} events associated with this user
+   * @return {Collection<Event>} Events that this user attended.
    */
-  events() {
+  attended_events() {
     return this.belongsToMany('Event', 'attendance_records');
   },
 

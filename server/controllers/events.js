@@ -12,7 +12,7 @@ const events = {
    */
   show(req, res) {
     Event.where('id', req.params.id)
-      .fetch({ withRelated: ['users'] })
+      .fetch({ withRelated: ['attendees'] })
       .then(event => res.json(event.toJSON()))
       .catch(err => res.json({ message: err.message }));
   },

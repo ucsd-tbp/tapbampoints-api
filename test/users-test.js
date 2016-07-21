@@ -21,7 +21,7 @@ describe('Users', function() {
           last_name: 'User',
           house: 'None',
           member_status: 'Initiate',
-          events: [],
+          attended_events: [],
         }, done);
     });
 
@@ -43,7 +43,7 @@ describe('Users', function() {
             last_name: 'User',
             house: 'None',
             member_status: 'Initiate',
-            events: [],
+            attended_events: [],
           },
           {
             email: 'admin@test.com',
@@ -51,7 +51,7 @@ describe('Users', function() {
             last_name: 'User',
             house: 'None',
             member_status: 'Initiate',
-            events: [],
+            attended_events: [],
           },
         ], done);
     });

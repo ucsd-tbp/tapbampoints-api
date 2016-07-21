@@ -11,7 +11,7 @@ const users = {
    */
   show(req, res) {
     User.where('id', req.params.id)
-      .fetch({ withRelated: ['events'], require: true })
+      .fetch({ withRelated: ['attended_events'], require: true })
       .then(user => res.json(user.toJSON()))
       .catch(User.NotFoundError, () => res.status(404).json({ error: 'User not found.' })
     );
@@ -25,7 +25,7 @@ const users = {
    */
   index(req, res) {
     // TODO Add pagination data via the Link header.
-    User.fetchAll({ withRelated: ['events'] })
+    User.fetchAll({ withRelated: ['attended_events'] })
       .then(userCollection => res.json(userCollection.toJSON()));
   },
 

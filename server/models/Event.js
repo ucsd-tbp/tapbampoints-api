@@ -16,7 +16,7 @@ const Event = db.model('Event', {
    *
    * @return {Collection<User>} Users associated with this event.
    */
-  users() {
+  attendees() {
     return this.belongsToMany('User', 'attendance_records');
   },
 
