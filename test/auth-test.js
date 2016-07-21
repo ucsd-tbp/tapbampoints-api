@@ -49,6 +49,7 @@ describe('Authentication', function() {
                 house: 'None',
                 member_status: 'Initiate',
                 attended_events: [],
+                chaired_events: [],
               }, done);
           });
       });
@@ -162,6 +163,7 @@ describe('Authentication', function() {
                 house: 'Red',
                 member_status: 'Member',
                 attended_events: [],
+                chaired_events: [],
               }, done);
           });
       });
@@ -185,6 +187,7 @@ describe('Authentication', function() {
               house: 'Blue',
               member_status: 'Initiate',
               attended_events: [],
+              chaired_events: [],
             }, done);
         });
     });

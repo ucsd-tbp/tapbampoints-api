@@ -11,8 +11,18 @@ const Event = db.model('Event', {
   fillable: ['name', 'description', 'points', 'officer_id', 'type_id'],
 
   /**
-   * Creates many-to-many relation with users through attendance_records as an
-   * intermediary table.
+   * Creates one-to-many relation for the relation between an officer and the
+   * events they chair.
+   *
+   * @return {User} Member that chaired this event.
+   */
+  officer() {
+    return this.belongsTo('User');
+  },
+
+  /**
+   * Creates many-to-many relation to represent an event and its confirmed
+   * attendees.
    *
    * @return {Collection<User>} Users associated with this event.
    */
@@ -21,7 +31,8 @@ const Event = db.model('Event', {
   },
 
   /**
-   * Creates many-to-one relation between events and event types.
+   * Creates a one-to-many relation to represent the type that this event
+   * belongs to.
    *
    * @return {EventType} Event type associated with this event.
    */

@@ -66,7 +66,7 @@ const auth = {
       if (jwtErr) return res.status(400).json({ error: jwtErr.message });
 
       User.where('id', decoded.sub)
-        .fetch({ withRelated: ['attended_events'], require: true })
+        .fetch({ withRelated: ['chaired_events', 'attended_events'], require: true })
         .then(user => {
           req.user = user;
           next();

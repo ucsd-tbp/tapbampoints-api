@@ -38,8 +38,18 @@ const User = db.model('User', {
   },
 
   /**
-   * Creates many-to-many relation with events through attendance_records as an
-   * intermediary table.
+   * Creates one-to-many relation to represent the relation between this user
+   * and the events they have chaired.
+   *
+   * @return {Collection<Event>} Events that this user chaired.
+   */
+  chaired_events() {
+    return this.hasMany('Event', 'officer_id');
+  },
+
+  /**
+   * Creates many-to-many relation with events to represent the events that
+   * this user has attended.
    *
    * @return {Collection<Event>} Events that this user attended.
    */
