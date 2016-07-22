@@ -5,6 +5,7 @@
 
 const bookshelf = require('bookshelf');
 const debug = require('debug')('tbp:database');
+const extensions = require('./extensions');
 
 debug('initializing knex and bookshelf instances');
 
@@ -18,11 +19,16 @@ db.plugin('registry');
 // Allows whitelisting/blacklisting of model attributes.
 db.plugin('visibility');
 
-// Allows defining of virtual properties.
+// Allows defining of virtual properties, i.e. model fields not in the schema.
 db.plugin('virtuals');
 
 // Provides fillable and guarded properties for mass-assignment protection.
 db.plugin('bookshelf-mass-assignment');
 
-// TODO Add a model for attendance records.
+// Adds a relationships property to the model.
+db.plugin('bookshelf-relationships');
+
+// Custom extensions to `Bookshelf.Model`.
+db.plugin(extensions);
+
 module.exports = db;

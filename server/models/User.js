@@ -16,6 +16,15 @@ const User = db.model('User', {
   guarded: ['id', 'is_admin'],
 
   outputVirtuals: false,
+
+  /** Registers event listeners. */
+  initialize() {
+    this.on('creating', this.hashPassword);
+
+    // TODO Write unit tests for hashing password on update.
+    this.on('updating', this.hashPassword);
+  },
+
   virtuals: {
     /**
      * Users can be created just via a barcode, so some users don't have an
@@ -29,32 +38,26 @@ const User = db.model('User', {
     },
   },
 
-  /** Registers event listeners. */
-  initialize() {
-    this.on('creating', this.hashPassword);
+  relationships: {
+    /**
+     * Creates one-to-many relation to represent the relation between this user
+     * and the events they have chaired.
+     *
+     * @return {Collection<Event>} Events that this user chaired.
+     */
+    chaired_events() {
+      return this.hasMany('Event', 'officer_id');
+    },
 
-    // TODO Write unit tests for hashing password on update.
-    this.on('updating', this.hashPassword);
-  },
-
-  /**
-   * Creates one-to-many relation to represent the relation between this user
-   * and the events they have chaired.
-   *
-   * @return {Collection<Event>} Events that this user chaired.
-   */
-  chaired_events() {
-    return this.hasMany('Event', 'officer_id');
-  },
-
-  /**
-   * Creates many-to-many relation with events to represent the events that
-   * this user has attended.
-   *
-   * @return {Collection<Event>} Events that this user attended.
-   */
-  attended_events() {
-    return this.belongsToMany('Event', 'attendance_records');
+    /**
+     * Creates many-to-many relation with events to represent the events that
+     * this user has attended.
+     *
+     * @return {Collection<Event>} Events that this user attended.
+     */
+    attended_events() {
+      return this.belongsToMany('Event', 'attendance_records');
+    },
   },
 
   /**

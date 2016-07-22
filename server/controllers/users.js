@@ -13,8 +13,8 @@ const users = {
     User.where('id', req.params.id)
       .fetch({ withRelated: ['chaired_events', 'attended_events'], require: true })
       .then(user => res.json(user.toJSON()))
-      .catch(User.NotFoundError, () => res.status(404).json({ error: 'User not found.' })
-    );
+      .catch(User.NotFoundError, () => res.status(404).json({ error: 'User not found.' }))
+      .catch(err => res.status(400).json({ error: err.message }));
   },
 
   /**
