@@ -16,7 +16,7 @@ const express = require('express');
 
 const controllers = require('../controllers');
 const validators = require('../controllers/validators');
-const acl = require('../controllers/acl');
+const middleware = require('../controllers/middleware');
 
 // TODO Use index.js to export router and define sets of routes and router.use.
 const router = express.Router();
@@ -24,13 +24,13 @@ const router = express.Router();
 // Middleware stack that only allows logged-in admins.
 const requireAdmin = [
   controllers.auth.verify,
-  acl.allow(['admin']),
+  middleware.acl.allow(['admin']),
 ];
 
 // Middleware stack that requires the logged-in user ID and param ID to match.
 const requireOwner = [
   controllers.auth.verify,
-  acl.allow(['owner']),
+  middleware.acl.allow(['owner']),
 ];
 
 // Authentication routes.

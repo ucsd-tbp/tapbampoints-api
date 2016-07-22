@@ -7,7 +7,6 @@
  */
 
 const Promise = require('bluebird');
-const debug = require('debug')('tbp:extensions');
 
 /**
  * Checks that every relation in `requestedRelations` exists in the
@@ -32,7 +31,6 @@ module.exports = bookshelf => {
   const proto = bookshelf.Model.prototype;
 
   const Model = bookshelf.Model.extend({
-
     /**
      * Overrides `Bookshelf.Model.fetch()` to validate relations passed with
      * the `withRelated` option.
@@ -44,12 +42,7 @@ module.exports = bookshelf => {
      * `Bookshelf.Model.fetch()` documentation}
      */
     fetch(options = {}) {
-      debug(this);
-      debug('firing custom fetch');
-      debug(options.withRelated);
-
       if (!validateRelations(options.withRelated, this)) {
-
         return Promise.reject(new Error(
           'Names of relations to load are invalid.'
         ));

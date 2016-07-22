@@ -13,6 +13,7 @@ const debug = require('debug')('tbp:app');
 
 const routes = require('./routes');
 const validators = require('./controllers/validators');
+const middleware = require('./controllers/middleware');
 
 const app = express();
 
@@ -26,6 +27,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(validator({ customValidators: validators.custom }));
 
 // TODO Add compression middleware (and helmet for production)
+
+// Custom API middleware.
+app.use(middleware.include);
 
 // Mounts API routes onto the base URL /api.
 app.use('/api', routes);
