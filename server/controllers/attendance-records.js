@@ -1,7 +1,5 @@
 /** @file Contains endpoints for routes related to attendance records. */
 
-const debug = require('debug')('tbp:users-controller');
-
 const User = require('../models/User');
 const Event = require('../models/Event');
 

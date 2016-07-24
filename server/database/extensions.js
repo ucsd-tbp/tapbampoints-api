@@ -81,7 +81,7 @@ module.exports = bookshelf => {
       opts.omitPivot = true;
 
       return proto.toJSON.call(this, opts);
-    }
+    },
   });
 
   bookshelf.Model = Model;

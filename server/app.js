@@ -6,20 +6,27 @@
 // Exposes environment variables in ../.env.
 require('dotenv').config();
 
-const express = require('express');
-const morgan = require('morgan');
 const bodyParser = require('body-parser');
-const validator = require('express-validator');
+const compression = require('compression');
 const debug = require('debug')('tbp:app');
+const express = require('express');
+const helmet = require('helmet');
+const morgan = require('morgan');
+const validator = require('express-validator');
 
+const middleware = require('./controllers/middleware');
 const routes = require('./routes');
 const validators = require('./controllers/validators');
-const middleware = require('./controllers/middleware');
 
 const app = express();
 
+debug('registering security, compression, body parsing, custom middleware, and routes');
 
-debug('registering body-parser and express-validator middleware');
+// Adds some security by adding HTTP headers.
+app.use(helmet());
+
+// Adds gzip compression to all requests.
+app.use(compression());
 
 // HTTP request logging middleware for development.
 if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
@@ -30,8 +37,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // Allows for validation on the request object.
 app.use(validator({ customValidators: validators.custom }));
-
-// TODO Add compression middleware (and helmet for production)
 
 // Custom API middleware.
 app.use(middleware.embed);
