@@ -23,7 +23,7 @@ const router = express.Router();
 
 // Middleware stack that only allows logged-in admins.
 const requireAdmin = [
-  controllers.auth.verify,
+  controllers.auth.verify,  // Requires login first.
   middleware.acl.allow(['admin']),
 ];
 
@@ -54,5 +54,9 @@ router.get('/events/:id', controllers.events.show);
 router.post('/events', validators.events.create, requireAdmin, controllers.events.create);
 router.patch('/events/:id', validators.events.update, requireAdmin, controllers.events.update);
 router.delete('/events/:id', requireAdmin, controllers.events.delete);
+
+// Attendance record routes.
+router.put('/users/:user_id/events/:event_id', validators.attendanceRecords.create, requireAdmin,
+  controllers.attendanceRecords.create);
 
 module.exports = router;

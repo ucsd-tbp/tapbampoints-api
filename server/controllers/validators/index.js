@@ -1,11 +1,13 @@
 /** @file Defines custom validators for use in other controller validations. */
 
+const attendanceRecords = require('./attendance-records');
 const auth = require('./auth');
 const events = require('./events');
 const users = require('./users');
 
 const User = require('../../models/User');
 
+// TODO Move validation to the model layer for reduced repetition.
 const custom = {
   /**
    * Checks whether an email has already been taken. Resolves when a user with
@@ -42,6 +44,7 @@ const custom = {
 };
 
 const validators = {
+  attendanceRecords,
   auth,
   custom,
   events,

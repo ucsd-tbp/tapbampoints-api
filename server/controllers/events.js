@@ -3,6 +3,7 @@
 const Event = require('../models/Event');
 
 const events = {
+  /** Creates an event. */
   create(req, res) {
     new Event().save(req.body)
       .then(event => res.status(201).json(event.toJSON()))

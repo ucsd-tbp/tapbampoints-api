@@ -5,7 +5,6 @@ const api = require('supertest')(app);
 
 const { helpers, queries } = require('./helpers');
 
-// TODO Speed up tests by not migrating and rolling back between each it block.
 describe('Authentication', function() {
   describe('token verification middleware', function() {
     before('inserts a regular and admin user into the database', function(done) {

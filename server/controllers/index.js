@@ -5,16 +5,18 @@
  * @see ../routes/index.js
  */
 
-const users = require('./users');
-const eventTypes = require('./event-types');
-const events = require('./events');
+const attendanceRecords = require('./attendance-records');
 const auth = require('./auth');
+const events = require('./events');
+const eventTypes = require('./event-types');
+const users = require('./users');
 
 const controllers = {
-  users,
-  eventTypes,
-  events,
+  attendanceRecords,
   auth,
+  events,
+  eventTypes,
+  users,
 };
 
 module.exports = controllers;
