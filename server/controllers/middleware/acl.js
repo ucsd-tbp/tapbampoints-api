@@ -21,7 +21,7 @@ const acl = {
         switch (role) {
           case 'admin':
             if (req.user.get('is_admin')) {
-              debug('user confirmed to have admin access, continuing')
+              debug('user confirmed to have admin access, continuing');
               return next();
             }
             break;

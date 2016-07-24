@@ -48,6 +48,6 @@ const events = {
 
     next();
   },
-}
+};
 
 module.exports = events;

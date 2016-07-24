@@ -1,9 +1,9 @@
 /** @file Exports all custom middleware. */
 
 const acl = require('./acl');
-const include = require('./include');
+const embed = require('./embed');
 
 module.exports = {
   acl,
-  include,
+  embed,
 };

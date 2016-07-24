@@ -29,7 +29,7 @@ app.use(validator({ customValidators: validators.custom }));
 // TODO Add compression middleware (and helmet for production)
 
 // Custom API middleware.
-app.use(middleware.include);
+app.use(middleware.embed);
 
 // Mounts API routes onto the base URL /api.
 app.use('/api', routes);
