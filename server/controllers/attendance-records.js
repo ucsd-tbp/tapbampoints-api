@@ -1,6 +1,9 @@
 /** @file Contains endpoints for routes related to attendance records. */
 
+const debug = require('debug')('tbp:users-controller');
+
 const User = require('../models/User');
+const Event = require('../models/Event');
 
 const attendanceRecords = {
   /**
@@ -41,6 +44,24 @@ const attendanceRecords = {
 
         return res.status(400).json({ error: message });
       });
+  },
+
+  /** Lists events that a user has attended. */
+  showAttendedEvents(req, res) {
+    new User({ id: req.params.id })
+      .fetch({ withRelated: ['attended_events'], require: true })
+      .then(user => user.attended_events().fetch({ withRelated: req.relations }))
+      .then(events => res.json(events.toJSON()))
+      .catch(err => res.status(400).json({ error: err.message }));
+  },
+
+  /** Lists users that attended an event. */
+  showAttendees(req, res) {
+    new Event({ id: req.params.id })
+      .fetch({ withRelated: ['attendees'], require: true })
+      .then(event => event.attendees().fetch({ withRelated: req.relations }))
+      .then(attendees => res.json(attendees.toJSON()))
+      .catch(err => res.status(400).json({ error: err.message }));
   },
 
   /** Updates an attendance record. */

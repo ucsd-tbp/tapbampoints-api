@@ -56,6 +56,8 @@ router.patch('/events/:id', validators.events.update, requireAdmin, controllers.
 router.delete('/events/:id', requireAdmin, controllers.events.delete);
 
 // Attendance record routes.
+router.get('/users/:id/events', controllers.attendanceRecords.showAttendedEvents);
+router.get('/events/:id/users', controllers.attendanceRecords.showAttendees);
 router.put('/users/:user_id/events/:event_id', validators.attendanceRecords.create, requireAdmin,
   controllers.attendanceRecords.create);
 router.patch('/users/:user_id/events/:event_id', validators.attendanceRecords.update, requireAdmin,
