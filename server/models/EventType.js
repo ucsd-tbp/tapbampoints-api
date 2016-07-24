@@ -18,7 +18,7 @@ const EventType = db.model('EventType', {
    * @return {Collection<Event>} Events associated with this event type.
    */
   events() {
-    return this.hasMany('Event');
+    return this.hasMany('Event', 'type_id');
   },
 });
 

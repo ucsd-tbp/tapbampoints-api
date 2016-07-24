@@ -1,5 +1,7 @@
 /** @file A quick and hackish ACL implementation to restrict certain routes. */
 
+const debug = require('debug')('tbp:acl');
+
 const acl = {
   /**
    * Returns middleware intended to be added to routes that require
@@ -14,10 +16,14 @@ const acl = {
    */
   allow(roles) {
     const aclMiddleware = (req, res, next) => {
+      debug('firing ACL middleware check');
       for (const role of roles) {
         switch (role) {
           case 'admin':
-            if (req.user.get('is_admin')) return next();
+            if (req.user.get('is_admin')) {
+              debug('user confirmed to have admin access, continuing')
+              return next();
+            }
             break;
           case 'owner':
             // TODO Add a check for resources that the user creates.

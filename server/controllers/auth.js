@@ -66,11 +66,15 @@ const auth = {
       if (jwtErr) return res.status(400).json({ error: jwtErr.message });
 
       User.where('id', decoded.sub)
-        .fetch({ withRelated: ['chaired_events', 'attended_events'], require: true })
+        .fetch({ withRelated: req.relations, require: true })
         .then(user => {
+          debug(`found user with ID: ${user.id} from JWT`);
           req.user = user;
           next();
         })
+        .catch(User.NotFoundError, () => res.status(400).json({
+          error: 'User with ID decoded from JWT could not be found.',
+        }))
         .catch(err => res.status(400).json({ error: err.message }));
     });
   },

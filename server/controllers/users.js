@@ -18,14 +18,14 @@ const users = {
   },
 
   /**
-   * Lists all users, each with their registered events.
+   * Lists all users.
    *
    * @param  {Request} req HTTP request object
    * @param  {Response} res HTTP response sent after receiving a request
    */
   index(req, res) {
     // TODO Add pagination data via the Link header.
-    User.fetchAll({ withRelated: ['chaired_events', 'attended_events'] })
+    User.fetchAll({ withRelated: req.relations })
       .then(userCollection => res.json(userCollection.toJSON()));
   },
 

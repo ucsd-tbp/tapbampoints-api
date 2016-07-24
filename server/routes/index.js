@@ -39,8 +39,8 @@ router.post('/auth/login', validators.auth.login, controllers.auth.login);
 router.get('/auth/me', controllers.auth.verify, controllers.auth.currentUser);
 
 // Other user routes.
-router.get('/users/:id', controllers.users.show);
 router.get('/users', controllers.users.index);
+router.get('/users/:id', controllers.users.show);
 router.patch('/users/:id', validators.users.update, requireOwner, controllers.users.update);
 router.delete('/users/:id', requireAdmin, controllers.users.delete);
 
@@ -48,6 +48,10 @@ router.delete('/users/:id', requireAdmin, controllers.users.delete);
 router.get('/event-types', controllers.eventTypes.index);
 
 // Event routes.
+router.get('/events', controllers.events.index);
 router.get('/events/:id', controllers.events.show);
+router.post('/events', validators.events.create, requireAdmin, controllers.events.create);
+router.patch('/events/:id', validators.events.update, requireAdmin, controllers.events.update);
+router.delete('/events/:id', requireAdmin, controllers.events.delete);
 
 module.exports = router;

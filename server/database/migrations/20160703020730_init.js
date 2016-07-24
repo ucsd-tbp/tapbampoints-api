@@ -24,14 +24,14 @@ exports.up = knex =>
   .createTable('event_types', table => {
     table.increments('id').primary();
     table.string('name').defaultTo('').notNullable();
-    table.text('description').defaultTo('').notNullable();
+    table.text('description');
   })
 
   // Events table.
   .createTable('events', table => {
     table.increments('id').primary();
     table.string('name').defaultTo('').notNullable();
-    table.text('description').defaultTo('').notNullable();
+    table.text('description');
     table.integer('points').defaultTo(0).notNullable();
     table.timestamps();
 
@@ -43,6 +43,7 @@ exports.up = knex =>
 
   // Pivot table for many-to-many relation between users and events.
   .createTable('attendance_records', table => {
+    table.increments('id').primary();
     table.unique(['user_id', 'event_id']);
 
     table.integer('user_id').unsigned().references('id')

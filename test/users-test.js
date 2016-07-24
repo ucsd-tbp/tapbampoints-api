@@ -21,8 +21,6 @@ describe('Users', function() {
           last_name: 'User',
           house: 'None',
           member_status: 'Initiate',
-          attended_events: [],
-          chaired_events: [],
         }, done);
     });
 
@@ -44,8 +42,6 @@ describe('Users', function() {
             last_name: 'User',
             house: 'None',
             member_status: 'Initiate',
-            attended_events: [],
-            chaired_events: [],
           },
           {
             email: 'admin@test.com',
@@ -53,8 +49,6 @@ describe('Users', function() {
             last_name: 'User',
             house: 'None',
             member_status: 'Initiate',
-            attended_events: [],
-            chaired_events: [],
           },
         ], done);
     });

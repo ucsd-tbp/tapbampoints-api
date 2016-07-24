@@ -48,8 +48,6 @@ describe('Authentication', function() {
                 last_name: 'User',
                 house: 'None',
                 member_status: 'Initiate',
-                attended_events: [],
-                chaired_events: [],
               }, done);
           });
       });
@@ -162,8 +160,6 @@ describe('Authentication', function() {
                 email: 'newuser@test.com',
                 house: 'Red',
                 member_status: 'Member',
-                attended_events: [],
-                chaired_events: [],
               }, done);
           });
       });
@@ -186,8 +182,6 @@ describe('Authentication', function() {
               email: null,
               house: 'Blue',
               member_status: 'Initiate',
-              attended_events: [],
-              chaired_events: [],
             }, done);
         });
     });

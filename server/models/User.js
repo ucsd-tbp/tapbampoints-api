@@ -15,6 +15,8 @@ const User = db.model('User', {
   // Attributes that are not mass-assignable.
   guarded: ['id', 'is_admin'],
 
+  // Whether to include virual properties in JSON serialization (e.g.
+  // is_registered).
   outputVirtuals: false,
 
   /** Registers event listeners. */

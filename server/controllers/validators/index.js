@@ -1,7 +1,9 @@
 /** @file Defines custom validators for use in other controller validations. */
 
-const users = require('./users');
 const auth = require('./auth');
+const events = require('./events');
+const users = require('./users');
+
 const User = require('../../models/User');
 
 const custom = {
@@ -40,9 +42,10 @@ const custom = {
 };
 
 const validators = {
-  users,
-  custom,
   auth,
+  custom,
+  events,
+  users,
 };
 
 module.exports = validators;
