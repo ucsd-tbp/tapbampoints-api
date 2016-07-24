@@ -21,8 +21,8 @@ const app = express();
 
 debug('registering body-parser and express-validator middleware');
 
-// HTTP request logging middleware.
-app.use(morgan('dev'));
+// HTTP request logging middleware for development.
+if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
 
 // Places request body in req.body.
 app.use(bodyParser.json());

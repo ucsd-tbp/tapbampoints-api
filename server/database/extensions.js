@@ -69,6 +69,19 @@ module.exports = bookshelf => {
 
       return proto.fetchAll.call(this, options);
     },
+
+    /**
+     * Overrides model conversion to JSON to omit _pivot attributes in the
+     * returned JSON.
+     *
+     * @param  {Object} options Hash of options.
+     */
+    toJSON(options) {
+      const opts = options || {};
+      opts.omitPivot = true;
+
+      return proto.toJSON.call(this, opts);
+    }
   });
 
   bookshelf.Model = Model;
