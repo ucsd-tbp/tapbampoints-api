@@ -16,6 +16,7 @@ describe('Users', function() {
     it('returns the user with the correct info', function(done) {
       api.get('/api/users/1')
         .expect(200, {
+          id: 1,
           email: 'test@test.com',
           first_name: 'Test',
           last_name: 'User',
@@ -37,6 +38,7 @@ describe('Users', function() {
       api.get('/api/users')
         .expect(200, [
           {
+            id: 1,
             email: 'test@test.com',
             first_name: 'Test',
             last_name: 'User',
@@ -44,6 +46,7 @@ describe('Users', function() {
             member_status: 'Initiate',
           },
           {
+            id: 2,
             email: 'admin@test.com',
             first_name: 'Admin',
             last_name: 'User',

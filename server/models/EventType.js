@@ -7,9 +7,6 @@ const db = require('../database');
 
 const EventType = db.model('EventType', {
   tableName: 'event_types',
-
-  hidden: ['id'],
-
   fillable: ['name', 'description'],
 
   /**

@@ -43,6 +43,7 @@ describe('Authentication', function() {
             api.get('/api/auth/me')
               .set('Authorization', `Bearer ${token}`)
               .expect(200, {
+                id: 1,
                 email: 'test@test.com',
                 first_name: 'Test',
                 last_name: 'User',
@@ -155,6 +156,7 @@ describe('Authentication', function() {
 
             api.get('/api/users/3')
               .expect(200, {
+                id: 3,
                 first_name: 'New',
                 last_name: 'User',
                 email: 'newuser@test.com',
@@ -177,6 +179,7 @@ describe('Authentication', function() {
 
           api.get('/api/users/4')
             .expect(200, {
+              id: 4,
               first_name: 'New',
               last_name: 'User with just barcode',
               email: null,

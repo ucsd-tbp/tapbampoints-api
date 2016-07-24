@@ -4,7 +4,6 @@ const db = require('../database');
 
 const AttendanceRecord = db.model('AttendanceRecord', {
   tableName: 'events',
-  hidden: ['id'],
   fillable: ['user_id', 'event_id', 'points_earned'],
 
   event() {

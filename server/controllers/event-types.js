@@ -3,12 +3,7 @@
 const EventType = require('../models/EventType');
 
 const eventTypes = {
-  /**
-   * Lists all event types.
-   *
-   * @param  {Request} req HTTP request object.
-   * @param  {Response} res HTTP response object.
-   */
+  /** Lists all event types. */
   index(req, res) {
     EventType.fetchAll()
     .then(types => res.json(types.toJSON()))
