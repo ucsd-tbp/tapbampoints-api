@@ -7,6 +7,7 @@
 require('dotenv').config();
 
 const express = require('express');
+const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const validator = require('express-validator');
 const debug = require('debug')('tbp:app');
@@ -17,7 +18,11 @@ const middleware = require('./controllers/middleware');
 
 const app = express();
 
+
 debug('registering body-parser and express-validator middleware');
+
+// HTTP request logging middleware.
+app.use(morgan('dev'));
 
 // Places request body in req.body.
 app.use(bodyParser.json());
