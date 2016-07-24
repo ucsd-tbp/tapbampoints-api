@@ -46,6 +46,7 @@ router.delete('/users/:id', requireAdmin, controllers.users.delete);
 
 // Event type routes.
 router.get('/event-types', controllers.eventTypes.index);
+router.get('/event-types/:id', controllers.eventTypes.show);
 
 // Event routes.
 router.get('/events', controllers.events.index);

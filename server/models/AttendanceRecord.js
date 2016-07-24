@@ -4,14 +4,17 @@ const db = require('../database');
 
 const AttendanceRecord = db.model('AttendanceRecord', {
   tableName: 'events',
-  fillable: ['user_id', 'event_id', 'points_earned'],
+  hidden: ['user_id', 'event_id'],
+  fillable: ['points_earned'],
 
-  event() {
-    return this.belongsTo('Event');
-  },
+  relationships: {
+    event() {
+      return this.belongsTo('Event');
+    },
 
-  user() {
-    return this.belongsTo('User');
+    user() {
+      return this.belongsTo('User');
+    },
   },
 });
 
