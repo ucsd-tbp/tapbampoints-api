@@ -55,9 +55,14 @@ router.post('/events', validators.events.create, requireAdmin, controllers.event
 router.patch('/events/:id', validators.events.update, requireAdmin, controllers.events.update);
 router.delete('/events/:id', requireAdmin, controllers.events.delete);
 
-// Attendance record routes.
+// Routes for getting a user's attended events or an event's attendees.
 router.get('/users/:id/events', controllers.attendanceRecords.showAttendedEvents);
 router.get('/events/:id/users', controllers.attendanceRecords.showAttendees);
+
+// Lists all attendance records and implements filters (e.g. by user ID).
+router.get('/attendance-records', controllers.attendanceRecords.index);
+
+// Routes for modifying attendance records.
 router.put('/users/:user_id/events/:event_id', validators.attendanceRecords.create, requireAdmin,
   controllers.attendanceRecords.create);
 router.patch('/users/:user_id/events/:event_id', validators.attendanceRecords.update, requireAdmin,

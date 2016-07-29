@@ -1,7 +1,10 @@
 /** @file Contains endpoints for routes related to attendance records. */
 
-const User = require('../models/User');
+const AttendanceRecord = require('../models/AttendanceRecord');
 const Event = require('../models/Event');
+const User = require('../models/User');
+
+const debug = require('debug')('tbp:attendance-records-controller');
 
 const attendanceRecords = {
   /**
@@ -21,7 +24,7 @@ const attendanceRecords = {
         let message;
 
         // Handles errors associated with inserting an attendance record.
-        // REVIEW Error codes versus prior validation middleware.
+        // TODO Move validation to validators -- should not be in controllers.
         switch (err.code) {
           // Checks if adding the record failed because of a duplicate
           // insertion, since `user_id` and `event_id` pairs are enforced
@@ -42,6 +45,19 @@ const attendanceRecords = {
 
         return res.status(400).json({ error: message });
       });
+  },
+
+  /**
+   * Lists all attendance records. If called with an authenticated user in the
+   * request (i.e. user in `req.user` from decoded JWT) then shows the
+   * attendance records of the authenticated user.
+   */
+  index(req, res) {
+    AttendanceRecord
+      .query({ where: { id: 1, points_earned: 2 } })
+      .fetchAll({ withRelated: req.relations })
+      .then(records => res.json(records.toJSON()))
+      .catch(err => res.status(400).json({ message: err.message }));
   },
 
   /** Lists events that a user has attended. */
