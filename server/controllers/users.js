@@ -10,8 +10,7 @@ const users = {
    * @param  {Response} res HTTP respones, contains retrieved user
    */
   show(req, res) {
-    User.where('id', req.params.id)
-      .fetch({ withRelated: req.relations, require: true })
+    new User().findByID(req.params.id, { embed: req.relations })
       .then(user => res.json(user.toJSON()))
       .catch(User.NotFoundError, () => res.status(404).json({ error: 'User not found.' }))
       .catch(err => res.status(400).json({ error: err.message }));

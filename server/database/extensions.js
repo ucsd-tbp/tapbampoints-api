@@ -7,7 +7,7 @@
  */
 
 const Promise = require('bluebird');
-const debug = require('debug')('tbp-extensions');
+const _ = require('lodash');
 
 /**
  * Checks that every relation in `requestedRelations` exists in the
@@ -33,48 +33,61 @@ module.exports = bookshelf => {
 
   const Model = bookshelf.Model.extend({
     /**
-     * Overrides `Bookshelf.Model.fetch()` to validate relations passed with
-     * the `withRelated` option.
-     *
-     * @param {Object} [options={}] Hash of options.
-     * @return {Promise<Model|null>} Resolves to the fetched model or `null` if
-     * none exists.
-     * @see {@link http://bookshelfjs.org/#Model-instance-fetch
-     * `Bookshelf.Model.fetch()` documentation}
+     * Creates queryable field on the model's prototype when defining
+     * attributes in a model that can be filtered or sorted.
      */
-    fetch(options = {}) {
-      debug('firing custom fetch with req.relations validation');
+    constructor(...args) {
+      proto.constructor.call(this, ...args);
+      const options = args[1] || {};
 
-      if (!validateRelations(options.withRelated, this)) {
-        return Promise.reject(new Error(
-          'Names of relations to load are invalid.'
-        ));
-      }
-
-      return proto.fetch.call(this, options);
+      if (options.queryable) this.queryable = _.clone(options.queryable);
     },
 
-    /**
-     * Overrides `Bookshelf.Model.fetchAll()` to validate relations.
-     * @see {@link fetch}
-     */
-    fetchAll(options = {}) {
-      debug('firing custom fetchAll with req.relations validation');
+    findByID(id, options = {}) {
+      options.filters = options.filters || {};
+      options.filters.id = id;
+      return this.find(options);
+    },
 
-      if (!validateRelations(options.withRelated, this)) {
-        return Promise.reject(new Error(
-          'Names of relations to load are invalid.'
-        ));
+    findAll(options = {}) {
+      return find(options, true)
+    },
+
+    find(options = {}, returnCollection = false) {
+      if (options.filters) {
+        // Removes parameters from query that aren't in queryable attributes.
+        Object.keys(options.filters).forEach(param => {
+          if (param !== 'id' && this.queryable && this.queryable.indexOf(param) === -1) {
+            delete param;
+          }
+        });
       }
 
-      return proto.fetchAll.call(this, options);
+      if (options.embed) {
+        if (!validateRelations(options.embed, this)) {
+          return Promise.reject(new Error(
+            'Names of relations to load are invalid.'
+          ));
+        }
+      }
+
+      const builder = this.query({ where: options.filters })
+
+      return this.query({ where: options.filters })
+        .fetch({ withRelated: options.embed, require: true })
+
+      if (returnCollection) {
+        return builder.fetchAll({ withRelated: options.embed })
+      }
+
+      return builder.fetch({ withRelated: options.embed, require: true })
     },
 
     /**
      * Overrides model conversion to JSON to omit _pivot attributes in the
      * returned JSON.
      *
-     * @param  {Object} options Hash of options.
+     * @param {Object} options Hash of options.
      */
     toJSON(options) {
       const opts = options || {};

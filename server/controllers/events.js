@@ -15,8 +15,7 @@ const events = {
 
   /** Shows event with ID given in request parameters. */
   show(req, res) {
-    Event.where('id', req.params.id)
-      .fetch({ withRelated: req.relations, require: true })
+    new Event().findByID(req.params.id, { embed: req.relations })
       .then(event => res.json(event.toJSON()))
       .catch(Event.NotFoundError, () => res.status(404).json({ error: 'Event not found.' }))
       .catch(err => res.status(400).json({ message: err.message }));
@@ -24,7 +23,7 @@ const events = {
 
   /** Lists all events. */
   index(req, res) {
-    Event.fetchAll({ withRelated: req.relations })
+    Event.findAll({ embed: req.relations })
       .then(eventCollection => res.json(eventCollection.toJSON()));
   },
 

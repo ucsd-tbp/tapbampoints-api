@@ -14,7 +14,7 @@ const debug = require('debug')('tbp:embed');
  *
  * // Loads user's attended events and chaired events to return as JSON.
  * User.where('id', req.params.id)
- *   .fetch({ withRelated: req.relations })
+ *   .fetch()
  *   .then(user => res.json(user.toJSON()));
  *
  * @param  {Request} req May contain an embed key in its query string.
