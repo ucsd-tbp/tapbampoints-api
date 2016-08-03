@@ -23,8 +23,9 @@ const events = {
 
   /** Lists all events. */
   index(req, res) {
-    Event.findAll({ embed: req.relations })
-      .then(eventCollection => res.json(eventCollection.toJSON()));
+    new Event().findAll({ embed: req.relations, filters: req.query })
+      .then(eventCollection => res.json(eventCollection.toJSON()))
+      .catch(err => res.status(400).json({ message: err.message }));
   },
 
   /** Updates event with ID in request parameters. */

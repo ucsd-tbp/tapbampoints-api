@@ -1,6 +1,7 @@
 /**
  * @file A subclass of Bookshelf.Model that adds extra functionality, used as
  * a plugin when initializing the Bookshelf instance.
+ *
  * @see {@link https://www.npmjs.com/package/bookshelf-mass-assignment A
  * similarly written plugin.}
  * @see index.js
@@ -43,14 +44,29 @@ module.exports = bookshelf => {
       if (options.queryable) this.queryable = _.clone(options.queryable);
     },
 
+    /**
+     * Finds a model given its ID.
+     *
+     * @param  {int} id
+     * @param  {Object} [options={}] Hash of options for querying and fetching.
+     * @return {Promise<Model>} Resolves to model with given ID.
+     */
     findByID(id, options = {}) {
       options.filters = options.filters || {};
       options.filters.id = id;
       return this.find(options);
     },
 
+    /**
+     * Finds a collection of models that match the provided filters. Overrides
+     * Bookshelf's fetch and fetchAll in order to validate request query string
+     * and to have defaults for commonly used options.
+     *
+     * @param  {Object} [options={}] Hash of options for querying and fetching.
+     * @return {Promise<Collection>} Resolves to model collection.
+     */
     findAll(options = {}) {
-      return find(options, true)
+      return this.find(options, true);
     },
 
     find(options = {}, returnCollection = false) {
@@ -58,9 +74,11 @@ module.exports = bookshelf => {
         // Removes parameters from query that aren't in queryable attributes.
         Object.keys(options.filters).forEach(param => {
           if (param !== 'id' && this.queryable && this.queryable.indexOf(param) === -1) {
-            delete param;
+            delete options.filters[param];
           }
         });
+      } else {
+        options.filters = {};
       }
 
       if (options.embed) {
@@ -71,16 +89,14 @@ module.exports = bookshelf => {
         }
       }
 
-      const builder = this.query({ where: options.filters })
+      const builder = this.query({ where: options.filters });
 
-      return this.query({ where: options.filters })
-        .fetch({ withRelated: options.embed, require: true })
-
+      // Returns a collection if called from findAll.
       if (returnCollection) {
-        return builder.fetchAll({ withRelated: options.embed })
+        return builder.fetchAll({ withRelated: options.embed });
       }
 
-      return builder.fetch({ withRelated: options.embed, require: true })
+      return builder.fetch({ withRelated: options.embed, require: true });
     },
 
     /**

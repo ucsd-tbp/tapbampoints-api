@@ -16,7 +16,7 @@ const User = db.model('User', {
   guarded: ['id', 'is_admin'],
 
   // Attributes that can be used to search, filter, or sort collection results.
-  queryable: [],
+  queryable: ['email', 'first_name', 'last_name', 'house', 'member_status'],
 
   // Whether to include virual properties in JSON serialization (e.g.
   // is_registered).

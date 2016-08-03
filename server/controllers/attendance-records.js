@@ -4,8 +4,6 @@ const AttendanceRecord = require('../models/AttendanceRecord');
 const Event = require('../models/Event');
 const User = require('../models/User');
 
-const debug = require('debug')('tbp:attendance-records-controller');
-
 const attendanceRecords = {
   /**
    * Creates an attendance record given a user ID (attendee) and an event ID
@@ -53,9 +51,7 @@ const attendanceRecords = {
    * attendance records of the authenticated user.
    */
   index(req, res) {
-    AttendanceRecord
-      .query({ where: { id: 1, points_earned: 2 } })
-      .fetchAll({ withRelated: req.relations })
+    new AttendanceRecord().findAll({ embed: req.relations, filters: req.query })
       .then(records => res.json(records.toJSON()))
       .catch(err => res.status(400).json({ message: err.message }));
   },
