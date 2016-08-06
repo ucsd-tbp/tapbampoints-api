@@ -11,6 +11,15 @@ debug('initializing knex and bookshelf instances');
 
 const config = require('./knexfile');
 const knex = require('knex')(config[process.env.NODE_ENV]);
+
+if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
+  knex.on('query', data => {
+    let index = 0;
+    // Replaces each question mark in SQL with its binding.
+    debug(data.sql.replace(/\?/g, () => data.bindings[index++]));
+  });
+}
+
 const db = bookshelf(knex);
 
 // Avoids circular dependencies when defining relationships between models.

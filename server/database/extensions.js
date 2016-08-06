@@ -4,7 +4,7 @@
  *
  * @see {@link https://www.npmjs.com/package/bookshelf-mass-assignment A
  * similarly written plugin.}
- * @see index.js
+ * @see ./index.js
  */
 
 const Promise = require('bluebird');
@@ -69,18 +69,28 @@ module.exports = bookshelf => {
       return this.find(options, true);
     },
 
+    /**
+     * Validates query string parameters and fetches a model with the requested
+     * relations based on the provided filters. Typically called from either
+     * findByID or findAll.
+     *
+     * @param {Object} [options={}] Hash of options.
+     * @param  {Boolean} [returnCollection=false] Whether to return a
+     * collection or a single model.
+     * @return {Promise<Model>|Promise<Collection>} Resolves to either a model
+     * or a collection depending on `returnCollection`.
+     */
     find(options = {}, returnCollection = false) {
-      if (options.filters) {
-        // Removes parameters from query that aren't in queryable attributes.
-        Object.keys(options.filters).forEach(param => {
-          if (param !== 'id' && this.queryable && this.queryable.indexOf(param) === -1) {
-            delete options.filters[param];
-          }
-        });
-      } else {
-        options.filters = {};
-      }
+      options.filters = options.filters || {};
 
+      // Removes parameters from query that aren't in queryable attributes.
+      Object.keys(options.filters).forEach(param => {
+        if (param !== 'id' && this.queryable && this.queryable.indexOf(param) === -1) {
+          delete options.filters[param];
+        }
+      });
+
+      // Validates values in embed query string parameter.
       if (options.embed) {
         if (!validateRelations(options.embed, this)) {
           return Promise.reject(new Error(
