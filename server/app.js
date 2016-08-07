@@ -44,4 +44,7 @@ app.use(middleware.embed);
 // Mounts API routes onto the base URL /api.
 app.use('/', routes);
 
+// If nothing else responded, then returns a 404.
+app.use((req, res) => res.status(404).json({ error: 'Endpoint doesn\'t exist.' }));
+
 module.exports = app;
