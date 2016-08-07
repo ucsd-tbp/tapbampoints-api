@@ -14,7 +14,7 @@ describe('Users', function() {
 
   describe('GET /users/:id', function() {
     it('returns the user with the correct info', function(done) {
-      api.get('/api/users/1')
+      api.get('/users/1')
         .expect(200, {
           id: 1,
           email: 'test@test.com',
@@ -26,7 +26,7 @@ describe('Users', function() {
     });
 
     it('responds with a 404 Not Found when trying to get a nonexistent user', function(done) {
-      api.get('/api/users/100')
+      api.get('/users/100')
         .expect(404, {
           error: 'User not found.',
         }, done);
@@ -35,7 +35,7 @@ describe('Users', function() {
 
   describe('GET /users', function() {
     it('returns a list of users', function(done) {
-      api.get('/api/users')
+      api.get('/users')
         .expect(200, [
           {
             id: 1,
@@ -61,7 +61,7 @@ describe('Users', function() {
     let token = null;
 
     before(function(done) {
-      api.post('/api/auth/login')
+      api.post('/auth/login')
       .send({
         email: 'test@test.com',
         password: 'password',
@@ -73,7 +73,7 @@ describe('Users', function() {
     });
 
     it('returns a 400 Bad Request when the first name is empty', function(done) {
-      api.patch('/api/users/1')
+      api.patch('/users/1')
         .set('Authorization', `Bearer ${token}`)
         .send({ first_name: '', last_name: 'Empty First Name' })
         .expect(400, [{
@@ -84,7 +84,7 @@ describe('Users', function() {
     });
 
     it('returns a 400 Bad Request when the last name is empty', function(done) {
-      api.patch('/api/users/1')
+      api.patch('/users/1')
         .set('Authorization', `Bearer ${token}`)
         .send({ first_name: 'Empty Last Name', last_name: '' })
         .expect(400, [{
@@ -95,7 +95,7 @@ describe('Users', function() {
     });
 
     it('returns a 400 Bad Request when the barcode is empty', function(done) {
-      api.patch('/api/users/1')
+      api.patch('/users/1')
         .set('Authorization', `Bearer ${token}`)
         .send({ barcode: '' })
         .expect(400, [{
@@ -106,7 +106,7 @@ describe('Users', function() {
     });
 
     it('returns a 400 Bad Request when the house is not of Red, Green, or Blue', function(done) {
-      api.patch('/api/users/1')
+      api.patch('/users/1')
         .set('Authorization', `Bearer ${token}`)
         .send({ house: 'Orange' })
         .expect(400, [{
@@ -118,7 +118,7 @@ describe('Users', function() {
 
     it('returns a 400 Bad Request when the member status is not of Initiate, Member, or Officer',
       function(done) {
-        api.patch('/api/users/1')
+        api.patch('/users/1')
           .set('Authorization', `Bearer ${token}`)
           .send({ member_status: 'None' })
           .expect(400, [{
@@ -129,27 +129,27 @@ describe('Users', function() {
       });
 
     it('does not update the is_admin field', function(done) {
-      api.patch('/api/users/1')
+      api.patch('/users/1')
         .set('Authorization', `Bearer ${token}`)
         .send({ first_name: 'Updated', is_admin: true })
         .expect(400, { error: 'Couldn\'t save model! Attributes are invalid.' }, done);
     });
     it('does not update the id field', function(done) {
-      api.patch('/api/users/1')
+      api.patch('/users/1')
         .set('Authorization', `Bearer ${token}`)
         .send({ first_name: 'Updated', id: true })
         .expect(400, { error: 'Couldn\'t save model! Attributes are invalid.' }, done);
     });
 
     it('updates the user\'s first and last names with valid input', function(done) {
-      api.patch('/api/users/1')
+      api.patch('/users/1')
         .set('Authorization', `Bearer ${token}`)
         .send({ first_name: 'Updated', last_name: 'Name' })
         .expect({ first_name: 'Updated', last_name: 'Name' }, done);
     });
 
     it('responds with a 401 Unauthorized when trying to update a nonexistent user', function(done) {
-      api.patch('/api/users/10')
+      api.patch('/users/10')
         .set('Authorization', `Bearer ${token}`)
         .send({ first_name: 'NonexistentUserName' })
         .expect(401, { error: 'Not authorized to access this route.' }, done);
@@ -157,7 +157,7 @@ describe('Users', function() {
 
     it('responds with a 401 Unauthorized when a logged in user tries to update a different user',
       function(done) {
-        api.post('/api/auth/register')
+        api.post('/auth/register')
           .send({
             first_name: 'Second',
             last_name: 'User',
@@ -166,7 +166,7 @@ describe('Users', function() {
           .expect(201, function(err, res) {
             expect(res.body.token).to.exist;
 
-            api.patch('/api/users/1')
+            api.patch('/users/1')
               .set('Authorization', `Bearer ${res.body.token}`)
               .send({ first_name: 'Updated', last_name: 'Name' })
               .expect(401, { error: 'Not authorized to access this route.' }, done);
@@ -179,7 +179,7 @@ describe('Users', function() {
     let adminToken = null;
 
     before(function(done) {
-      api.post('/api/auth/login')
+      api.post('/auth/login')
       .send({
         email: 'test@test.com',
         password: 'password',
@@ -187,7 +187,7 @@ describe('Users', function() {
       .end(function(err, res) {
         token = res.body.token;
 
-        api.post('/api/auth/login')
+        api.post('/auth/login')
         .send({
           email: 'admin@test.com',
           password: 'admin',
@@ -200,16 +200,16 @@ describe('Users', function() {
     });
 
     it('responds with a 401 Unauthorized when the logged in user isn\'t an admin', function(done) {
-      api.delete('/api/users/1')
+      api.delete('/users/1')
         .set('Authorization', `Bearer ${token}`)
         .expect(401, { error: 'Not authorized to access this route.' }, done);
     });
 
     it('responds with a 204 No Content and deletes the user', function(done) {
-      api.delete('/api/users/1')
+      api.delete('/users/1')
         .set('Authorization', `Bearer ${adminToken}`)
         .expect(204, {}, function() {
-          api.get('/api/users/1')
+          api.get('/users/1')
             .expect(404, {
               error: 'User not found.',
             }, done);
@@ -217,7 +217,7 @@ describe('Users', function() {
     });
 
     it('responds with a 404 Not Found when trying to delete a nonexistent user', function(done) {
-      api.delete('/api/users/10')
+      api.delete('/users/10')
         .set('Authorization', `Bearer ${adminToken}`)
         .expect(404, { error: 'User not found.' }, done);
     });

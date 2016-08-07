@@ -42,6 +42,6 @@ app.use(validator({ customValidators: validators.custom }));
 app.use(middleware.embed);
 
 // Mounts API routes onto the base URL /api.
-app.use('/api', routes);
+app.use('/', routes);
 
 module.exports = app;
