@@ -8,6 +8,7 @@ require('dotenv').config();
 
 const bodyParser = require('body-parser');
 const compression = require('compression');
+const cors = require('cors');
 const debug = require('debug')('tbp:app');
 const express = require('express');
 const helmet = require('helmet');
@@ -21,6 +22,9 @@ const validators = require('./controllers/validators');
 const app = express();
 
 debug('registering security, compression, body parsing, custom middleware, and routes');
+
+// Enables all CORS requests.
+app.use(cors());
 
 // Adds some security by adding HTTP headers.
 app.use(helmet());
