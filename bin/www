@@ -7,7 +7,7 @@ const debug = require('debug')('tbp:www');
 const http = require('http');
 
 // Gets port number from environment and stores in Express.
-const port = process.env.PORT || '8080';
+const port = process.env.PORT || '8000';
 app.set('port', port);
 
 // Creates HTTP server and listens on provided port.
