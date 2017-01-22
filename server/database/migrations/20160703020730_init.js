@@ -23,16 +23,19 @@ exports.up = knex =>
   // additional info.
   .createTable('event_types', table => {
     table.increments('id').primary();
-    table.string('name').defaultTo('').notNullable();
+    table.string('summary').defaultTo('').notNullable();
     table.text('description');
   })
 
   // Events table.
   .createTable('events', table => {
     table.increments('id').primary();
-    table.string('name').defaultTo('').notNullable();
+    table.string('summary').defaultTo('').notNullable();
     table.text('description');
     table.integer('points').defaultTo(0).notNullable();
+    table.string('location');
+    table.dateTime('start');
+    table.dateTime('end');
     table.timestamps();
 
     table.integer('type_id').unsigned().references('id')

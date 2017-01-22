@@ -1,21 +1,17 @@
-const faker = require('faker');
-
 exports.seed = (knex, Promise) => {
   const seedQueries = [];
 
-  // Creates array of insert statements for fake event data.
-  for (let i = 1; i <= 10; i++) {
-    const query = knex('events').insert({
-      id: i,
-      name: faker.lorem.words(),
-      description: faker.lorem.lines(),
-      points: faker.random.number({ min: 1, max: 6 }),
-      officer_id: 1,
-      type_id: faker.random.number({ min: 1, max: 4 }),
-    });
+  const query = knex('events').insert({
+    id: 1,
+    summary: 'Green House: TapEx Bonding',
+    description: 'Stop by TapEx in PC to grab a drink and mingle!',
+    points: 2,
+    type_id: 2,
+    start: '2017-01-18 14:00:00',
+    end: '2017-01-18 16:00:00',
+  });
 
-    seedQueries.push(query);
-  }
+  seedQueries.push(query);
 
   // Drops event database before adding fake data.
   return knex('events').del().then(() => Promise.all(seedQueries));

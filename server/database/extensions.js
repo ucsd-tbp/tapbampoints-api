@@ -97,6 +97,10 @@ module.exports = bookshelf => {
             'Names of relations to load are invalid.'
           ));
         }
+
+        // FIXME Stop embed from going into filters, and figure out why embed
+        // works for users but not other models.
+        delete options.filters.embed;
       }
 
       const builder = this.query({ where: options.filters });

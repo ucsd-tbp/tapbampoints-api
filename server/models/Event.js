@@ -7,7 +7,9 @@ const db = require('../database');
 const Event = db.model('Event', {
   tableName: 'events',
   hidden: ['type_id', 'officer_id'],
-  fillable: ['name', 'description', 'points', 'officer_id', 'type_id'],
+  fillable: [
+    'summary', 'description', 'location', 'points', 'officer_id', 'type_id', 'start', 'end',
+  ],
 
   relationships: {
     /**

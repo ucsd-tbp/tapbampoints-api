@@ -19,6 +19,7 @@ const middleware = require('./controllers/middleware');
 const routes = require('./routes');
 const validators = require('./controllers/validators');
 
+// TODO Prevent SQL from being bubbled up as an error message.
 const app = express();
 
 debug('registering security, compression, body parsing, custom middleware, and routes');

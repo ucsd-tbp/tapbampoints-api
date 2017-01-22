@@ -8,8 +8,8 @@ const events = {
     debug('firing events.create validation middleware');
 
     req.checkBody({
-      name: {
-        notEmpty: { errorMessage: 'The event name can\'t be empty.' },
+      summary: {
+        notEmpty: { errorMessage: 'The event summary can\'t be empty.' },
       },
 
       description: {
@@ -29,9 +29,9 @@ const events = {
     debug('firing events.update validation middleware');
 
     req.checkBody({
-      name: {
+      summary: {
         optional: true,
-        notEmpty: { errorMessage: 'The event name can\'t be empty.' },
+        notEmpty: { errorMessage: 'The event summary can\'t be empty.' },
       },
 
       description: {
