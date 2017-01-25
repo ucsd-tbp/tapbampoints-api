@@ -26,8 +26,13 @@ function makeJWT(user) {
     subject: user.id.toString(),
   };
 
+  const payload = {
+    email: user.get('email'),
+    memberStatus: user.get('member_status'),
+  };
+
   return new Promise((resolve, reject) => {
-    jwt.sign({ email: user.get('email') }, process.env.JWT_SECRET, options, (err, token) => {
+    jwt.sign(payload, process.env.JWT_SECRET, options, (err, token) => {
       if (err) reject(err);
       resolve(token);
     });

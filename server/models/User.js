@@ -13,7 +13,7 @@ const User = db.model('User', {
   hidden: ['password', 'barcode', 'is_admin'],
 
   // Attributes that are not mass-assignable.
-  guarded: ['id', 'is_admin'],
+  guarded: ['id', 'is_admin', 'member_status'],
 
   // Attributes that can be used to search, filter, or sort collection results.
   queryable: ['email', 'first_name', 'last_name', 'house', 'member_status'],

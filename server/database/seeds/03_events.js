@@ -9,6 +9,7 @@ exports.seed = (knex, Promise) => {
     type_id: 2,
     start: '2017-01-18 14:00:00',
     end: '2017-01-18 16:00:00',
+    location: 'Tapioca Express, PC',
   });
 
   seedQueries.push(query);
