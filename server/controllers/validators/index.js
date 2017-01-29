@@ -14,16 +14,16 @@ const custom = {
    * the given email does not exist in the database in order to indicate that
    * the email is available.
    *
-   * @param  {string} email Email to check existence of.
+   * @param  {String} email Email to check existence of.
    * @return {Promise<User>} Resolves when the email was not found.
    */
   isEmailAvailable(email) {
     return new Promise((resolve, reject) => {
       User.where('email', email)
         .fetch({ require: true })
-        .then(() => reject(new Error('Email is not available.')))
-        .catch(() => resolve('Email is available'));
-    });
+        .then(() => reject())
+        .catch(() => resolve());
+    })
   },
 
   /**
@@ -37,9 +37,9 @@ const custom = {
     return new Promise((resolve, reject) => {
       User.where('barcode', barcode)
         .fetch({ require: true })
-        .then(() => reject(new Error('Barcode is not available.')))
-        .catch(() => resolve('Barcode is available.'));
-    });
+        .then(() => reject())
+        .catch(() => resolve());
+    })
   },
 };
 

@@ -148,7 +148,6 @@ describe('Authentication', function() {
             password: 'password',
             barcode: 'barcode2',
             house: 'Red',
-            member_status: 'Member',
           })
           .expect(201, function(err, res) {
             expect(res.body.token).to.exist;
@@ -160,7 +159,7 @@ describe('Authentication', function() {
                 last_name: 'User',
                 email: 'newuser@test.com',
                 house: 'Red',
-                member_status: 'Member',
+                member_status: 'Initiate',
               }, done);
           });
       });
