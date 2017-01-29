@@ -1,8 +1,16 @@
 /** @file Initial migration */
 
 exports.up = knex =>
+  // Specifies user roles.
+  knex.schema.createTable('roles', table => {
+    table.increments('id').primary();
+    table.string('name').unique().notNullable();
+    table.string('display_name').defaultTo('');
+    table.string('description').defaultTo('');
+  })
+
   // Users table, including house and member status.
-  knex.schema.createTable('users', table => {
+  .createTable('users', table => {
     table.increments('id').primary();
 
     // Can be null if a user authenticates via the barcode.
@@ -12,11 +20,10 @@ exports.up = knex =>
     table.string('first_name').defaultTo('').notNullable();
     table.string('last_name').defaultTo('').notNullable();
     table.string('barcode').unique().notNullable();
-    table.boolean('is_admin').defaultTo(false).notNullable();
     table.enu('house', ['Red', 'Green', 'Blue', 'None']).defaultTo('None').notNullable();
-    table.enu('member_status', ['Initiate', 'Pending', 'Member', 'Officer'])
-      .defaultTo('Initiate')
-      .notNullable();
+
+    table.integer('role_id').unsigned().references('id')
+      .inTable('roles');
   })
 
   // Reference table for event types (academic, social, community, wildcard).
@@ -24,8 +31,9 @@ exports.up = knex =>
   // additional info.
   .createTable('event_types', table => {
     table.increments('id').primary();
-    table.string('summary').defaultTo('').notNullable();
-    table.text('description');
+    table.string('name').unique().notNullable();
+    table.string('display_name').defaultTo('');
+    table.text('description').defaultTo('');
   })
 
   // Events table.
@@ -66,4 +74,5 @@ exports.down = knex =>
   knex.schema.dropTable('attendance_records')
               .dropTable('events')
               .dropTable('event_types')
-              .dropTable('users');
+              .dropTable('users')
+              .dropTable('roles');

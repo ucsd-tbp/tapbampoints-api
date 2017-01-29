@@ -45,8 +45,8 @@ router.patch('/users/:id', validators.users.update, requireOwner, controllers.us
 router.delete('/users/:id', requireAdmin, controllers.users.delete);
 
 // Event type routes.
-router.get('/event-types', controllers.eventTypes.index);
-router.get('/event-types/:id', controllers.eventTypes.show);
+router.get('/events/types', controllers.eventTypes.index);
+router.get('/events/types/:id', controllers.eventTypes.show);
 
 // Event routes.
 router.get('/events', controllers.events.index);
@@ -60,7 +60,7 @@ router.get('/users/:id/events', controllers.attendanceRecords.showAttendedEvents
 router.get('/events/:id/users', controllers.attendanceRecords.showAttendees);
 
 // Lists all attendance records and implements filters (e.g. by user ID).
-router.get('/attendance-records', controllers.attendanceRecords.index);
+router.get('/events/records', controllers.attendanceRecords.index);
 
 // Routes for modifying attendance records.
 router.put('/users/:user_id/events/:event_id', validators.attendanceRecords.create, requireAdmin,

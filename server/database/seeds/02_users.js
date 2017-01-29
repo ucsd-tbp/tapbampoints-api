@@ -13,8 +13,7 @@ exports.seed = (knex, Promise) => {
     last_name: 'Kenobi',
     barcode: faker.random.uuid(),
     house: faker.helpers.randomize(['Red', 'Green', 'Blue']),
-    member_status: 'Officer',
-    is_admin: true,
+    role_id: 5,
   }));
 
   // Inserts a non-admin user.
@@ -26,8 +25,7 @@ exports.seed = (knex, Promise) => {
     last_name: 'Skywalker',
     barcode: faker.random.uuid(),
     house: faker.helpers.randomize(['Red', 'Green', 'Blue']),
-    member_status: 'Member',
-    is_admin: false,
+    role_id: 4,
   }));
 
   // Drops user database before adding fake data.

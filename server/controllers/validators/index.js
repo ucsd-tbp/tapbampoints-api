@@ -23,7 +23,7 @@ const custom = {
         .fetch({ require: true })
         .then(() => reject())
         .catch(() => resolve());
-    })
+    });
   },
 
   /**
@@ -39,7 +39,17 @@ const custom = {
         .fetch({ require: true })
         .then(() => reject())
         .catch(() => resolve());
-    })
+    });
+  },
+
+  /**
+   * Only allows 'initiate' or 'member' roles. Prevents users from registering
+   * as officers or approved members.
+   *
+   * @return {Boolean} True if role field is either 'initiate' or 'pending'.
+   */
+  isSafeRole(role) {
+    return role === 'initiate' || role === 'pending';
   },
 };
 

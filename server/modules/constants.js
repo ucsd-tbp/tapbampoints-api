@@ -6,7 +6,7 @@ const constants = {
     PENDING_MEMBER: 'Pending Member',
     MEMBER: 'Member',
     OFFICER: 'Officer',
-  });
+  }),
 };
 
 module.exports = constants;

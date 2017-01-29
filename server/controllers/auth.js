@@ -6,6 +6,7 @@
 const debug = require('debug')('tbp:auth');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const Role = require('../models/Role');
 
 /**
  * Creates registered claims to sign the JWT with and places the user's admin
@@ -14,10 +15,8 @@ const User = require('../models/User');
  *
  * @private
  * @param  {User} user User to create token for.
- * @return {Promise<String>} Resolves to newly created token. Returns a Promise
- * to chain calls in controllers, e.g. `.then(makeJWT).then(token => ...)`.
- * @see {@link https://tools.ietf.org/html/rfc7519#section-4.1 the JWT spec
- * concerning claims.}
+ * @return {Promise<String>} Resolves to newly created token.
+ * @see https://tools.ietf.org/html/rfc7519#section-4.1 (the JWT spec on claims)
  */
 function makeJWT(user) {
   // TODO Generate additional registered claims, as per the JWT spec.
@@ -27,9 +26,11 @@ function makeJWT(user) {
   };
 
   const payload = {
-    email: user.get('email'),
-    memberStatus: user.get('member_status'),
+    id: user.get('id'),
   };
+
+  debug('printing out user role');
+  console.log(user.get('role'));
 
   return new Promise((resolve, reject) => {
     jwt.sign(payload, process.env.JWT_SECRET, options, (err, token) => {
@@ -47,7 +48,7 @@ const auth = {
    * not present or invalid. Places the authenticated user in `req.user`.
    *
    * To make authenticated requests, the header must be formatted like:
-   * Authorization: Bearer {token}
+   * `Authorization: Bearer {token}`
    *
    * @param  {Request} req HTTP request object.
    * @param  {Response} res HTTP response object.
@@ -107,27 +108,15 @@ const auth = {
    * @param  {Request} req Must contain an email and password combination if
    * the user has registered an email or password. Otherwise, the user can
    * login with just the barcode.
-   * @param {string} req.body.email Email to search for the user with.
-   * @param {string} req.body.password Password to authenticate email against.
-   * @param {string} req.body.barcode If user has not registered an email and
-   * password yet, then just the barcode can be used to log in.
    * @param  {Response} res HTTP response containing the generated token
-   *
-   * @see `User.login(credentials)`
    */
   login(req, res) {
-    const credentials = {
-      key: req.body.barcode ? 'barcode' : 'email',
-      search: req.body.barcode ? req.body.barcode : req.body.email,
-      pass: req.body.barcode ? undefined : req.body.password,
-    };
-
-    new User().login(credentials)
+    new User().login(req.email, req.password)
       .then(makeJWT)
       .then(token => res.json({ token }))
       .catch(User.NotFoundError, () =>
         res.status(404).json({
-          error: `An account with that ${credentials.key} has not been registered.`,
+          error: 'An account with that email has not been registered.',
         }))
       .catch(err => res.status(401).json({ error: err.message }));
   },

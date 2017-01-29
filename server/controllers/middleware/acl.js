@@ -17,6 +17,10 @@ const acl = {
   allow(roles) {
     const aclMiddleware = (req, res, next) => {
       debug('firing ACL middleware check');
+
+      console.log(req.user.get('role'));
+
+      // Checks requirements for each role.
       for (const role of roles) {
         switch (role) {
           case 'admin':

@@ -7,7 +7,7 @@ const db = require('../database');
 
 const EventType = db.model('EventType', {
   tableName: 'event_types',
-  fillable: ['name', 'description'],
+  fillable: ['name', 'display_name', 'description'],
 
   relationships: {
     /**
