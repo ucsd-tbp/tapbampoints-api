@@ -6,7 +6,6 @@
 const debug = require('debug')('tbp:auth');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const Role = require('../models/Role');
 
 /**
  * Creates registered claims to sign the JWT with and places the user's admin
@@ -26,11 +25,9 @@ function makeJWT(user) {
   };
 
   const payload = {
-    id: user.get('id'),
+    email: user.get('email'),
+    role: user.related('role').name,
   };
-
-  debug('printing out user role');
-  console.log(user.get('role'));
 
   return new Promise((resolve, reject) => {
     jwt.sign(payload, process.env.JWT_SECRET, options, (err, token) => {
@@ -111,7 +108,7 @@ const auth = {
    * @param  {Response} res HTTP response containing the generated token
    */
   login(req, res) {
-    new User().login(req.email, req.password)
+    new User().login(req.body.email, req.body.password)
       .then(makeJWT)
       .then(token => res.json({ token }))
       .catch(User.NotFoundError, () =>

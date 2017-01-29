@@ -12,23 +12,8 @@ const Role = db.model('Role', {
   relationships: {
     /** Users that are assigned to a certain role. */
     users() {
-      return this.hasMany('User', 'role_id');
+      return this.hasMany('User');
     },
-  },
-
-  /**
-   * Given a role unique name, retrieves the role's corresponding ID.
-   *
-   * @private
-   * @param {String} name Name of role, e.g. 'initiate' or 'member'.
-   * @return {Promise} Resolves to role ID if found.
-   */
-  updateWithRoleID(user) {
-    if (!Object.hasOwnProperty('role')) {
-      throw new Error('Role property doesn\'t exist on the given user object!');
-    }
-
-    return Role.where('name', name).fetch({ require: true });
   },
 });
 

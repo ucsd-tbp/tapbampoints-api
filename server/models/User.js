@@ -40,7 +40,7 @@ const User = db.model('User', {
 
     /** Permission role. */
     role() {
-      return this.belongsTo('Role', 'role_id');
+      return this.belongsTo('Role');
     },
   },
 
@@ -49,8 +49,6 @@ const User = db.model('User', {
    * @return {Promise<string>} Resolves to hashed password.
    */
   hashPassword() {
-    console.log('hashing password');
-
     return new Promise((resolve, reject) => {
       bcrypt.hash(this.attributes.password, 10, (err, hash) => {
         if (err) reject(err);
@@ -79,7 +77,7 @@ const User = db.model('User', {
         this.set('role_id', role.id);
 
         debug(this.attributes);
-      })
+      });
   },
 
   /**
@@ -94,7 +92,7 @@ const User = db.model('User', {
   login(email, password) {
     // FIXME Fix Promise anti-patterns, i.e. new Promise() and nesting Promises.
     return User.where('email', email)
-      .fetch({ require: true })
+      .fetch({ require: true, withRelated: ['role'] })
       .then(user =>
         new Promise((resolve, reject) => {
           // Checks for password correctness.

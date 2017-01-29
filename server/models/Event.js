@@ -8,41 +8,25 @@ const Event = db.model('Event', {
   tableName: 'events',
   hidden: ['type_id', 'officer_id'],
   fillable: [
-    'summary', 'description', 'location', 'points', 'officer_id', 'type_id', 'start', 'end',
+    'summary', 'description', 'location', 'points', 'start', 'end',
   ],
 
   relationships: {
-    /**
-     * Creates one-to-many relation for the relation between an officer and the
-     * events they chair.
-     *
-     * @return {User} Member that chaired this event.
-     */
+    /** Officer chairing this event. */
     officer() {
       return this.belongsTo('User', 'officer_id');
     },
 
-    /**
-     * Creates many-to-many relation to represent an event and its confirmed
-     * attendees.
-     *
-     * @return {Collection<User>} Users associated with this event.
-     */
+    /** Attendees confirmed to be at event. */
     attendees() {
       return this.belongsToMany('User', 'attendance_records');
     },
 
-    /**
-     * Creates a one-to-many relation to represent the type that this event
-     * belongs to.
-     *
-     * @return {EventType} Event type associated with this event.
-     */
+    /** Type of this event, i.e. 'academic', 'social', 'service'. */
     type() {
       return this.belongsTo('EventType', 'type_id');
     },
   },
 });
 
-// Loads Event model into Bookshelf registry.
 module.exports = Event;
