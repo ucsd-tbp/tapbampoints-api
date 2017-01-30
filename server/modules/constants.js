@@ -2,10 +2,19 @@
 
 const constants = {
   MemberStatuses: Object.freeze({
-    INITIATE: 'Initiate',
-    PENDING_MEMBER: 'Pending Member',
-    MEMBER: 'Member',
-    OFFICER: 'Officer',
+    INITIATE: 'initiate',
+    PENDING_MEMBER: 'pending',
+    MEMBER: 'member',
+    INACTIVE: 'inactive',
+    OFFICER: 'officer',
+    ADMIN: 'admin',
+  }),
+
+  EventTypes: Object.freeze({
+    ACADEMIC: 'academic',
+    SOCIAL: 'social',
+    SERVICE: 'service',
+    WILDCARD: 'wildcard',
   }),
 };
 

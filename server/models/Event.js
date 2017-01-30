@@ -9,9 +9,7 @@ const EventType = require('./EventType');
 const Event = db.model('Event', {
   tableName: 'events',
   hidden: ['type_id', 'officer_id'],
-  fillable: [
-    'summary', 'description', 'location', 'points', 'start', 'end',
-  ],
+  fillable: ['summary', 'description', 'location', 'points', 'start', 'end', 'type'],
 
   relationships: {
     /** Officer chairing this event. */
@@ -37,6 +35,7 @@ const Event = db.model('Event', {
   convertTypeToID() {
     if (!hasOwnProperty.call(this.attributes, 'type')) return;
 
+    // TODO Add tests for incorrect error types.
     return EventType.where('name', this.attributes.type).fetch({ require: true })
       .then((type) => {
         // Replaces `role` property with `role_id`.

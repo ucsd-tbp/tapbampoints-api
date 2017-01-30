@@ -46,7 +46,7 @@ describe('Authentication', function() {
                 email: 'test@test.com',
                 first_name: 'Test',
                 last_name: 'User',
-                house: 'None',
+                house: 'none',
                 member_status: 'Initiate',
               }, done);
           });

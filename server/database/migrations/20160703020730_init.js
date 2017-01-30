@@ -15,15 +15,16 @@ exports.up = knex =>
 
     // Can be null if a user authenticates via the barcode.
     table.string('email').unique();
-    table.string('password');
+    table.string('password').notNullable();
 
     table.string('first_name').defaultTo('').notNullable();
     table.string('last_name').defaultTo('').notNullable();
     table.string('barcode').unique().notNullable();
-    table.enu('house', ['red', 'green', 'blue', 'None']).defaultTo('None').notNullable();
+    table.enu('house', ['red', 'green', 'blue', 'none']).defaultTo('none').notNullable();
 
     table.integer('role_id').unsigned().references('id')
-      .inTable('roles');
+      .inTable('roles')
+      .notNullable();
   })
 
   // Reference table for event types (academic, social, community, wildcard).
@@ -40,15 +41,17 @@ exports.up = knex =>
   .createTable('events', table => {
     table.increments('id').primary();
     table.string('summary').defaultTo('').notNullable();
-    table.text('description');
+    table.text('description').defaultTo('');
     table.integer('points').defaultTo(0).notNullable();
-    table.string('location');
-    table.dateTime('start');
-    table.dateTime('end');
+    table.string('location').notNullable().defaultTo('');
+    table.dateTime('start').notNullable();
+    table.dateTime('end').notNullable();
     table.timestamps();
 
     table.integer('type_id').unsigned().references('id')
-          .inTable('event_types');
+          .inTable('event_types')
+          .notNullable();
+
     table.integer('officer_id').unsigned().references('id')
           .inTable('users');
   })

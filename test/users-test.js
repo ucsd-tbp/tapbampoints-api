@@ -20,7 +20,7 @@ describe('Users', function() {
           email: 'test@test.com',
           first_name: 'Test',
           last_name: 'User',
-          house: 'None',
+          house: 'none',
           member_status: 'Initiate',
         }, done);
     });
@@ -42,7 +42,7 @@ describe('Users', function() {
             email: 'test@test.com',
             first_name: 'Test',
             last_name: 'User',
-            house: 'None',
+            house: 'none',
             member_status: 'Initiate',
           },
           {
@@ -50,7 +50,7 @@ describe('Users', function() {
             email: 'admin@test.com',
             first_name: 'Admin',
             last_name: 'User',
-            house: 'None',
+            house: 'none',
             member_status: 'Initiate',
           },
         ], done);
@@ -120,11 +120,11 @@ describe('Users', function() {
       function(done) {
         api.patch('/users/1')
           .set('Authorization', `Bearer ${token}`)
-          .send({ member_status: 'None' })
+          .send({ member_status: 'none' })
           .expect(400, [{
             param: 'member_status',
             msg: 'The member status must be Initiate, Member, or Officer.',
-            value: 'None',
+            value: 'none',
           }], done);
       });
 
@@ -151,7 +151,7 @@ describe('Users', function() {
     it('responds with a 401 Unauthorized when trying to update a nonexistent user', function(done) {
       api.patch('/users/10')
         .set('Authorization', `Bearer ${token}`)
-        .send({ first_name: 'NonexistentUserName' })
+        .send({ first_name: 'nonexistentUserName' })
         .expect(401, { error: 'Not authorized to access this route.' }, done);
     });
 
