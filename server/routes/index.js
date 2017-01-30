@@ -22,15 +22,15 @@ const middleware = require('../controllers/middleware');
 const router = express.Router();
 
 // Middleware stack that only allows logged-in admins.
-const requireAdmin = [
-  controllers.auth.verify,  // Requires login first.
-  middleware.acl.allow(['admin']),
+const requireOfficer = [
+  controllers.auth.verify,
+  middleware.acl.allowAnyOf(['admin', 'officer']),
 ];
 
 // Middleware stack that requires the logged-in user ID and param ID to match.
 const requireOwner = [
   controllers.auth.verify,
-  middleware.acl.allow(['owner']),
+  middleware.acl.allowAnyOf(['owner']),
 ];
 
 // Authentication routes.
@@ -42,7 +42,7 @@ router.get('/auth/me', controllers.auth.verify, controllers.auth.currentUser);
 router.get('/users', controllers.users.index);
 router.get('/users/:id', controllers.users.show);
 router.patch('/users/:id', validators.users.update, requireOwner, controllers.users.update);
-router.delete('/users/:id', requireAdmin, controllers.users.delete);
+router.delete('/users/:id', requireOfficer, controllers.users.delete);
 
 // Event type routes.
 router.get('/events/types', controllers.eventTypes.index);
@@ -51,9 +51,9 @@ router.get('/events/types/:id', controllers.eventTypes.show);
 // Event routes.
 router.get('/events', controllers.events.index);
 router.get('/events/:id', controllers.events.show);
-router.post('/events', validators.events.create, requireAdmin, controllers.events.create);
-router.patch('/events/:id', validators.events.update, requireAdmin, controllers.events.update);
-router.delete('/events/:id', requireAdmin, controllers.events.delete);
+router.post('/events', validators.events.create, requireOfficer, controllers.events.create);
+router.patch('/events/:id', validators.events.update, requireOfficer, controllers.events.update);
+router.delete('/events/:id', requireOfficer, controllers.events.delete);
 
 // Routes for getting a user's attended events or an event's attendees.
 router.get('/users/:id/events', controllers.attendanceRecords.showAttendedEvents);
@@ -63,11 +63,11 @@ router.get('/events/:id/users', controllers.attendanceRecords.showAttendees);
 router.get('/events/records', controllers.attendanceRecords.index);
 
 // Routes for modifying attendance records.
-router.put('/users/:user_id/events/:event_id', validators.attendanceRecords.create, requireAdmin,
+router.put('/users/:user_id/events/:event_id', validators.attendanceRecords.create, requireOfficer,
   controllers.attendanceRecords.create);
-router.patch('/users/:user_id/events/:event_id', validators.attendanceRecords.update, requireAdmin,
-  controllers.attendanceRecords.update);
-router.delete('/users/:user_id/events/:event_id', requireAdmin,
+router.patch('/users/:user_id/events/:event_id', validators.attendanceRecords.update,
+  requireOfficer, controllers.attendanceRecords.update);
+router.delete('/users/:user_id/events/:event_id', requireOfficer,
   controllers.attendanceRecords.delete);
 
 module.exports = router;

@@ -68,6 +68,9 @@ const auth = {
     jwt.verify(token, process.env.JWT_SECRET, (jwtErr, decoded) => {
       if (jwtErr) return res.status(400).json({ error: jwtErr.message });
 
+      // ACL checking requires knowing the user's role.
+      req.relations.push('role');
+
       User.where('id', decoded.sub)
         .fetch({ withRelated: req.relations, require: true })
         .then(user => {

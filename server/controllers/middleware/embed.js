@@ -26,6 +26,9 @@ const debug = require('debug')('tbp:embed');
 function embed(req, res, next) {
   debug('checking for relations in query string');
 
+  // No relations to load if embed query string parameter isn't specified.
+  req.relations = [];
+
   // Continues to next middleware if there aren't any desired relations to load.
   if (!req.query.embed) return next();
 

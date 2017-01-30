@@ -12,20 +12,13 @@ const User = db.model('User', {
   tableName: 'users',
 
   // Attributes that aren't serialized when converting a User to JSON.
-  hidden: ['password', 'barcode'],
+  hidden: ['password', 'barcode', 'role_id'],
 
   // Attributes that are not mass-assignable.
   guarded: ['id'],
 
   // Attributes that can be used to search, filter, or sort collection results.
   queryable: ['email', 'first_name', 'last_name', 'house', 'member_status'],
-
-  /** Registers event listeners. */
-  initialize() {
-    // TODO Write unit tests for hashing password on update.
-    this.on('saving', this.hashPassword);
-    this.on('saving', this.convertRoletoID);
-  },
 
   relationships: {
     /** Events this user has chaired. */
@@ -42,6 +35,13 @@ const User = db.model('User', {
     role() {
       return this.belongsTo('Role');
     },
+  },
+
+  /** Registers event listeners. */
+  initialize() {
+    // TODO Write unit tests for hashing password on update.
+    this.on('saving', this.hashPassword);
+    this.on('saving', this.convertRoletoID);
   },
 
   /**
@@ -75,8 +75,6 @@ const User = db.model('User', {
         // Replaces `role` property with `role_id`.
         delete this.attributes.role;
         this.set('role_id', role.id);
-
-        debug(this.attributes);
       });
   },
 

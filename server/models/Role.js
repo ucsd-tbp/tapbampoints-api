@@ -7,6 +7,7 @@ const db = require('../database');
 
 const Role = db.model('Role', {
   tableName: 'roles',
+  hidden: ['id'],
   fillable: ['name', 'display_name', 'description'],
 
   relationships: {

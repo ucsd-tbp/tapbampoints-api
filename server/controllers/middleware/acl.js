@@ -1,6 +1,8 @@
-/** @file A quick and hackish ACL implementation to restrict certain routes. */
+/** @file A (kinda hackish) ACL implementation to restrict certain routes. */
 
 const debug = require('debug')('tbp:acl');
+const includes = require('lodash/includes');
+const toInteger = require('lodash/toInteger');
 
 const acl = {
   /**
@@ -14,26 +16,20 @@ const acl = {
    * @return {Function|Response} If the user satisfies all roles, then
    * continues down the middleware stack.
    */
-  allow(roles) {
+  allowAnyOf(roles) {
     const aclMiddleware = (req, res, next) => {
       debug('firing ACL middleware check');
+      const currentUserRole = req.user.related('role').toJSON().name;
 
-      // Checks requirements for each role.
-      for (const role of roles) {
-        switch (role) {
-          case 'admin':
-            if (req.user.get('is_admin')) {
-              debug('user confirmed to have admin access, continuing');
-              return next();
-            }
-            break;
-          case 'owner':
-            // TODO Add a check for resources that the user creates.
-            if (req.user.id === parseInt(req.params.id, 10)) return next();
-            break;
-          default:
-            return next('An invalid access group was specified.');
-        }
+      // Checks if user's role is in list of allowed roles.
+      if (includes(roles, currentUserRole)) {
+        debug(`${roles} contains user role ${currentUserRole}; continuing`);
+        return next();
+      }
+
+      // Only continues if user owns resource being accessed.
+      if (includes(roles, 'owner') && req.user.id === toInteger(req.params.id)) {
+        return next();
       }
 
       return res.status(401).json({ error: 'Not authorized to access this route.' });

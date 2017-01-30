@@ -2,7 +2,9 @@
 
 require('./User');
 require('./AttendanceRecord');
+
 const db = require('../database');
+const EventType = require('./EventType');
 
 const Event = db.model('Event', {
   tableName: 'events',
@@ -26,6 +28,21 @@ const Event = db.model('Event', {
     type() {
       return this.belongsTo('EventType', 'type_id');
     },
+  },
+
+  initialize() {
+    this.on('saving', this.convertTypeToID);
+  },
+
+  convertTypeToID() {
+    if (!hasOwnProperty.call(this.attributes, 'type')) return;
+
+    return EventType.where('name', this.attributes.type).fetch({ require: true })
+      .then((type) => {
+        // Replaces `role` property with `role_id`.
+        delete this.attributes.type;
+        this.set('type_id', type.id);
+      });
   },
 });
 
