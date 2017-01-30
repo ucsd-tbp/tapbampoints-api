@@ -68,7 +68,7 @@ describe('Authentication', function() {
           email: 'incorrectemail',
           password: 'password',
           barcode: 'barcode',
-          house: 'Red',
+          house: 'red',
           member_status: 'Member',
         })
         .expect(400, [{
@@ -129,7 +129,7 @@ describe('Authentication', function() {
           last_name: 'User',
           email: 'newuser@test.com',
           password: 'password',
-          house: 'Red',
+          house: 'red',
           member_status: 'Member',
         })
         .expect(400, [{
@@ -147,7 +147,7 @@ describe('Authentication', function() {
             email: 'newuser@test.com',
             password: 'password',
             barcode: 'barcode2',
-            house: 'Red',
+            house: 'red',
           })
           .expect(201, function(err, res) {
             expect(res.body.token).to.exist;
@@ -158,7 +158,7 @@ describe('Authentication', function() {
                 first_name: 'New',
                 last_name: 'User',
                 email: 'newuser@test.com',
-                house: 'Red',
+                house: 'red',
                 member_status: 'Initiate',
               }, done);
           });
@@ -170,7 +170,7 @@ describe('Authentication', function() {
           first_name: 'New',
           last_name: 'User with just barcode',
           barcode: 'barcode3',
-          house: 'Blue',
+          house: 'blue',
         })
         .expect(201, function(err, res) {
           expect(res.body.token).to.exist;
@@ -181,7 +181,7 @@ describe('Authentication', function() {
               first_name: 'New',
               last_name: 'User with just barcode',
               email: null,
-              house: 'Blue',
+              house: 'blue',
               member_status: 'Initiate',
             }, done);
         });

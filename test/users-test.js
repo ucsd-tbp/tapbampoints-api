@@ -105,13 +105,13 @@ describe('Users', function() {
         }], done);
     });
 
-    it('returns a 400 Bad Request when the house is not of Red, Green, or Blue', function(done) {
+    it('returns a 400 Bad Request when the house is not of red, green, or blue', function(done) {
       api.patch('/users/1')
         .set('Authorization', `Bearer ${token}`)
         .send({ house: 'Orange' })
         .expect(400, [{
           param: 'house',
-          msg: 'The house must be Red, Green, or Blue.',
+          msg: 'The house must be red, green, or blue.',
           value: 'Orange',
         }], done);
     });

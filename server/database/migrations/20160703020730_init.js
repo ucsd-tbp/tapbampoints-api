@@ -20,7 +20,7 @@ exports.up = knex =>
     table.string('first_name').defaultTo('').notNullable();
     table.string('last_name').defaultTo('').notNullable();
     table.string('barcode').unique().notNullable();
-    table.enu('house', ['Red', 'Green', 'Blue', 'None']).defaultTo('None').notNullable();
+    table.enu('house', ['red', 'green', 'blue', 'None']).defaultTo('None').notNullable();
 
     table.integer('role_id').unsigned().references('id')
       .inTable('roles');

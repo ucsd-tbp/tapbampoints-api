@@ -34,8 +34,8 @@ const users = {
 
       house: {
         optional: true,
-        isIn: ['Red', 'Green', 'Blue'],
-        errorMessage: 'The house must be Red, Green, or Blue.',
+        isIn: ['red', 'green', 'blue'],
+        errorMessage: 'The house must be red, green, or blue.',
       },
 
       member_status: {

@@ -12,7 +12,7 @@ exports.seed = (knex, Promise) => {
     first_name: 'Obi-Wan',
     last_name: 'Kenobi',
     barcode: faker.random.uuid(),
-    house: faker.helpers.randomize(['Red', 'Green', 'Blue']),
+    house: faker.helpers.randomize(['red', 'green', 'blue']),
     role_id: 5,
   }));
 
@@ -24,7 +24,7 @@ exports.seed = (knex, Promise) => {
     first_name: 'Luke',
     last_name: 'Skywalker',
     barcode: faker.random.uuid(),
-    house: faker.helpers.randomize(['Red', 'Green', 'Blue']),
+    house: faker.helpers.randomize(['red', 'green', 'blue']),
     role_id: 4,
   }));
 
