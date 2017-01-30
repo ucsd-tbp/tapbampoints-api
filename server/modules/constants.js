@@ -5,7 +5,7 @@ const constants = {
     INITIATE: 'initiate',
     PENDING_MEMBER: 'pending',
     MEMBER: 'member',
-    INACTIVE: 'inactive',
+    INACTIVE_MEMBER: 'inactive',
     OFFICER: 'officer',
     ADMIN: 'admin',
   }),

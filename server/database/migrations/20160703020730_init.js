@@ -46,7 +46,7 @@ exports.up = knex =>
     table.string('location').notNullable().defaultTo('');
     table.dateTime('start').notNullable();
     table.dateTime('end').notNullable();
-    table.timestamps();
+    table.timestamps(false, true);
 
     table.integer('type_id').unsigned().references('id')
           .inTable('event_types')
