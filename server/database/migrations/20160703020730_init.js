@@ -71,6 +71,13 @@ exports.up = knex =>
     table.integer('points_earned').unsigned()
           .defaultTo(0)
           .notNullable();
+  })
+
+  .createTable('announcements', table => {
+    table.increments('id').primary();
+    table.string('summary').notNullable();
+    table.text('description').defaultTo('').notNullable();
+    table.timestamps(false, true);
   });
 
 exports.down = knex =>
@@ -78,4 +85,5 @@ exports.down = knex =>
               .dropTable('events')
               .dropTable('event_types')
               .dropTable('users')
-              .dropTable('roles');
+              .dropTable('roles')
+              .dropTable('announcements');
