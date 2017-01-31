@@ -4,7 +4,6 @@ const db = require('../database');
 
 const Announcement = db.model('Announcement', {
   tableName: 'announcements',
-  hidden: ['id'],
   fillable: ['summary, description'],
 });
 
