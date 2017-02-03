@@ -1,6 +1,8 @@
 const faker = require('faker');
 const bcrypt = require('bcrypt');
 
+const Houses = require('../../modules/constants').Houses;
+
 exports.seed = (knex, Promise) => {
   const seedQueries = [];
 
@@ -12,11 +14,12 @@ exports.seed = (knex, Promise) => {
     first_name: 'Obi-Wan',
     last_name: 'Kenobi',
     barcode: faker.random.uuid(),
-    house: faker.helpers.randomize(['red', 'green', 'blue']),
+    house: faker.helpers.randomize([Houses.RED, Houses.GREEN, Houses.BLUE]),
     role_id: 5,
+    valid: 1,
   }));
 
-  // Inserts a non-admin user.
+  // Inserts a non-admin verified user.
   seedQueries.push(knex('users').insert({
     id: 2,
     email: 'member@tbp.ucsd.edu',
@@ -24,8 +27,22 @@ exports.seed = (knex, Promise) => {
     first_name: 'Luke',
     last_name: 'Skywalker',
     barcode: faker.random.uuid(),
-    house: faker.helpers.randomize(['red', 'green', 'blue']),
+    house: faker.helpers.randomize([Houses.RED, Houses.GREEN, Houses.BLUE, Houses.NONE]),
     role_id: 4,
+    valid: 1,
+  }));
+
+    // Inserts a non-verified user.
+  seedQueries.push(knex('users').insert({
+    id: 3,
+    email: 'invalid@tbp.ucsd.edu',
+    password: bcrypt.hashSync('password', 0),
+    first_name: 'Rey',
+    last_name: 'Skywalker',
+    barcode: faker.random.uuid(),
+    house: faker.helpers.randomize([Houses.RED, Houses.GREEN, Houses.BLUE, Houses.NONE]),
+    role_id: 4,
+    valid: 0,
   }));
 
   // Drops user database before adding fake data.
