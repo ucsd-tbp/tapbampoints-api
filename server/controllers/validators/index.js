@@ -21,7 +21,7 @@ const custom = {
     return new Promise((resolve, reject) => {
       User.where('email', email)
         .fetch({ require: true })
-        .then(() => reject())
+        .then(() => reject(new Error('Email isn\'t available!')))
         .catch(() => resolve());
     });
   },
@@ -37,7 +37,7 @@ const custom = {
     return new Promise((resolve, reject) => {
       User.where('barcode', barcode)
         .fetch({ require: true })
-        .then(() => reject())
+        .then(() => reject(new Error('Barcode isn\'t available!')))
         .catch(() => resolve());
     });
   },

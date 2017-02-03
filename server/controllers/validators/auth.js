@@ -8,13 +8,15 @@ const auth = {
     debug('firing auth.register validation middleware');
 
     req.checkBody('email', 'Email is invalid.').isEmail();
-    req.checkBody('password', 'Password must be at least 4 characters.').isLength({ min: 4 });
-    req.checkBody('barcode', 'The barcode from an ID card is required.').notEmpty();
-
-    req.checkBody('role', 'Must register with a role as an initiate or a member.').isSafeRole();
-
     req.checkBody('email', 'This email has already been registered.').isEmailAvailable();
-    req.checkBody('barcode', 'This barcode has already been registered.').isBarcodeAvailable();
+
+    if (req.body.password) {
+      req.checkBody('password', 'Password must be at least 4 characters.').isLength({ min: 4 });
+      req.checkBody('role', 'Must register with a role as an initiate or a member.').isSafeRole();
+
+      req.checkBody('barcode', 'The barcode from an ID card is required.').notEmpty();
+      req.checkBody('barcode', 'This barcode has already been registered.').isBarcodeAvailable();
+    }
 
     req.getValidationResult().then((result) => {
       if (!result.isEmpty()) {

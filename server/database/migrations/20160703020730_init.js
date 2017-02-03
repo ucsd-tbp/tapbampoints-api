@@ -1,3 +1,5 @@
+const Houses = require('../../modules/constants').Houses;
+
 /** @file Initial migration */
 
 exports.up = knex =>
@@ -13,18 +15,23 @@ exports.up = knex =>
   .createTable('users', table => {
     table.increments('id').primary();
 
-    // Can be null if a user authenticates via the barcode.
     table.string('email').unique();
-    table.string('password').notNullable();
+
+    // Password or barcode can be null if a user hasn't been verified via email.
+    table.string('password');
+    table.string('barcode').unique();
 
     table.string('first_name').defaultTo('').notNullable();
     table.string('last_name').defaultTo('').notNullable();
-    table.string('barcode').unique().notNullable();
-    table.enu('house', ['red', 'green', 'blue', 'none']).defaultTo('none').notNullable();
+    table.enu('house', [Houses.RED, Houses.GREEN, Houses.BLUE, Houses.NONE])
+      .defaultTo(Houses.NONE).notNullable();
 
+    table.boolean('valid').defaultTo(false).notNullable();
+    table.string('email_verification_code');
+
+    // Can be null if a user hasn't been verified via email yet.
     table.integer('role_id').unsigned().references('id')
-      .inTable('roles')
-      .notNullable();
+      .inTable('roles');
   })
 
   // Reference table for event types (academic, social, community, wildcard).

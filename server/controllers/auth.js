@@ -18,21 +18,30 @@ const User = require('../models/User');
  * @see https://tools.ietf.org/html/rfc7519#section-4.1 (the JWT spec on claims)
  */
 function makeJWT(user) {
+  if (!user.get('valid')) {
+    return {
+      message: 'Your account hasn\'t been verified. Check your email for an email verification ' +
+               'code to claim your account.',
+    };
+  }
+
   // TODO Generate additional registered claims, as per the JWT spec.
   const options = {
     expiresIn: '2 days',
     subject: user.id.toString(),
   };
 
+  // Encoded in returned token.
   const payload = {
     email: user.get('email'),
     role: user.related('role').name,
   };
 
+  // Generates a token with the encoded payload to send back to the client.
   return new Promise((resolve, reject) => {
     jwt.sign(payload, process.env.JWT_SECRET, options, (err, token) => {
       if (err) reject(err);
-      resolve(token);
+      resolve({ token });
     });
   });
 }
@@ -95,7 +104,7 @@ const auth = {
   register(req, res) {
     new User().save(req.body)
       .then(makeJWT)
-      .then(token => res.status(201).json({ token }))
+      .then(response => res.status(201).json(response))
       .catch(User.NoRowsUpdatedError, () => res.status(400).json({ error: 'User was not saved!' }))
       .catch(err => res.status(400).json({ error: err.message }));
   },
@@ -113,7 +122,7 @@ const auth = {
   login(req, res) {
     new User().login(req.body.email, req.body.password)
       .then(makeJWT)
-      .then(token => res.json({ token }))
+      .then(response => res.json(response))
       .catch(User.NotFoundError, () =>
         res.status(404).json({
           error: 'An account with that email has not been registered.',

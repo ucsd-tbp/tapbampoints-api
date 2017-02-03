@@ -5,50 +5,31 @@
 
 const debug = require('debug')('tbp:users-validator');
 
+const Houses = require('../../modules/constants').Houses;
+const Roles = require('../../modules/constants').Roles;
+
 const users = {
   /** Validates PATCH requests to /api/users/:id. */
   update(req, res, next) {
     debug('firing users.update validation middleware');
 
-    req.checkBody({
-      first_name: {
-        optional: true,
-        notEmpty: {
-          errorMessage: 'Your first name can\'t be empty.',
-        },
-      },
+    req.checkBody('first_name', 'First name can\'t be empty.').optional().notEmpty();
+    req.checkBody('last_name', 'Last name can\'t be empty.').optional().notEmpty();
+    req.checkBody('barcode', 'Barcode can\'t be empty.').optional().notEmpty();
 
-      last_name: {
-        optional: true,
-        notEmpty: {
-          errorMessage: 'Your last name can\'t be empty.',
-        },
-      },
+    req.checkBody('house', 'House must be red, green, or blue.').optional()
+      .isIn([Houses.RED, Houses.GREEN, Houses.BLUE]);
 
-      barcode: {
-        optional: true,
-        notEmpty: {
-          errorMessage: 'The barcode can\'t be empty.',
-        },
-      },
+    req.checkBody('role', 'Role must be initiate or member.').optional()
+      .isIn([Roles.INITIATE, Roles.PENDING]);
 
-      house: {
-        optional: true,
-        isIn: ['red', 'green', 'blue'],
-        errorMessage: 'The house must be red, green, or blue.',
-      },
+    req.getValidationResult().then((result) => {
+      if (!result.isEmpty()) {
+        return res.status(400).json({ errors: result.array() });
+      }
 
-      member_status: {
-        optional: true,
-        isIn: ['Initiate', 'Member', 'Officer'],
-        errorMessage: 'The member status must be Initiate, Member, or Officer.',
-      },
+      next();
     });
-
-    const errors = req.validationErrors();
-    if (errors) return res.status(400).json(errors);
-
-    next();
   },
 };
 

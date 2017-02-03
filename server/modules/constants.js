@@ -1,7 +1,7 @@
 /** @file A series of application-wide constants. */
 
 const constants = {
-  MemberStatuses: Object.freeze({
+  Roles: Object.freeze({
     INITIATE: 'initiate',
     PENDING_MEMBER: 'pending',
     MEMBER: 'member',
@@ -15,6 +15,13 @@ const constants = {
     SOCIAL: 'social',
     SERVICE: 'service',
     WILDCARD: 'wildcard',
+  }),
+
+  Houses: Object.freeze({
+    RED: 'red',
+    GREEN: 'green',
+    BLUE: 'blue',
+    NONE: 'none',
   }),
 };
 
