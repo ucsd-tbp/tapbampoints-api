@@ -23,7 +23,7 @@ const events = {
 
   /** Lists all events. */
   index(req, res) {
-    new Event().findAll({ embed: req.relations, filters: req.query })
+    new Event().findAll({ embed: req.relations, filters: req.filters })
       .then(eventCollection => res.json(eventCollection.toJSON()))
       .catch(err => res.status(400).json({ message: err.message }));
   },

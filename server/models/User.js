@@ -27,7 +27,7 @@ const User = db.model('User', {
   virtuals: {
     // Convenience getter and setter for retrieving the full name of a user
     // instead of concatenating first_name and last_name each time.
-    fullName: {
+    full_name: {
       get() {
         return `${this.get('first_name')} ${this.get('last_name')}`;
       },
@@ -39,6 +39,9 @@ const User = db.model('User', {
       },
     },
   },
+
+  // Removes virtual properties from JSON output.
+  outputVirtuals: false,
 
   relationships: {
     /** Events this user has chaired. */
@@ -125,9 +128,11 @@ const User = db.model('User', {
       .fetch({ require: true, withRelated: ['role'] })
       .then(user =>
         new Promise((resolve, reject) => {
-          if (!user.get('valid')) reject(new Error(
-            'Your account hasn\'t been verified. Check your email for a verification code.'
-          ))
+          if (!user.get('valid')) {
+            reject(new Error(
+              'Your account hasn\'t been verified. Check your email for a verification code.'
+            ));
+          }
 
           // Checks for password correctness.
           bcrypt.compare(password, user.get('password'), (err, result) => {

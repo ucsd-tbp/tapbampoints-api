@@ -24,7 +24,7 @@ const users = {
    */
   index(req, res) {
     // TODO Add pagination data via the Link header.
-    new User().findAll({ embed: req.relations, filters: req.query })
+    new User().findAll({ embed: req.relations, filters: req.filters })
       .then(userCollection => res.json(userCollection.toJSON()))
       .catch(err => res.status(400).json({ error: err.message }));
   },

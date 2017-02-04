@@ -8,7 +8,9 @@
  */
 
 const Promise = require('bluebird');
-const _ = require('lodash');
+
+const clone = require('lodash/clone');
+const forEach = require('lodash/forEach');
 
 /**
  * Checks that every relation in `requestedRelations` exists in the
@@ -41,7 +43,7 @@ module.exports = bookshelf => {
       proto.constructor.call(this, ...args);
       const options = args[1] || {};
 
-      if (options.queryable) this.queryable = _.clone(options.queryable);
+      if (options.queryable) this.queryable = clone(options.queryable);
     },
 
     /**
@@ -90,27 +92,31 @@ module.exports = bookshelf => {
         }
       });
 
-      // Validates values in embed query string parameter.
       if (options.embed) {
+        // All relationships in the embed query string parameter must be valid
+        // relationships defined on the model.
         if (!validateRelations(options.embed, this)) {
           return Promise.reject(new Error(
             'Names of relations to load are invalid.'
           ));
         }
-
-        // FIXME Stop embed from going into filters, and figure out why embed
-        // works for users but not other models.
-        delete options.filters.embed;
       }
 
-      const builder = this.query({ where: options.filters });
+      // Creates a series of WHERE clauses according to the objects in
+      // `options.filters`, which is an array of objects. See
+      // sever/controllers/middleware/filters.js for more info on how the
+      // `filters` property is added to the request object.
+      const builder = this.query((queryBuilder) => {
+        forEach(options.filters, (clause) =>
+          queryBuilder.andWhere(clause.key, clause.comparison, clause.value)
+        );
+      });
 
-      // Returns a collection if called from findAll.
-      if (returnCollection) {
-        return builder.fetchAll({ withRelated: options.embed });
-      }
-
-      return builder.fetch({ withRelated: options.embed, require: true });
+      // Returns a collection if `find` was called from `findAll` versus
+      // returning a single model when called from `findByID`.
+      return returnCollection ?
+        builder.fetchAll({ withRelated: options.embed }) :
+        builder.fetch({ withRelated: options.embed, require: true });
     },
 
     /**

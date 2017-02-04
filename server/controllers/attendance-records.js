@@ -51,7 +51,7 @@ const attendanceRecords = {
    * attendance records of the authenticated user.
    */
   index(req, res) {
-    new AttendanceRecord().findAll({ embed: req.relations, filters: req.query })
+    new AttendanceRecord().findAll({ embed: req.relations, filters: req.filters })
       .then(records => res.json(records.toJSON()))
       .catch(err => res.status(400).json({ message: err.message }));
   },

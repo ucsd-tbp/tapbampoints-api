@@ -45,6 +45,7 @@ app.use(validator({ customValidators: validators.custom }));
 
 // Custom API middleware.
 app.use(middleware.embed);
+app.use(middleware.filters);
 
 // Mounts API routes onto the base URL /api.
 app.use('/', routes);

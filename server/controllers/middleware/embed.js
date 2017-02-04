@@ -1,6 +1,6 @@
 /** @file Defines middleware for parsing embed key in query string. */
 
-const debug = require('debug')('tbp:embed');
+const debug = require('debug')('tbp:embed-middleware');
 
 /**
  * Middleware to convert embed key in URL query string to an array of the
@@ -10,7 +10,7 @@ const debug = require('debug')('tbp:embed');
  *
  * @example
  *
- * // URL: https://api.tbp.org/users/1?embed=attended_events,chaired_events
+ * // GET request to /users/1?embed=attended_events,chaired_events
  *
  * // Loads user's attended events and chaired events to return as JSON.
  * User.where('id', req.params.id)
@@ -21,19 +21,23 @@ const debug = require('debug')('tbp:embed');
  * @param  {Response} res HTTP response.
  * @param  {Function} next Callback to continue through the middleware stack.
  *
- * @see {@link ../controllers/users}
+ * @see ../controllers/users
  */
 function embed(req, res, next) {
-  debug('checking for relations in query string');
-
   // No relations to load if embed query string parameter isn't specified.
   req.relations = [];
 
   // Continues to next middleware if there aren't any desired relations to load.
   if (!req.query.embed) return next();
 
+  // Each relation in query parameter should be separated by a comma.
   req.relations = req.query.embed.split(',');
-  debug(req.relations);
+
+  // Removes embed field from query parameters to avoid being treated as a
+  // WHERE clause later in the middleware stack.
+  delete req.query.embed;
+
+  debug(`found relationships to embed: ${req.relations}`);
   next();
 }
 

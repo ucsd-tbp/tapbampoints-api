@@ -1,6 +1,6 @@
 /** @file A (kinda hackish) ACL implementation to restrict certain routes. */
 
-const debug = require('debug')('tbp:acl');
+const debug = require('debug')('tbp:acl-middleware');
 const includes = require('lodash/includes');
 const toInteger = require('lodash/toInteger');
 

@@ -16,7 +16,7 @@ const eventTypes = {
 
   /** Lists all event types. */
   index(req, res) {
-    new EventType().findAll({ embed: req.relations, filters: req.query })
+    new EventType().findAll({ embed: req.relations, filters: req.filters })
       .then(types => res.json(types.toJSON()))
       .catch(err => res.json({ error: err.message }));
   },
