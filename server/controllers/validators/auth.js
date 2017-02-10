@@ -14,8 +14,8 @@ const auth = {
       req.checkBody('password', 'Password must be at least 4 characters.').isLength({ min: 4 });
       req.checkBody('role', 'Must register with a role as an initiate or a member.').isSafeRole();
 
-      req.checkBody('barcode', 'The barcode from an ID card is required.').notEmpty();
-      req.checkBody('barcode', 'This barcode has already been registered.').isBarcodeAvailable();
+      req.checkBody('pid', 'The PID from an ID card is required.').notEmpty();
+      req.checkBody('pid', 'This PID has already been registered.').isPIDAvailable();
     }
 
     req.getValidationResult().then((result) => {

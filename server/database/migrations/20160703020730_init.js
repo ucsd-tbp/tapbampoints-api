@@ -17,9 +17,9 @@ exports.up = knex =>
 
     table.string('email').unique();
 
-    // Password or barcode can be null if a user hasn't been verified via email.
+    // Password or pid can be null if a user hasn't been verified via email.
     table.string('password');
-    table.string('barcode').unique();
+    table.string('pid').unique();
 
     table.string('first_name').defaultTo('').notNullable();
     table.string('last_name').defaultTo('').notNullable();

@@ -15,7 +15,7 @@ const users = {
 
     req.checkBody('first_name', 'First name can\'t be empty.').optional().notEmpty();
     req.checkBody('last_name', 'Last name can\'t be empty.').optional().notEmpty();
-    req.checkBody('barcode', 'Barcode can\'t be empty.').optional().notEmpty();
+    req.checkBody('pid', 'PID can\'t be empty.').optional().notEmpty();
 
     req.checkBody('house', 'House must be red, green, or blue.').optional()
       .isIn([Houses.RED, Houses.GREEN, Houses.BLUE]);

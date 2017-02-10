@@ -94,13 +94,13 @@ describe('Users', function() {
         }], done);
     });
 
-    it('returns a 400 Bad Request when the barcode is empty', function(done) {
+    it('returns a 400 Bad Request when the pid is empty', function(done) {
       api.patch('/users/1')
         .set('Authorization', `Bearer ${token}`)
-        .send({ barcode: '' })
+        .send({ pid: '' })
         .expect(400, [{
-          param: 'barcode',
-          msg: 'The barcode can\'t be empty.',
+          param: 'pid',
+          msg: 'The pid can\'t be empty.',
           value: '',
         }], done);
     });
@@ -161,7 +161,7 @@ describe('Users', function() {
           .send({
             first_name: 'Second',
             last_name: 'User',
-            barcode: 'barcode2',
+            pid: 'pid2',
           })
           .expect(201, function(err, res) {
             expect(res.body.token).to.exist;

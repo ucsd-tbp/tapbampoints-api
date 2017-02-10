@@ -111,12 +111,9 @@ const auth = {
 
   /**
    * Creates a JWT from the user after validating the user credentials passed
-   * in the request. Users can login via their barcode hash only if the email
-   * and password have not been set.
+   * in the request.
    *
-   * @param  {Request} req Must contain an email and password combination if
-   * the user has registered an email or password. Otherwise, the user can
-   * login with just the barcode.
+   * @param  {Request} req Must contain an email and password combination.
    * @param  {Response} res HTTP response containing the generated token
    */
   login(req, res) {

@@ -14,7 +14,7 @@ const User = db.model('User', {
   tableName: 'users',
 
   // Attributes that aren't serialized when converting a User to JSON.
-  hidden: ['password', 'barcode', 'role_id', 'valid', 'email_verification_code'],
+  hidden: ['password', 'pid', 'role_id', 'valid', 'email_verification_code'],
 
   // Attributes that are not mass-assignable.
   guarded: ['id', 'valid', 'email_verification_code'],

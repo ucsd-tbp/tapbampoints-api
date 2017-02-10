@@ -17,7 +17,7 @@ const queries = {
       last_name: 'User',
       email: 'test@test.com',
       password: bcrypt.hashSync('password', 0),
-      barcode: 'barcode1',
+      pid: 'pid1',
     }),
 
     knex('users').insert({
@@ -26,7 +26,7 @@ const queries = {
       last_name: 'User',
       email: 'admin@test.com',
       password: bcrypt.hashSync('admin', 0),
-      barcode: 'adminbarcode',
+      pid: 'adminpid',
       is_admin: true,
     }),
   ],
@@ -38,7 +38,7 @@ const queries = {
       last_name: 'User',
       email: 'officer@test.com',
       password: bcrypt.hashSync('officer', 0),
-      barcode: 'officerbarcode',
+      pid: 'officerpid',
       is_admin: true,
     }),
 

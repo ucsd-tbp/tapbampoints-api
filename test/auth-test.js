@@ -67,7 +67,7 @@ describe('Authentication', function() {
           last_name: 'User',
           email: 'incorrectemail',
           password: 'password',
-          barcode: 'barcode',
+          pid: 'pid',
           house: 'red',
           member_status: 'Member',
         })
@@ -85,7 +85,7 @@ describe('Authentication', function() {
           last_name: 'Password',
           email: 'shortpassword@test.com',
           password: 'pas',
-          barcode: 'barcode',
+          pid: 'pid',
         })
         .expect(400, [{
           param: 'password',
@@ -100,7 +100,7 @@ describe('Authentication', function() {
           first_name: 'No',
           last_name: 'Password',
           email: 'nopassword@test.com',
-          barcode: 'barcode',
+          pid: 'pid',
         })
         .expect(400, [{
           msg: 'Password must be at least 4 characters.',
@@ -114,7 +114,7 @@ describe('Authentication', function() {
           first_name: 'No',
           last_name: 'Email',
           password: 'noemail',
-          barcode: 'barcode',
+          pid: 'pid',
         })
         .expect(400, [{
           msg: 'Email is invalid.',
@@ -122,7 +122,7 @@ describe('Authentication', function() {
         }], done);
     });
 
-    it('returns a 400 Bad Request if the barcode was not provided', function(done) {
+    it('returns a 400 Bad Request if the pid was not provided', function(done) {
       api.post('/auth/register')
         .send({
           first_name: 'New',
@@ -133,12 +133,12 @@ describe('Authentication', function() {
           member_status: 'Member',
         })
         .expect(400, [{
-          param: 'barcode',
-          msg: 'The barcode from an ID card is required.',
+          param: 'pid',
+          msg: 'The pid from an ID card is required.',
         }], done);
     });
 
-    it('returns a 201 Created and a token given a valid email, password, and barcode',
+    it('returns a 201 Created and a token given a valid email, password, and pid',
       function(done) {
         api.post('/auth/register')
           .send({
@@ -146,7 +146,7 @@ describe('Authentication', function() {
             last_name: 'User',
             email: 'newuser@test.com',
             password: 'password',
-            barcode: 'barcode2',
+            pid: 'pid2',
             house: 'red',
           })
           .expect(201, function(err, res) {
@@ -164,12 +164,12 @@ describe('Authentication', function() {
           });
       });
 
-    it('returns a 201 Created when registering with just the barcode', function(done) {
+    it('returns a 201 Created when registering with just the pid', function(done) {
       api.post('/auth/register')
         .send({
           first_name: 'New',
-          last_name: 'User with just barcode',
-          barcode: 'barcode3',
+          last_name: 'User with just pid',
+          pid: 'pid3',
           house: 'blue',
         })
         .expect(201, function(err, res) {
@@ -179,7 +179,7 @@ describe('Authentication', function() {
             .expect(200, {
               id: 4,
               first_name: 'New',
-              last_name: 'User with just barcode',
+              last_name: 'User with just pid',
               email: null,
               house: 'blue',
               member_status: 'Initiate',
@@ -194,7 +194,7 @@ describe('Authentication', function() {
           last_name: 'User',
           email: 'uniqueuser@test.com',
           password: 'password',
-          barcode: 'barcode4',
+          pid: 'pid4',
         })
         .expect(201, function() {
           api.post('/auth/register')
@@ -203,7 +203,7 @@ describe('Authentication', function() {
               last_name: 'User',
               email: 'uniqueuser@test.com',
               password: 'password',
-              barcode: 'barcode5',
+              pid: 'pid5',
             })
             .expect(400, [{
               param: 'email',
@@ -213,25 +213,25 @@ describe('Authentication', function() {
         });
     });
 
-    it('returns a 400 Bad Request if a user with a duplicate barcode is registered',
+    it('returns a 400 Bad Request if a user with a duplicate pid is registered',
       function(done) {
         api.post('/auth/register')
           .send({
-            first_name: 'Unique Barcode',
+            first_name: 'Unique PID',
             last_name: 'User',
-            barcode: 'barcode2',
+            pid: 'pid2',
           })
           .expect(201, function() {
             api.post('/auth/register')
               .send({
-                first_name: 'Duplicate Barcode',
+                first_name: 'Duplicate PID',
                 last_name: 'User',
-                barcode: 'barcode2',
+                pid: 'pid2',
               })
               .expect(400, [{
-                param: 'barcode',
-                msg: 'This barcode has already been registered.',
-                value: 'barcode2',
+                param: 'pid',
+                msg: 'This pid has already been registered.',
+                value: 'pid2',
               }], done);
           });
       });
@@ -244,58 +244,58 @@ describe('Authentication', function() {
 
     after(helpers.rollback);
 
-    it(`returns a 400 Bad Request when trying to login with email, password, and barcode
+    it(`returns a 400 Bad Request when trying to login with email, password, and pid
         all present in request body`,
       function(done) {
         api.post('/auth/login')
-          .send({ email: 'test@test.com', password: 'password', barcode: 'barcode1' })
+          .send({ email: 'test@test.com', password: 'password', pid: 'pid1' })
           .expect(400, {
-            error: 'Login is only allowed via barcode, or via an email and password combination.',
+            error: 'Login is only allowed via pid, or via an email and password combination.',
           }, done);
       });
 
-    it(`returns a 400 Bad Request when trying to login with an email and barcode present in request
+    it(`returns a 400 Bad Request when trying to login with an email and pid present in request
         body`,
       function(done) {
         api.post('/auth/login')
-          .send({ email: 'test@test.com', barcode: 'barcode1' })
+          .send({ email: 'test@test.com', pid: 'pid1' })
           .expect(400, {
-            error: 'Login is only allowed via barcode, or via an email and password combination.',
+            error: 'Login is only allowed via pid, or via an email and password combination.',
           }, done);
       });
 
-    it(`returns a 400 Bad Request when trying to login with a password and barcode present in
+    it(`returns a 400 Bad Request when trying to login with a password and pid present in
         request body`,
       function(done) {
         api.post('/auth/login')
-          .send({ password: 'password', barcode: 'barcode1' })
+          .send({ password: 'password', pid: 'pid1' })
           .expect(400, {
-            error: 'Login is only allowed via barcode, or via an email and password combination.',
+            error: 'Login is only allowed via pid, or via an email and password combination.',
           }, done);
       });
 
-    it(`returns a 400 Bad Request when trying to login with a barcode when a user has a registered
+    it(`returns a 400 Bad Request when trying to login with a pid when a user has a registered
         email and password`, function(done) {
       api.post('/auth/login')
-        .send({ barcode: 'barcode1' })
+        .send({ pid: 'pid1' })
         .expect(401, {
-          error: 'Login via barcode is disabled with a registered email and password.',
+          error: 'Login via pid is disabled with a registered email and password.',
         }, done);
     });
 
-    it('returns a token when logging in a non-registered user with just the barcode',
+    it('returns a token when logging in a non-registered user with just the pid',
       function(done) {
         api.post('/auth/register')
           .send({
             first_name: 'New',
-            last_name: 'User with just barcode',
-            barcode: 'barcode2',
+            last_name: 'User with just pid',
+            pid: 'pid2',
           })
           .expect(201, function(err, res) {
             expect(res.body.token).to.exist;
 
             api.post('/auth/login')
-              .send({ barcode: 'barcode2' })
+              .send({ pid: 'pid2' })
               .expect(200, function(loginErr, loginRes) {
                 expect(loginRes.body.token).to.exist;
                 done();
@@ -315,10 +315,10 @@ describe('Authentication', function() {
         .expect(404, { error: 'An account with that email has not been registered.' }, done);
     });
 
-    it('returns a 404 Not Found if a user with the given barcode does not exist', function(done) {
+    it('returns a 404 Not Found if a user with the given pid does not exist', function(done) {
       api.post('/auth/login')
-        .send({ barcode: 'nonexistentbarcode' })
-        .expect(404, { error: 'An account with that barcode has not been registered.' }, done);
+        .send({ pid: 'nonexistentpid' })
+        .expect(404, { error: 'An account with that pid has not been registered.' }, done);
     });
 
     it('returns a 200 OK when logging in with valid credentials', function(done) {

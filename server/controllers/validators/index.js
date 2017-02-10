@@ -27,17 +27,17 @@ const custom = {
   },
 
   /**
-   * Checks whether a barcode has already been taken, similar to
+   * Checks whether a pid has already been taken, similar to
    * {@link isEmailAvailable} above.
    *
-   * @param  {string} barcode Barcode to check existence of.
-   * @return {Promise<User>} Resolves when barcode was not found.
+   * @param  {string} pid PID to check existence of.
+   * @return {Promise<User>} Resolves when pid was not found.
    */
-  isBarcodeAvailable(barcode) {
+  isPIDAvailable(pid) {
     return new Promise((resolve, reject) => {
-      User.where('barcode', barcode)
+      User.where('pid', pid)
         .fetch({ require: true })
-        .then(() => reject(new Error('Barcode isn\'t available!')))
+        .then(() => reject(new Error('PID isn\'t available!')))
         .catch(() => resolve());
     });
   },
