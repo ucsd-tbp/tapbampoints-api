@@ -15,7 +15,7 @@ const events = {
 
   /** Shows event with ID given in request parameters. */
   show(req, res) {
-    new Event().findByID(req.params.id, { embed: req.relations })
+    new Event().findByID(req.params.id, { embed: req.relations, filters: req.filters })
       .then(event => res.json(event.toJSON()))
       .catch(Event.NotFoundError, () => res.status(404).json({ error: 'Event not found.' }))
       .catch(err => res.status(400).json({ message: err.message }));

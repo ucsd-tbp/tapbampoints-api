@@ -14,13 +14,13 @@ const User = db.model('User', {
   tableName: 'users',
 
   // Attributes that aren't serialized when converting a User to JSON.
-  hidden: ['password', 'pid', 'role_id', 'valid', 'email_verification_code'],
+  hidden: ['password', 'role_id', 'valid', 'email_verification_code'],
 
   // Attributes that are not mass-assignable.
   guarded: ['id', 'valid', 'email_verification_code'],
 
   // Attributes that can be used to search, filter, or sort collection results.
-  queryable: ['email', 'first_name', 'last_name', 'house', 'member_status'],
+  queryable: ['email', 'first_name', 'last_name', 'house', 'pid'],
 
   // Attributes that aren't in the database, but are calculated on the fly
   // based on in-database attributes.

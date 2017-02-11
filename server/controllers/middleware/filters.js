@@ -57,8 +57,8 @@ function filters(req, res, next) {
     return { key, comparison, value };
   });
 
-  next();
   debug(req.filters);
+  next();
 }
 
 module.exports = filters;

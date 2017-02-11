@@ -11,6 +11,7 @@ const Promise = require('bluebird');
 
 const clone = require('lodash/clone');
 const forEach = require('lodash/forEach');
+const includes = require('lodash/includes');
 
 /**
  * Checks that every relation in `requestedRelations` exists in the
@@ -54,8 +55,9 @@ module.exports = bookshelf => {
      * @return {Promise<Model>} Resolves to model with given ID.
      */
     findByID(id, options = {}) {
-      options.filters = options.filters || {};
-      options.filters.id = id;
+      options.filters = options.filters || [];
+      options.filters.push({ key: 'id', comparison: '=', value: id });
+
       return this.find(options);
     },
 
@@ -83,12 +85,12 @@ module.exports = bookshelf => {
      * or a collection depending on `returnCollection`.
      */
     find(options = {}, returnCollection = false) {
-      options.filters = options.filters || {};
+      options.filters = options.filters || [];
 
       // Removes parameters from query that aren't in queryable attributes.
       Object.keys(options.filters).forEach(param => {
-        if (param !== 'id' && this.queryable && this.queryable.indexOf(param) === -1) {
-          delete options.filters[param];
+        if (param !== 'id' && this.queryable && !includes(this.queryable, param)) {
+          delete options.filters.param;
         }
       });
 
