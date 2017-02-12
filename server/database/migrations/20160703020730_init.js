@@ -78,6 +78,7 @@ exports.up = knex =>
     table.decimal('points_earned').unsigned()
           .defaultTo(0)
           .notNullable();
+    table.timestamps(false, true);
   })
 
   .createTable('announcements', table => {
