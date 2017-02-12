@@ -2,35 +2,38 @@
 
 const debug = require('debug')('tbp:records-validator');
 
+const Event = require('../../models/Event');
+const User = require('../../models/User');
+
 const attendanceRecords = {
   /**
    * Validates PUT requests to /users/:id/events/:id. PUT requests should be
    * idempotent, so all fields of the attendance record are required when
-   * creating a new record.
+   * creating a new record. Also used to validate PATCH requests since the only
+   * field is `points_earned`.
    */
-  create(req, res, next) {
+  createOrUpdate(req, res, next) {
     debug('firing attendanceRecords.create validation middleware');
 
-    req.check('points_earned', 'Points earned value must be a number greater than or equal to 0.')
-      .isInt({ min: 0 });
+    req.checkBody('points_earned', 'Number of points should be greater than or equal to 0.')
+      .isNotNegative();
 
-    const errors = req.validationErrors();
-    if (errors) return res.status(400).json(errors);
+    req.checkBody('points_earned', 'Number of points should be a multiple of 0.25.')
+      .isValidPointValue();
 
-    next();
-  },
+    req.checkParams('event_id', 'Can\'t register user; this event doesn\'t exist.')
+      .exists('id', Event);
 
-  /** Validates PATCH requests to /users/:id/events/:id. */
-  update(req, res, next) {
-    debug('firing attendanceRecords.update validation middleware');
+    req.checkParams('user_id', 'Can\'t register user; this user doesn\'t exist.')
+      .exists('id', User);
 
-    req.check('points_earned', 'Points earned value must be a number greater than or equal to 0.')
-      .optional().isInt({ min: 0 });
+    req.getValidationResult().then((result) => {
+      if (!result.isEmpty()) {
+        return res.status(400).json({ errors: result.array() });
+      }
 
-    const errors = req.validationErrors();
-    if (errors) return res.status(400).json(errors);
-
-    next();
+      next();
+    });
   },
 };
 

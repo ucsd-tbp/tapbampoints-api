@@ -1,5 +1,6 @@
 /** @file Request validation for the authentication routes on /api/auth. */
 
+const User = require('../../models/User');
 const debug = require('debug')('tbp:auth-validator');
 
 const auth = {
@@ -8,14 +9,16 @@ const auth = {
     debug('firing auth.register validation middleware');
 
     req.checkBody('email', 'Email is invalid.').isEmail();
-    req.checkBody('email', 'This email has already been registered.').isEmailAvailable();
+    req.checkBody('email', 'This email has already been registered.').isUnique('email', User);
 
+    // If the password is part of the request body, then a user is manually
+    // creating an account and
     if (req.body.password) {
       req.checkBody('password', 'Password must be at least 4 characters.').isLength({ min: 4 });
       req.checkBody('role', 'Must register with a role as an initiate or a member.').isSafeRole();
 
       req.checkBody('pid', 'The PID from an ID card is required.').notEmpty();
-      req.checkBody('pid', 'This PID has already been registered.').isPIDAvailable();
+      req.checkBody('pid', 'This PID has already been registered.').isUnique('pid', User);
     }
 
     req.getValidationResult().then((result) => {

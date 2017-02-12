@@ -5,51 +5,55 @@ const auth = require('./auth');
 const events = require('./events');
 const users = require('./users');
 
-const User = require('../../models/User');
-
-// TODO Move validation to the model layer for reduced repetition.
 const custom = {
   /**
-   * Checks whether an email has already been taken. Resolves when a user with
-   * the given email does not exist in the database in order to indicate that
-   * the email is available.
+   * Checks whether a row in the table corresponding to `model` has a row that
+   * has an attribute named `identifier` with its value as `value`. This
+   * validator should be used when enforcing unique fields in the database,
+   * like IDs or student PIDs.
    *
-   * @param  {String} email Email to check existence of.
-   * @return {Promise<User>} Resolves when the email was not found.
+   * @param {any} value Value corresponding to `identifier`.
+   * @param {string} identifier Name of attribute in table.
+   * @param {Model} model Bookshelf model to check.
+   *
+   * @return {Promise} Resolves only if a row could not be found with the given
+   * criteria.
    */
-  isEmailAvailable(email) {
+  isUnique(value, identifier, model) {
     return new Promise((resolve, reject) => {
-      User.where('email', email)
+      model.where(identifier, value)
         .fetch({ require: true })
-        .then(() => reject(new Error('Email isn\'t available!')))
+        .then(() => reject(new Error(`${identifier} with value ${value} already exists!`)))
         .catch(() => resolve());
     });
   },
 
-  /**
-   * Checks whether a pid has already been taken, similar to
-   * {@link isEmailAvailable} above.
-   *
-   * @param  {string} pid PID to check existence of.
-   * @return {Promise<User>} Resolves when pid was not found.
-   */
-  isPIDAvailable(pid) {
+  /** The reverse of `isUnique`. */
+  exists(value, identifier, model) {
     return new Promise((resolve, reject) => {
-      User.where('pid', pid)
+      model.where(identifier, value)
         .fetch({ require: true })
-        .then(() => reject(new Error('PID isn\'t available!')))
-        .catch(() => resolve());
+        .then(() => resolve())
+        .catch(() => reject(new Error(`${identifier} with value ${value} doesn't exist!`)));
     });
   },
 
   /**
    * Only allows 'initiate' or 'member' roles. Prevents users from registering
    * as officers or approved members.
-   *
-   * @return {Boolean} True if role field is either 'initiate' or 'pending'.
    */
   isSafeRole(role) {
     return role === 'initiate' || role === 'pending';
+  },
+
+  /** Only allows decimal values that are multiples of 0.25. */
+  isValidPointValue(pointValue) {
+    return pointValue * 100 % 25 === 0;
+  },
+
+  /** Allows `value` greater than or equal to zero. */
+  isNotNegative(value) {
+    return value >= 0;
   },
 };
 

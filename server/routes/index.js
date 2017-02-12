@@ -65,9 +65,9 @@ router.get('/events/:id/users', controllers.attendanceRecords.showAttendees);
 router.get('/records', controllers.attendanceRecords.index);
 
 // Routes for modifying attendance records.
-router.put('/users/:user_id/events/:event_id', validators.attendanceRecords.create, requireOfficer,
-  controllers.attendanceRecords.create);
-router.patch('/users/:user_id/events/:event_id', validators.attendanceRecords.update,
+router.put('/users/:user_id/events/:event_id', validators.attendanceRecords.createOrUpdate,
+  requireOfficer, controllers.attendanceRecords.create);
+router.patch('/users/:user_id/events/:event_id', validators.attendanceRecords.createOrUpdate,
   requireOfficer, controllers.attendanceRecords.update);
 router.delete('/users/:user_id/events/:event_id', requireOfficer,
   controllers.attendanceRecords.delete);

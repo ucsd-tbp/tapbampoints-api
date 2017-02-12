@@ -49,7 +49,7 @@ exports.up = knex =>
     table.increments('id').primary();
     table.string('summary').defaultTo('').notNullable();
     table.text('description').defaultTo('');
-    table.integer('points').defaultTo(0).notNullable();
+    table.decimal('points').defaultTo(0).notNullable();
     table.string('location').notNullable().defaultTo('');
     table.dateTime('start').notNullable();
     table.dateTime('end').notNullable();
@@ -75,7 +75,7 @@ exports.up = knex =>
           .inTable('events')
           .onDelete('CASCADE');
 
-    table.integer('points_earned').unsigned()
+    table.decimal('points_earned').unsigned()
           .defaultTo(0)
           .notNullable();
   })

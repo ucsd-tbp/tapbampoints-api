@@ -31,12 +31,6 @@ const attendanceRecords = {
             message = 'You have already signed into the event.';
             break;
 
-          // If a foreign key constraint fails, then the corresponding ID
-          // row in one of the tables does not exist.
-          case 'ER_NO_REFERENCED_ROW_2':
-            message = 'The user or event doesn\'t exist.';
-            break;
-
           default:
             message = 'An error occurred when making the attendance record';
         }
