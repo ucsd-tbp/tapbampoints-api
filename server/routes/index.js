@@ -14,6 +14,8 @@
 
 const express = require('express');
 
+const Roles = require('../modules/constants').Roles;
+
 const controllers = require('../controllers');
 const validators = require('../controllers/validators');
 const middleware = require('../controllers/middleware');
@@ -24,7 +26,7 @@ const router = express.Router();
 // Middleware stack that only allows logged-in admins.
 const requireOfficer = [
   controllers.auth.verify,
-  middleware.acl.allowAnyOf(['admin', 'officer']),
+  middleware.acl.allowAnyOf([Roles.ADMIN, Roles.OFFICER]),
 ];
 
 // Middleware stack that requires the logged-in user ID and param ID to match.
@@ -60,7 +62,7 @@ router.get('/users/:id/events', controllers.attendanceRecords.showAttendedEvents
 router.get('/events/:id/users', controllers.attendanceRecords.showAttendees);
 
 // Lists all attendance records and implements filters (e.g. by user ID).
-router.get('/events/records', controllers.attendanceRecords.index);
+router.get('/records', controllers.attendanceRecords.index);
 
 // Routes for modifying attendance records.
 router.put('/users/:user_id/events/:event_id', validators.attendanceRecords.create, requireOfficer,
