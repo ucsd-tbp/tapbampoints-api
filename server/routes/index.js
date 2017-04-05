@@ -64,6 +64,9 @@ router.get('/events/:id/users', controllers.attendanceRecords.showAttendees);
 // Lists all attendance records and implements filters (e.g. by user ID).
 router.get('/records', controllers.attendanceRecords.index);
 
+// Convenience endpoint for getting current points between a date range.
+router.get('/records/points', controllers.attendanceRecords.currentPoints);
+
 // Routes for modifying attendance records.
 router.put('/users/:user_id/events/:event_id', validators.attendanceRecords.createOrUpdate,
   requireOfficer, controllers.attendanceRecords.create);
@@ -71,6 +74,7 @@ router.patch('/users/:user_id/events/:event_id', validators.attendanceRecords.cr
   requireOfficer, controllers.attendanceRecords.update);
 router.delete('/users/:user_id/events/:event_id', requireOfficer,
   controllers.attendanceRecords.delete);
+
 
 // Announcement routes.
 router.get('/announcements', controllers.announcements.index);

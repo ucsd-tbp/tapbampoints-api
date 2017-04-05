@@ -1,5 +1,7 @@
 /** @file Contains endpoints for routes related to attendance records. */
 
+const db = require('../database');
+
 const AttendanceRecord = require('../models/AttendanceRecord');
 const Event = require('../models/Event');
 const User = require('../models/User');
@@ -35,7 +37,7 @@ const attendanceRecords = {
             message = 'An error occurred when making the attendance record';
         }
 
-        return res.status(400).json({ error: message });
+        return res.status(400).json({ message });
       });
   },
 
@@ -88,6 +90,48 @@ const attendanceRecords = {
       .then(() => res.send(204))
       .catch(err => res.status(400).json({ error: err.message }));
   },
+
+  /**
+   * Finds the number of points that a user received in each event category,
+   * along with the number of events that user attended in each category.
+   * Requires user PID in the request parameters. Includes event categories that
+   * the user has no points in.
+   *
+   * @example
+   *
+   * GET /records/points?pid=A12345678
+   *
+   * {
+   *   academic: { num_events: 1, total: 7 },
+   *   social: { num_events: 2, total: 9 },
+   *   service: { num_events: 0, total: 0 },
+   *   wildcard: { num_events: 0, total: 0 },
+   * }
+   *
+   */
+  currentPoints(req, res) {
+    if (!req.query.pid)
+      res.status(400).json({ error: 'PID is required.' });
+
+    const sqlQuery = `
+      SELECT
+        event_types.name AS type,
+        COUNT(records.event_id) AS num_events,
+        SUM(CASE WHEN records.points_earned IS NULL THEN 0 ELSE records.points_earned END) AS total
+      FROM attendance_records records
+      INNER JOIN events
+        ON records.event_id = events.id
+      INNER JOIN users
+        ON records.user_id = users.id AND users.pid = (?)
+      RIGHT OUTER JOIN event_types
+        ON events.type_id = event_types.id
+      GROUP BY event_types.name;
+    `
+
+    db.knex.raw(sqlQuery, [req.query.pid])
+      .then(data => res.json(data[0]))
+      .catch(err => res.status(400).json({ error: err.message }));
+  }
 };
 
 module.exports = attendanceRecords;

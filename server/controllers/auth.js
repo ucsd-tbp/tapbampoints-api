@@ -86,6 +86,9 @@ const auth = {
           debug(`found user with ID: ${user.id} from JWT`);
           req.user = user;
           next();
+
+          // Gets rid of Bluebird "promise created but not returned" warning.
+          return null;
         })
         .catch(User.NotFoundError, () => res.status(400).json({
           error: 'User with ID decoded from JWT could not be found.',
