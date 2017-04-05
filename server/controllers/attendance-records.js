@@ -1,9 +1,11 @@
 /** @file Contains endpoints for routes related to attendance records. */
 
 const format = require('date-fns/format');
-const constants = require('../modules/constants');
+const keyBy = require('lodash/keyBy');
+const forEach = require('lodash/forEach');
 
 const db = require('../database');
+const constants = require('../modules/constants');
 const AttendanceRecord = require('../models/AttendanceRecord');
 const Event = require('../models/Event');
 const User = require('../models/User');
@@ -140,7 +142,14 @@ const attendanceRecords = {
       format(lowerDateTimeISO, constants.DATABASE_DATE_FORMAT),
       format(upperDateTimeISO, constants.DATABASE_DATE_FORMAT),
     ])
-      .then(data => res.json(data[0]))
+      .then((data) => {
+        // SQL query returns rows in an array, so converts array into an object
+        // with the event type as its properties for convenience.
+        let pointsByType = keyBy(data[0], 'type')
+        pointsByType = forEach(pointsByType, (info) => delete info.type);
+
+        res.json(pointsByType);
+      })
       .catch(err => res.status(400).json({ error: err.message }));
   },
 };
