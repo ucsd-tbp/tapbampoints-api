@@ -1,7 +1,9 @@
 /** @file Contains endpoints for routes related to attendance records. */
 
-const db = require('../database');
+const format = require('date-fns/format');
+const constants = require('../modules/constants');
 
+const db = require('../database');
 const AttendanceRecord = require('../models/AttendanceRecord');
 const Event = require('../models/Event');
 const User = require('../models/User');
@@ -110,8 +112,12 @@ const attendanceRecords = {
    *
    */
   currentPoints(req, res) {
-    if (!req.query.pid)
+    if (!req.query.pid) {
       res.status(400).json({ error: 'PID is required.' });
+    }
+
+    const lowerDateTimeISO = req.query.timeMin || constants.EPOCH_ISO_DATETIME;
+    const upperDateTimeISO = req.query.timeMax || (new Date()).toISOString();
 
     const sqlQuery = `
       SELECT
@@ -125,13 +131,18 @@ const attendanceRecords = {
         ON records.user_id = users.id AND users.pid = (?)
       RIGHT OUTER JOIN event_types
         ON events.type_id = event_types.id
+          AND records.created_at BETWEEN (?) AND (?)
       GROUP BY event_types.name;
-    `
+    `;
 
-    db.knex.raw(sqlQuery, [req.query.pid])
+    db.knex.raw(sqlQuery, [
+      req.query.pid,
+      format(lowerDateTimeISO, constants.DATABASE_DATE_FORMAT),
+      format(upperDateTimeISO, constants.DATABASE_DATE_FORMAT),
+    ])
       .then(data => res.json(data[0]))
       .catch(err => res.status(400).json({ error: err.message }));
-  }
+  },
 };
 
 module.exports = attendanceRecords;
