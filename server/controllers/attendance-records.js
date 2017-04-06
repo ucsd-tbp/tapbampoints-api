@@ -106,12 +106,11 @@ const attendanceRecords = {
    * GET /records/points?pid=A12345678
    *
    * {
-   *   academic: { num_events: 1, total: 7 },
-   *   social: { num_events: 2, total: 9 },
-   *   service: { num_events: 0, total: 0 },
-   *   wildcard: { num_events: 0, total: 0 },
+   *   academic: { attended: 1, total: 7 },
+   *   social: { attended: 2, total: 9 },
+   *   service: { attended: 0, total: 0 },
+   *   wildcard: { attended: 0, total: 0 },
    * }
-   *
    */
   currentPoints(req, res) {
     if (!req.query.pid) {
@@ -124,7 +123,7 @@ const attendanceRecords = {
     const sqlQuery = `
       SELECT
         event_types.name AS type,
-        COUNT(records.event_id) AS num_events,
+        COUNT(records.event_id) AS attended,
         SUM(CASE WHEN records.points_earned IS NULL THEN 0 ELSE records.points_earned END) AS total
       FROM attendance_records records
       INNER JOIN events

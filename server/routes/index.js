@@ -75,7 +75,6 @@ router.patch('/users/:user_id/events/:event_id', validators.attendanceRecords.cr
 router.delete('/users/:user_id/events/:event_id', requireOfficer,
   controllers.attendanceRecords.delete);
 
-
 // Announcement routes.
 router.get('/announcements', controllers.announcements.index);
 
