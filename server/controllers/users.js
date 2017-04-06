@@ -4,11 +4,17 @@ const User = require('../models/User');
 
 const users = {
   /**
-   * Displays info for a user with the given ID and associated events.
-   *
-   * @param  {Request} req HTTP request object
-   * @param  {Response} res HTTP respones, contains retrieved user
+   * Creates a token that the user can use to verify their account, given the
+   * ID of the user to be verified. Then, sends an email with a link that the
+   * user can use to claim their account.
    */
+  generateVerificationToken(req, res) {
+    if (!req.body.id) {
+      return res.status(400).json({ message: 'ID of account to verify is required.' });
+    }
+  },
+
+  /** Displays info for a user with the given ID and associated events. */
   show(req, res) {
     new User().findByID(req.params.id, { embed: req.relations })
       .then(user => res.json(user.toJSON()))
@@ -16,12 +22,7 @@ const users = {
       .catch(err => res.status(400).json({ error: err.message }));
   },
 
-  /**
-   * Lists all users.
-   *
-   * @param  {Request} req HTTP request object
-   * @param  {Response} res HTTP response sent after receiving a request
-   */
+  /** Lists all users. */
   index(req, res) {
     // TODO Add pagination data via the Link header.
     new User().findAll({ embed: req.relations, filters: req.filters })
@@ -29,12 +30,7 @@ const users = {
       .catch(err => res.status(400).json({ error: err.message }));
   },
 
-  /**
-   * Updates user with ID given in request parameters.
-   *
-   * @param  {Request} req HTTP request object
-   * @param  {Response} res HTTP response sent after receiving a request
-   */
+  /** Updates user with ID given in request parameters. */
   update(req, res) {
     User.where({ id: req.params.id })
       .save(req.body, { patch: true })
@@ -45,12 +41,7 @@ const users = {
       .catch(err => res.status(400).json({ error: err.message }));
   },
 
-  /**
-   * Deletes user with ID given in request parameters.
-   *
-   * @param  {Request} req HTTP request object
-   * @param  {Response} res HTTP response sent after receiving a request
-   */
+  /** Deletes user with ID given in request parameters. */
   delete(req, res) {
     User.where({ id: req.params.id })
       .destroy({ require: true })

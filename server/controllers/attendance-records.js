@@ -144,7 +144,7 @@ const attendanceRecords = {
       .then((data) => {
         // SQL query returns rows in an array, so converts array into an object
         // with the event type as its properties for convenience.
-        let pointsByType = keyBy(data[0], 'type')
+        let pointsByType = keyBy(data[0], 'type');
         pointsByType = forEach(pointsByType, (info) => delete info.type);
 
         res.json(pointsByType);

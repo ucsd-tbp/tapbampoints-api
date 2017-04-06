@@ -86,6 +86,13 @@ exports.up = knex =>
     table.string('summary').notNullable();
     table.text('description').defaultTo('').notNullable();
     table.timestamps(false, true);
+  })
+
+  .createTable('verification_tokens', table => {
+    table.uuid('id').primary();
+    table.string('token').notNullable();
+    table.integer('user_id').notNullable();
+    table.dateTime('expiration').notNullable();
   });
 
 exports.down = knex =>
@@ -94,4 +101,5 @@ exports.down = knex =>
               .dropTable('event_types')
               .dropTable('users')
               .dropTable('roles')
-              .dropTable('announcements');
+              .dropTable('announcements')
+              .dropTable('verification_tokens');
