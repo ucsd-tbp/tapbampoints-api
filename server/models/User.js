@@ -5,9 +5,10 @@ const debug = require('debug')('tbp:user-model');
 const isEmpty = require('lodash/isEmpty');
 
 require('./Event');
-const db = require('../database');
 
+const db = require('../database');
 const Role = require('./Role');
+const constants = require('../modules/constants');
 
 const User = db.model('User', {
   // Database table that this model and its attributes correspond to.
@@ -75,7 +76,7 @@ const User = db.model('User', {
     if (!this.attributes.password) return Promise.resolve();
 
     return new Promise((resolve, reject) => {
-      bcrypt.hash(this.attributes.password, 10, (err, hash) => {
+      bcrypt.hash(this.attributes.password, constants.SALT_ROUNDS, (err, hash) => {
         if (err) reject(err);
 
         debug(`hashed password: ${hash}`);

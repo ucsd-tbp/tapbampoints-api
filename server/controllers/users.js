@@ -1,6 +1,13 @@
 /** @file Contaisn endpoints for user routes on /api/users. */
 
+const bcrypt = require('bcrypt');
+const uuid = require('uuid/v4');
+const addDays = require('date-fns/add_days');
+const format = require('date-fns/format');
+
+const db = require('../database');
 const User = require('../models/User');
+const constants = require('../modules/constants');
 
 const users = {
   /**
@@ -9,9 +16,52 @@ const users = {
    * user can use to claim their account.
    */
   generateVerificationToken(req, res) {
-    if (!req.body.id) {
-      return res.status(400).json({ message: 'ID of account to verify is required.' });
+    if (!req.body.pid) {
+      return res.status(400).json({ message: 'PID of user to verify is required.' });
     }
+
+    // Checks that an unverified account has been made given the PID.
+    const findUserQuery = 'SELECT email, valid from users where pid = ?';
+    db.knex.raw(findUserQuery, [req.body.pid])
+      .then((result) => {
+        if (result[0].length <= 0) {
+          return Promise.reject(new Error(`Couldn\'t find an account with PID ${req.body.pid}.`));
+        }
+
+        if (result[0][0].valid) {
+          return Promise.reject(
+            new Error(`Account with PID ${req.body.pid} has already been claimed.`)
+          );
+        }
+
+        return result[0][0].email;
+      })
+      .then((email) => {
+        // The id is used for looking up the hashed verification token.
+        const token = uuid();
+        return Promise.all([email, bcrypt.hash(token, constants.SALT_ROUNDS)]);
+      })
+      .then(([email, hash]) => {
+        // TODO Extend CRUD methods in a Bookshelf base class – otherwise simple
+        // CRUD queries via an ORM become too verbose.
+        const createTokenQuery = `
+          REPLACE INTO verification_tokens (id, token, pid, expiration) VALUES (?, ?, ?, ?);
+        `;
+
+        // A second UUID is used for looking up the hashed UUID.
+        const id = uuid();
+
+        // Verification token expires a day from now.
+        const expiration = format(addDays(new Date(), 1), constants.DATABASE_DATE_FORMAT);
+
+        return Promise.all([
+          email, db.knex.raw(createTokenQuery, [id, hash, req.body.pid, expiration]),
+        ]);
+      })
+      .then(([email]) => {
+        res.json({ message: `Sent verification email to ${email}.` });
+      })
+      .catch(err => res.status(400).json({ message: err.message }));
   },
 
   /** Displays info for a user with the given ID and associated events. */

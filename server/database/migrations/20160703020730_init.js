@@ -91,7 +91,7 @@ exports.up = knex =>
   .createTable('verification_tokens', table => {
     table.uuid('id').primary();
     table.string('token').notNullable();
-    table.integer('user_id').notNullable();
+    table.string('pid').unique().notNullable();
     table.dateTime('expiration').notNullable();
   });
 

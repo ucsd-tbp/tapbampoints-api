@@ -46,6 +46,9 @@ router.get('/users/:id', controllers.users.show);
 router.patch('/users/:id', validators.users.update, requireOwner, controllers.users.update);
 router.delete('/users/:id', requireOfficer, controllers.users.delete);
 
+// User account verification.
+router.post('/verify', controllers.users.generateVerificationToken);
+
 // Event type routes.
 router.get('/events/types', controllers.eventTypes.index);
 router.get('/events/types/:id', controllers.eventTypes.show);

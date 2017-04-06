@@ -29,6 +29,9 @@ const constants = {
 
   // Datetime string for the beginning of time (practically) in ISO format.
   EPOCH_ISO_DATETIME: '1970-01-01T00:00:00.000Z',
+
+  // Salt rounds used when hashing passwords and tokens via bcrypt.
+  SALT_ROUNDS: 10,
 };
 
 module.exports = constants;
