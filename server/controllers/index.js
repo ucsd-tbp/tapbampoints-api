@@ -11,6 +11,7 @@ const auth = require('./auth');
 const events = require('./events');
 const eventTypes = require('./event-types');
 const users = require('./users');
+const verification = require('./verification');
 
 const controllers = {
   announcements,
@@ -19,6 +20,7 @@ const controllers = {
   events,
   eventTypes,
   users,
+  verification,
 };
 
 module.exports = controllers;
