@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 const uuid = require('uuid/v4');
 const addDays = require('date-fns/add_days');
 const format = require('date-fns/format');
+const mailer = require('nodemailer');
 
 const db = require('../database');
 const User = require('../models/User');
@@ -59,7 +60,28 @@ const users = {
         ]);
       })
       .then(([email]) => {
-        res.json({ message: `Sent verification email to ${email}.` });
+        let transporter = mailer.createTransport(constants.EMAIL_TRANSPORT_CONFIG);
+
+        const EMAIL_TEMPLATE = `
+          <h3>Thanks for coming!</h3>
+          <p>
+            You recently dropped by one of our events. To keep track of the points you received,
+            you'll need to register an account with us using the verification link below.
+          </p>
+          <a href="google.com">Verify your Account</a>
+        `
+
+        let mailOptions = {
+          from: constants.EMAIL_SENDER,
+          to: email,
+          subject: 'UCSD Tau Beta Pi Account Verification',
+          html: EMAIL_TEMPLATE,
+        };
+
+        transporter.sendMail(mailOptions, (error, info) => {
+          if (error) return res.status(400).json({ message: error });
+          res.json({ message: `Sent verification email to ${email}.` });
+        });
       })
       .catch(err => res.status(400).json({ message: err.message }));
   },
