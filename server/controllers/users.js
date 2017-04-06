@@ -21,6 +21,10 @@ const users = {
       return res.status(400).json({ message: 'PID of user to verify is required.' });
     }
 
+    // The id is used for looking up the hashed verification token.
+    const id = uuid();
+    const token = uuid();
+
     // Checks that an unverified account has been made given the PID.
     const findUserQuery = 'SELECT email, valid from users where pid = ?';
     db.knex.raw(findUserQuery, [req.body.pid])
@@ -37,20 +41,13 @@ const users = {
 
         return result[0][0].email;
       })
-      .then((email) => {
-        // The id is used for looking up the hashed verification token.
-        const token = uuid();
-        return Promise.all([email, bcrypt.hash(token, constants.SALT_ROUNDS)]);
-      })
+      .then(email => Promise.all([email, bcrypt.hash(token, constants.SALT_ROUNDS)]))
       .then(([email, hash]) => {
         // TODO Extend CRUD methods in a Bookshelf base class – otherwise simple
         // CRUD queries via an ORM become too verbose.
         const createTokenQuery = `
           REPLACE INTO verification_tokens (id, token, pid, expiration) VALUES (?, ?, ?, ?);
         `;
-
-        // A second UUID is used for looking up the hashed UUID.
-        const id = uuid();
 
         // Verification token expires a day from now.
         const expiration = format(addDays(new Date(), 1), constants.DATABASE_DATE_FORMAT);
@@ -61,6 +58,7 @@ const users = {
       })
       .then(([email]) => {
         let transporter = mailer.createTransport(constants.EMAIL_TRANSPORT_CONFIG);
+        const verificationLink = `${process.env.CLIENT_ADDRESS}/claim?id=${id}&token=${token}`;
 
         const EMAIL_TEMPLATE = `
           <h3>Thanks for coming!</h3>
@@ -68,7 +66,7 @@ const users = {
             You recently dropped by one of our events. To keep track of the points you received,
             you'll need to register an account with us using the verification link below.
           </p>
-          <a href="google.com">Verify your Account</a>
+          <a href="${verificationLink}">Verify your Account</a>
         `
 
         let mailOptions = {
