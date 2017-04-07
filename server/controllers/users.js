@@ -23,7 +23,7 @@ const users = {
   /** Updates user with ID given in request parameters. */
   update(req, res) {
     User.where({ id: req.params.id })
-      .save(req.body, { patch: true })
+      .save(req.body, { method: 'update' })
       .then(user => res.json(user.toJSON()))
       .catch(User.NoRowsUpdatedError, () =>
         res.status(404).json({ error: 'User could not be updated.' })

@@ -23,15 +23,22 @@ const middleware = require('../controllers/middleware');
 // TODO Use index.js to export router and define sets of routes and router.use.
 const router = express.Router();
 
-// Middleware stack that only allows logged-in admins.
+// Only allows logged-in admins.
 const requireOfficer = [
   controllers.auth.verify,
   middleware.acl.allowAnyOf([Roles.ADMIN, Roles.OFFICER]),
 ];
 
-// Middleware stack that requires the logged-in user ID and param ID to match.
+// Requires the logged-in user ID and param ID to match.
 const requireOwner = [
   controllers.auth.verify,
+  middleware.acl.allowAnyOf(['owner']),
+];
+
+// Requires the user from the verification token to match the param ID.
+const requireVerificationToken = [
+  controllers.verification.checkVerificationToken,
+  controllers.verification.invalidateVerificationToken,
   middleware.acl.allowAnyOf(['owner']),
 ];
 
@@ -40,15 +47,18 @@ router.post('/auth/register', validators.auth.register, controllers.auth.registe
 router.post('/auth/login', validators.auth.login, controllers.auth.login);
 router.get('/auth/me', controllers.auth.verify, controllers.auth.currentUser);
 
+// Routes related to account verification.
+router.post('/auth/generatetoken', controllers.verification.generateVerificationToken);
+router.get('/auth/checktoken', controllers.verification.checkVerificationToken,
+  controllers.auth.currentUser);
+router.patch('/auth/claim/:id', validators.users.claim, requireVerificationToken,
+  controllers.users.update);
+
 // Other user routes.
 router.get('/users', controllers.users.index);
 router.get('/users/:id', controllers.users.show);
 router.patch('/users/:id', validators.users.update, requireOwner, controllers.users.update);
 router.delete('/users/:id', requireOfficer, controllers.users.delete);
-
-// Routes related to account verification.
-router.post('/verify', controllers.verification.generateVerificationToken);
-router.post('/claim', controllers.verification.verifyAccount);
 
 // Event type routes.
 router.get('/events/types', controllers.eventTypes.index);

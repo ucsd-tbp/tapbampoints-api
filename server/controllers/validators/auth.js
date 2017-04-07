@@ -12,9 +12,9 @@ const auth = {
     req.checkBody('email', 'This email has already been registered.').isUnique('email', User);
 
     // If the password is part of the request body, then a user is manually
-    // creating an account and
+    // creating an account.
     if (req.body.password) {
-      req.checkBody('password', 'Password must be at least 4 characters.').isLength({ min: 4 });
+      req.checkBody('password', 'Password must be at least 6 characters.').isLength({ min: 6 });
       req.checkBody('role', 'Must register with a role as an initiate or a member.').isSafeRole();
 
       req.checkBody('pid', 'The PID from an ID card is required.').notEmpty();

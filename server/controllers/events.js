@@ -31,7 +31,7 @@ const events = {
   /** Updates event with ID in request parameters. */
   update(req, res) {
     Event.where({ id: req.params.id })
-      .save(req.body, { patch: true })
+      .save(req.body, { method: 'patch' })
       .then(event => res.json(event.toJSON()))
       .catch(Event.NoRowsUpdatedError, () =>
         res.status(404).json({ error: 'Event could not be updated.' })
