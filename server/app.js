@@ -58,6 +58,8 @@ app.use((req, res) => res.status(404).json({ error: 'Endpoint doesn\'t exist.' }
 
 // Global error handler.
 app.use((error, req, res, next) => {
+  debug(`reached global error handler with error message: ${error.message}`);
+
   switch (error.constructor) {
     case errors.ResourceNotFoundError:
       res.status(404).send({ message: error.message });

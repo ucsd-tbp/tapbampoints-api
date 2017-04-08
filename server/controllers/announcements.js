@@ -4,10 +4,13 @@ const Announcement = require('../models/Announcement');
 
 const announcements = {
   /** Lists all announcements. */
-  index(req, res) {
-    new Announcement().findAll({ embed: req.relations, filters: req.filters })
-      .then(announcementCollection => res.json(announcementCollection.toJSON()))
-      .catch(err => res.status(400).json({ message: err.message }));
+  index(req, res, next) {
+    new Announcement().findAll({
+        embed: req.relations,
+        filters: req.filters,
+      })
+      .then(collection => res.json(collection.toJSON()))
+      .catch(next);
   },
 };
 

@@ -15,7 +15,6 @@ const events = {
   show(req, res, next) {
     new Event().findByID(req.params.id, {
         embed: req.relations,
-        filters: req.filters,
       })
       .then(event => res.json(event.toJSON()))
       .catch(next);
