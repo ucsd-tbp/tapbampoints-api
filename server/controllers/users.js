@@ -20,23 +20,16 @@ const users = {
       .catch(next);
   },
 
-  update(req, res) {
-    User.where({ id: req.params.id })
-      .save(req.body, { method: 'update' })
+  update(req, res, next) {
+    new User().update(req.params.id, req.body)
       .then(user => res.json(user.toJSON()))
-      .catch(User.NoRowsUpdatedError, () =>
-        res.status(404).json({ error: 'User could not be updated.' })
-      )
-      .catch(err => res.status(400).json({ error: err.message }));
+      .catch(next);
   },
 
-  delete(req, res) {
-    User.where({ id: req.params.id })
-      .destroy({ require: true })
+  delete(req, res, next) {
+    new User().delete(req.params.id)
       .then(() => res.sendStatus(204))
-      .catch(User.NoRowsDeletedError, () =>
-        res.status(404).json({ error: 'User not found.' })
-      );
+      .catch(next);
   },
 };
 

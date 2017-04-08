@@ -3,13 +3,10 @@
 const Event = require('../models/Event');
 
 const events = {
-  create(req, res) {
-    new Event().save(req.body)
+  create(req, res, next) {
+    new Event().create(req.body)
       .then(event => res.status(201).json(event.toJSON()))
-      .catch(Event.NoRowsUpdatedError, () => res.status(400).json({
-        error: 'Event was not saved!',
-      }))
-      .catch(err => res.status(400).json({ error: err.message }));
+      .catch(next);
   },
 
   show(req, res, next) {
@@ -20,7 +17,7 @@ const events = {
       .catch(next);
   },
 
-  index(req, res) {
+  index(req, res, next) {
     new Event().findAll({
         embed: req.relations,
         filters: req.filters,
@@ -29,23 +26,16 @@ const events = {
       .catch(next);
   },
 
-  update(req, res) {
-    Event.where({ id: req.params.id })
-      .save(req.body, { method: 'patch' })
+  update(req, res, next) {
+    new Event().update(req.params.id, req.body)
       .then(event => res.json(event.toJSON()))
-      .catch(Event.NoRowsUpdatedError, () =>
-        res.status(404).json({ error: 'Event could not be updated.' })
-      )
-      .catch(err => res.status(400).json({ error: err.message }));
+      .catch(next);
   },
 
-  delete(req, res) {
-    Event.where({ id: req.params.id })
-      .destroy({ require: true })
+  delete(req, res, next) {
+    new Event().delete(req.params.id)
       .then(() => res.sendStatus(204))
-      .catch(Event.NoRowsDeletedError, () =>
-        res.status(404).json({ error: 'Event not found.' })
-      );
+      .catch(next);
   },
 };
 

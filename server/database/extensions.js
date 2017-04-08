@@ -146,6 +146,23 @@ module.exports = bookshelf => {
       }
     },
 
+    create(body) {
+      return this.save(body)
+        .catch(this.resourceErrorHandler);
+    },
+
+    update(id, body) {
+      return this.where({ id })
+        .save(body, { method: 'update', require: true })
+        .catch(this.resourceErrorHandler);
+    },
+
+    delete(id) {
+      return this.where({ id })
+        .destroy({ require: true })
+        .catch(this.resourceErrorHandler);
+    },
+
     /**
      * Overrides model conversion to JSON to omit _pivot attributes in the
      * returned JSON.
