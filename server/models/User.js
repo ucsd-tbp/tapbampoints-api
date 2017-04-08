@@ -124,26 +124,22 @@ const User = db.model('User', {
    * successful.
    */
   login(email, password) {
-    // FIXME Fix Promise anti-patterns, i.e. new Promise() and nesting Promises.
     return User.where('email', email)
       .fetch({ require: true, withRelated: ['role'] })
-      .then(user =>
-        new Promise((resolve, reject) => {
-          if (!user.get('valid')) {
-            reject(new Error(
-              'Your account hasn\'t been verified. Check your email for a verification code.'
-            ));
-          }
+      .then((user) => {
+        if (!user.get('valid')) {
+          return Promise.reject(new Error('Your account hasn\'t been verified.'));
+        }
 
-          // Checks for password correctness.
-          bcrypt.compare(password, user.get('password'), (err, result) => {
-            if (err) return reject(err);
-            if (!result) return reject(new Error('The email and password entered don\'t match.'));
+        return [user, bcrypt.compare(password, user.get('password'))];
+      })
+      .then(([user, comparisonResult]) => {
+        if (!comparisonResult) {
+          return Promise.reject(new Error('The email and password entered don\'t match.'));
+        }
 
-            resolve(user);
-          });
-        })
-      );
+        return user;
+      });
   },
 });
 

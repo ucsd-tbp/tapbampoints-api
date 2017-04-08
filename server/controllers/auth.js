@@ -61,8 +61,6 @@ const auth = {
    * @param  {Function} next Callback that passes control to the next handler.
    */
   verify(req, res, next) {
-    debug('firing token verification middleware');
-
     const authorization = req.headers.authorization;
     if (!authorization) return res.status(401).json({ error: 'Authorization header not present.' });
 
@@ -74,27 +72,31 @@ const auth = {
       });
     }
 
-    jwt.verify(token, process.env.JWT_SECRET, (jwtErr, decoded) => {
-      if (jwtErr) return res.status(400).json({ error: jwtErr.message });
+    // Decodes JWT token given in Authorization headers.
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    if (!decoded) {
+      return res.status(400).json({ message: 'Token is invalid.' });
+    }
 
-      // ACL checking requires knowing the user's role.
-      req.relations.push('role');
+    // ACL checking followes, which requires knowing the user's role.
+    req.relations.push('role');
 
-      User.where('id', decoded.sub)
-        .fetch({ withRelated: req.relations, require: true })
-        .then(user => {
-          debug(`found user with ID: ${user.id} from JWT`);
-          req.user = user;
-          next();
+    User.where('id', decoded.sub)
+      .fetch({ withRelated: req.relations, require: true })
+      .then(user => {
+        debug(`found user with ID: ${user.id} from JWT`);
 
-          // Gets rid of Bluebird "promise created but not returned" warning.
-          return null;
-        })
-        .catch(User.NotFoundError, () => res.status(400).json({
-          error: 'User with ID decoded from JWT could not be found.',
-        }))
-        .catch(err => res.status(400).json({ error: err.message }));
-    });
+        // Attaches user to request object.
+        req.user = user;
+        next();
+
+        // Gets rid of Bluebird "promise created but not returned" warning.
+        return null;
+      })
+      .catch(User.NotFoundError, () => res.status(400).json({
+        error: 'User with ID decoded from JWT could not be found.',
+      }))
+      .catch(err => res.status(400).json({ message: err.message }));
   },
 
   /**
