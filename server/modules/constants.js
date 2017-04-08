@@ -43,6 +43,9 @@ const constants = {
   }),
 
   EMAIL_SENDER: '"Brian Tan" <tbpointsapp@gmail.com>',
+
+  GENERIC_ERROR_MESSAGE: 'Something went horribly wrong! Contact the tech chair because this ' +
+    'probably isn\'t supposed to happen.',
 };
 
 module.exports = constants;

@@ -19,6 +19,9 @@ const middleware = require('./controllers/middleware');
 const routes = require('./routes');
 const validators = require('./controllers/validators');
 
+const errors = require('./modules/errors');
+const constants = require('./modules/constants');
+
 // TODO Prevent SQL from being bubbled up as an error message.
 const app = express();
 
@@ -52,5 +55,21 @@ app.use('/', routes);
 
 // If nothing else responded, then returns a 404.
 app.use((req, res) => res.status(404).json({ error: 'Endpoint doesn\'t exist.' }));
+
+// Global error handler.
+app.use((error, req, res, next) => {
+  switch (error.constructor) {
+    case errors.ResourceNotFoundError:
+      res.status(404).send({ message: error.message });
+      break;
+    case errors.ResourceNotUpdatedError:
+      res.status(304).send({ message: error.message });
+      break;
+    default:
+      res.status(500).send({ message: errors.GENERIC_ERROR_MESSAGE });
+  }
+
+  next();
+});
 
 module.exports = app;

@@ -3,7 +3,6 @@
 const Event = require('../models/Event');
 
 const events = {
-  /** Creates an event. */
   create(req, res) {
     new Event().save(req.body)
       .then(event => res.status(201).json(event.toJSON()))
@@ -13,22 +12,24 @@ const events = {
       .catch(err => res.status(400).json({ error: err.message }));
   },
 
-  /** Shows event with ID given in request parameters. */
-  show(req, res) {
-    new Event().findByID(req.params.id, { embed: req.relations, filters: req.filters })
+  show(req, res, next) {
+    new Event().findByID(req.params.id, {
+        embed: req.relations,
+        filters: req.filters,
+      })
       .then(event => res.json(event.toJSON()))
-      .catch(Event.NotFoundError, () => res.status(404).json({ error: 'Event not found.' }))
-      .catch(err => res.status(400).json({ message: err.message }));
+      .catch(next);
   },
 
-  /** Lists all events. */
   index(req, res) {
-    new Event().findAll({ embed: req.relations, filters: req.filters })
-      .then(eventCollection => res.json(eventCollection.toJSON()))
-      .catch(err => res.status(400).json({ message: err.message }));
+    new Event().findAll({
+        embed: req.relations,
+        filters: req.filters,
+      })
+      .then(collection => res.json(collection.toJSON()))
+      .catch(next);
   },
 
-  /** Updates event with ID in request parameters. */
   update(req, res) {
     Event.where({ id: req.params.id })
       .save(req.body, { method: 'patch' })
@@ -39,7 +40,6 @@ const events = {
       .catch(err => res.status(400).json({ error: err.message }));
   },
 
-  /** Deletes event with ID given in request parameters. */
   delete(req, res) {
     Event.where({ id: req.params.id })
       .destroy({ require: true })

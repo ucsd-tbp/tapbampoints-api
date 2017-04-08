@@ -7,11 +7,21 @@
  * @see ./index.js
  */
 
-const Promise = require('bluebird');
-
 const clone = require('lodash/clone');
 const forEach = require('lodash/forEach');
 const includes = require('lodash/includes');
+
+const errors = require('../modules/errors');
+
+/**
+ * Deals with Promises returned as a result of Bookshelf ORM calls and converts
+ * Bookshelf errors to custom errors that the global error handler in app.js
+ * can interpret.
+ *
+ * @param  {Error} error Bookshelf ORM error to handle.
+ * @return {Promise} Rejected promise with the custom error if a Bookshelf
+ * error was thrown.
+ */
 
 /**
  * Checks that every relation in `requestedRelations` exists in the
@@ -47,6 +57,17 @@ module.exports = bookshelf => {
       if (options.queryable) this.queryable = clone(options.queryable);
     },
 
+    resourceErrorHandler(error) {
+      if (error instanceof Model.NotFoundError) {
+        return Promise.reject(new errors.ResourceNotFoundError());
+      } else if (error instanceof Model.NoRowsDeletedError
+              || error instanceof Model.NoRowsUpdatedError) {
+        return Promise.reject(new errors.ResourceNotUpdatedError());
+      } else {
+        return Promise.reject(new errors.InternalServerError());
+      }
+    },
+
     /**
      * Finds a model given its ID.
      *
@@ -79,12 +100,12 @@ module.exports = bookshelf => {
      * findByID or findAll.
      *
      * @param {Object} [options={}] Hash of options.
-     * @param  {Boolean} [returnCollection=false] Whether to return a
+     * @param  {Boolean} [isCollection=false] Whether to return a
      * collection or a single model.
      * @return {Promise<Model>|Promise<Collection>} Resolves to either a model
-     * or a collection depending on `returnCollection`.
+     * or a collection depending on `isCollection`.
      */
-    find(options = {}, returnCollection = false) {
+    find(options = {}, isCollection = false) {
       options.filters = options.filters || [];
 
       // Removes parameters from query that aren't in queryable attributes.
@@ -116,9 +137,13 @@ module.exports = bookshelf => {
 
       // Returns a collection if `find` was called from `findAll` versus
       // returning a single model when called from `findByID`.
-      return returnCollection ?
-        builder.fetchAll({ withRelated: options.embed }) :
-        builder.fetch({ withRelated: options.embed, require: true });
+      if (isCollection) {
+        return builder.fetchAll({ withRelated: options.embed })
+          .catch(this.resourceErrorHandler);
+      } else {
+        return builder.fetch({ withRelated: options.embed, require: true })
+          .catch(this.resourceErrorHandler);
+      }
     },
 
     /**
