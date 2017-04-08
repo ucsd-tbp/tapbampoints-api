@@ -19,6 +19,7 @@ const middleware = require('./controllers/middleware');
 const routes = require('./routes');
 const validators = require('./controllers/validators');
 
+const find = require('lodash/find');
 const errors = require('./modules/errors');
 const constants = require('./modules/constants');
 
@@ -52,6 +53,13 @@ app.use(middleware.filters);
 
 // Mounts API routes onto the base URL /api.
 app.use('/', routes);
+
+// Index route dynamically lists all registered routes on the API.
+app.get('/', (req, res) => {
+  const stack = find(app._router.stack, (layer) => layer.name === 'router').handle.stack;
+  const routes = stack.map((layer) => layer.route.path);
+  res.status(200).send({ endpoints: routes });
+});
 
 // If nothing else responded, then returns a 404.
 app.use((req, res) => res.status(404).json({ error: 'Endpoint doesn\'t exist.' }));
