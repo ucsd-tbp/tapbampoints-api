@@ -19,16 +19,6 @@ const {
 } = require('../modules/errors');
 
 /**
- * Deals with Promises returned as a result of Bookshelf ORM calls and converts
- * Bookshelf errors to custom errors that the global error handler in app.js
- * can interpret.
- *
- * @param  {Error} error Bookshelf ORM error to handle.
- * @return {Promise} Rejected promise with the custom error if a Bookshelf
- * error was thrown.
- */
-
-/**
  * Checks that every relation in `requestedRelations` exists in the
  * `model.relationships` object.
  *
@@ -62,6 +52,15 @@ module.exports = bookshelf => {
       if (options.queryable) this.queryable = clone(options.queryable);
     },
 
+    /**
+     * Deals with Promises returned as a result of Bookshelf ORM calls and converts
+     * Bookshelf errors to custom errors that the global error handler in app.js
+     * can interpret.
+     *
+     * @param  {Error} error Bookshelf ORM error to handle.
+     * @return {Promise} Rejected promise with the custom error if a Bookshelf
+     * error was thrown.
+     */
     resourceErrorHandler(error) {
       if (error instanceof Model.NotFoundError) {
         throw new ResourceNotFoundError();

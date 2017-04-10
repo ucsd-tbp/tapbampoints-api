@@ -73,7 +73,7 @@ const User = db.model('User', {
    * @return {Promise<string>} Resolves to hashed password.
    */
   hashPassword() {
-    if (!this.attributes.password) return Promise.resolve();
+    if (!this.attributes.password) return;
 
     return bcrypt.hash(this.attributes.password, SALT_ROUNDS)
       .then(hash => this.set('password', hash));
@@ -86,7 +86,7 @@ const User = db.model('User', {
    */
   convertRoletoID() {
     // Stops if role field isn't in attributes to be saved/updated.
-    if (!hasOwnProperty.call(this.attributes, 'role')) return Promise.resolve();
+    if (!hasOwnProperty.call(this.attributes, 'role')) return;
 
     return Role.where('name', this.attributes.role).fetch({ require: true })
       .then((role) => {
@@ -120,7 +120,7 @@ const User = db.model('User', {
       .fetch({ require: true, withRelated: ['role'] })
       .then((user) => {
         if (!user.get('valid')) {
-          return Promise.reject(new Error('Your account hasn\'t been verified.'));
+          throw new UnauthorizedError('Your account hasn\'t been verified.');
         }
 
         return Promise.all([user, bcrypt.compare(password, user.get('password'))]);

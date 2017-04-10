@@ -99,12 +99,11 @@ const auth = {
    * @param  {Request} req Contains valid fields to save a User with.
    * @param  {Response} res Contains newly generated token.
    */
-  register(req, res) {
-    new User().save(req.body)
+  register(req, res, next) {
+    new User().create(req.body)
       .then(makeJWT)
       .then(response => res.status(201).json(response))
-      .catch(User.NoRowsUpdatedError, () => res.status(400).json({ error: 'User was not saved!' }))
-      .catch(err => res.status(400).json({ error: err.message }));
+      .catch(next);
   },
 
   /**
@@ -114,15 +113,11 @@ const auth = {
    * @param  {Request} req Must contain an email and password combination.
    * @param  {Response} res HTTP response containing the generated token
    */
-  login(req, res) {
+  login(req, res, next) {
     new User().login(req.body.email, req.body.password)
       .then(makeJWT)
       .then(response => res.json(response))
-      .catch(User.NotFoundError, () =>
-        res.status(404).json({
-          error: 'An account with that email has not been registered.',
-        }))
-      .catch(err => res.status(401).json({ error: err.message }));
+      .catch(next);
   },
 
   /**
