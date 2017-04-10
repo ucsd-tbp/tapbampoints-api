@@ -64,7 +64,7 @@ app.use((req, res) => res.status(404).json({ error: 'Endpoint doesn\'t exist.' }
 
 // Global error handler.
 app.use((error, req, res, next) => {
-  let statusCode = 200;
+  let statusCode;
 
   // Handles returning the appropriate status code according to exception.
   switch (error.constructor) {

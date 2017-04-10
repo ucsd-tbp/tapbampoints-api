@@ -3,7 +3,7 @@
  * authentication middleware.
  */
 
-const jwt = require('jsonwebtoken');
+const jwt = require('bluebird').promisifyAll(require('jsonwebtoken'));
 
 const User = require('../models/User');
 const { MalformedRequestError, UnauthorizedError } = require('../modules/errors');
@@ -38,13 +38,7 @@ function makeJWT(user) {
     role: user.related('role').name,
   };
 
-  // Generates a token with the encoded payload to send back to the client.
-  return new Promise((resolve, reject) => {
-    jwt.sign(payload, process.env.JWT_SECRET, options, (err, token) => {
-      if (err) reject(err);
-      resolve({ token });
-    });
-  });
+  return Promise.all([user, jwt.sign(payload, process.env.JWT_SECRET, options)]);
 }
 
 // TODO Add JWT refresh middleware and JWT blacklisting.
@@ -102,7 +96,10 @@ const auth = {
   register(req, res, next) {
     new User().create(req.body)
       .then(makeJWT)
-      .then(response => res.status(201).json(response))
+      .then(([user, token]) => {
+        res.set('token', token);
+        res.send(user.toJSON());
+      })
       .catch(next);
   },
 
@@ -116,7 +113,10 @@ const auth = {
   login(req, res, next) {
     new User().login(req.body.email, req.body.password)
       .then(makeJWT)
-      .then(response => res.json(response))
+      .then(([user, token]) => {
+        res.set('token', token);
+        res.send(user.toJSON());
+      })
       .catch(next);
   },
 

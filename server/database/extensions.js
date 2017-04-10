@@ -53,9 +53,9 @@ module.exports = bookshelf => {
     },
 
     /**
-     * Deals with Promises returned as a result of Bookshelf ORM calls and converts
-     * Bookshelf errors to custom errors that the global error handler in app.js
-     * can interpret.
+     * Deals with Promises returned as a result of Bookshelf ORM calls and
+     * converts Bookshelf errors to custom errors that the global error handler
+     * in app.js can interpret.
      *
      * @param  {Error} error Bookshelf ORM error to handle.
      * @return {Promise} Rejected promise with the custom error if a Bookshelf

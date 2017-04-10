@@ -10,6 +10,12 @@ const User = require('../models/User');
 
 const constants = require('../modules/constants');
 
+const {
+  MalformedRequestError,
+  UnauthorizedError,
+  ResourceNotFoundError
+} = require('../modules/errors');
+
 // TODO Should make an ORM model for verification tokens.
 const verification = {
   /**
@@ -17,9 +23,9 @@ const verification = {
    * ID of the user to be verified. Then, sends an email with a link that the
    * user can use to claim their account.
    */
-  generateVerificationToken(req, res) {
+  generateVerificationToken(req, res, next) {
     if (!req.body.pid) {
-      return res.status(400).json({ message: 'PID of user to verify is required.' });
+      throw new MalformedRequestError('PID of user to verify is required.');
     }
 
     // The id is used for looking up the hashed verification token.
@@ -33,16 +39,16 @@ const verification = {
       // first to avoid an expensive token hash if the PID can't be found.
       .then((result) => {
         if (result[0].length <= 0) {
-          return Promise.reject(new Error(`Couldn\'t find an account with PID ${req.body.pid}.`));
+          throw new ResourceNotFoundError(`Couldn\'t find an account with PID ${req.body.pid}.`);
         }
 
-        if (result[0][0].valid) {
-          return Promise.reject(
-            new Error(`Account with PID ${req.body.pid} has already been claimed.`)
-          );
+        const unverifiedUser = result[0][0];
+
+        if (unverifiedUser.valid) {
+          throw new UnauthorizedError(`Account with PID ${req.body.pid} has already been claimed.`);
         }
 
-        return result[0][0].email;
+        return unverifiedUser.email;
       })
 
       // Hashes the verification token.
@@ -87,11 +93,14 @@ const verification = {
         };
 
         transporter.sendMail(mailOptions, (error) => {
-          if (error) return res.status(400).json({ message: error });
+          if (error) {
+            throw new MalformedRequestError(error.message);
+          }
+
           res.json({ message: `Sent verification email to ${email}.` });
         });
       })
-      .catch(err => res.status(400).json({ message: err.message }));
+      .catch(next);
   },
 
   /**
@@ -100,7 +109,7 @@ const verification = {
    */
   checkVerificationToken(req, res, next) {
     if (!req.query.id || !req.query.token) {
-      return res.status(400).json({ message: 'Account verification requires an ID and token.' });
+      throw new MalformedRequestError('Account verification requires an ID and token.');
     }
 
     const findVerificationTokenQuery = `
@@ -110,7 +119,7 @@ const verification = {
     return db.knex.raw(findVerificationTokenQuery, [req.query.id])
       .then((data) => {
         if (data[0].length <= 0) {
-          return Promise.reject(new Error('Verification token doesn\'t exist.'));
+          throw new MalformedRequestError('Verification token doesn\'t exist.');
         }
 
         const verificationTokenInfo = data[0][0];
@@ -121,11 +130,11 @@ const verification = {
       })
       .then(([tokenMatches, verificationTokenInfo]) => {
         if (!tokenMatches) {
-          return Promise.reject(new Error('Verification token is invalid.'));
+          throw new UnauthorizedError('Verification token is invalid.');
         }
 
         if (isAfter(new Date(), verificationTokenInfo.expiration)) {
-          return Promise.reject(new Error('Verification token expired.'));
+          throw new MalformedRequestError('Verification token expired.');
         }
 
         return User.where('pid', verificationTokenInfo.pid).fetch({ require: true });
@@ -134,19 +143,19 @@ const verification = {
         req.user = user;
         return next();
       })
-      .catch(error => res.status(400).json({ message: error.message }));
+      .catch(next);
   },
 
   /** Removes verification token. */
   invalidateVerificationToken(req, res, next) {
     if (!req.query.id || !req.query.token) {
-      return res.status(400).json({ message: 'No token to invalidate.' });
+      throw new MalformedRequestError('No token to invalidate.');
     }
 
     const deleteVerificationTokenQuery = 'DELETE FROM verification_tokens WHERE id = ? LIMIT 1;';
     return db.knex.raw(deleteVerificationTokenQuery, [req.query.id])
       .then(() => next())
-      .catch(error => res.status(400).json({ message: error.message }));
+      .catch(next);
   },
 };
 
