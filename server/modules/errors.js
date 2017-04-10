@@ -2,10 +2,6 @@
 
 const constants = require('./constants');
 
-/**
- * Indicates that a resource was not found to return a 404.
- * @param {string} message Custom error message.
- */
 function ResourceNotFoundError(message) {
   this.name = 'ResourceNotFoundError';
   this.message = message || 'Resource not found.';
@@ -24,6 +20,24 @@ function ResourceNotUpdatedError(message) {
 ResourceNotUpdatedError.prototype = Object.create(Error.prototype);
 ResourceNotUpdatedError.prototype.constructor = ResourceNotUpdatedError;
 
+function UnauthorizedError(message) {
+  this.name = 'UnauthorizedError';
+  this.message = message || 'Not authorized to make this request.';
+  Error.captureStackTrace(this, UnauthorizedError);
+}
+
+UnauthorizedError.prototype = Object.create(Error.prototype);
+UnauthorizedError.prototype.constructor = UnauthorizedError;
+
+function MalformedRequestError(message) {
+  this.name = 'MalformedRequestError';
+  this.message = message || 'Request is malformed.';
+  Error.captureStackTrace(this, MalformedRequestError);
+}
+
+MalformedRequestError.prototype = Object.create(Error.prototype);
+MalformedRequestError.prototype.constructor = MalformedRequestError;
+
 function InternalServerError(message) {
   this.name = 'InternalServerError';
   this.message =  message || constants.GENERIC_ERROR_MESSAGE;
@@ -34,7 +48,9 @@ InternalServerError.prototype = Object.create(Error.prototype);
 InternalServerError.prototype.constructor = InternalServerError;
 
 module.exports = {
+  InternalServerError,
+  MalformedRequestError,
   ResourceNotFoundError,
   ResourceNotUpdatedError,
-  InternalServerError,
+  UnauthorizedError,
 };

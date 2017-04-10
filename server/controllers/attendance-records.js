@@ -52,11 +52,11 @@ const attendanceRecords = {
    */
   index(req, res) {
     new AttendanceRecord().findAll({
-        embed: req.relations,
-        filters: req.filters,
-      })
-      .then(collection => res.json(collection.toJSON()))
-      .catch(next);
+      embed: req.relations,
+      filters: req.filters,
+    })
+    .then(collection => res.json(collection.toJSON()))
+    .catch(next);
   },
 
   /** Lists events that a user has attended. */

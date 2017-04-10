@@ -8,7 +8,8 @@ require('./Event');
 
 const db = require('../database');
 const Role = require('./Role');
-const constants = require('../modules/constants');
+const { SALT_ROUNDS } = require('../modules/constants');
+const { UnauthorizedError } = require('../modules/errors');
 
 const User = db.model('User', {
   // Database table that this model and its attributes correspond to.
@@ -75,16 +76,8 @@ const User = db.model('User', {
   hashPassword() {
     if (!this.attributes.password) return Promise.resolve();
 
-    return new Promise((resolve, reject) => {
-      bcrypt.hash(this.attributes.password, constants.SALT_ROUNDS, (err, hash) => {
-        if (err) reject(err);
-
-        debug(`hashed password: ${hash}`);
-        this.set('password', hash);
-
-        resolve(hash);
-      });
-    });
+    return bcrypt.hash(this.attributes.password, SALT_ROUNDS)
+      .then(hash => this.set('password', hash));
   },
 
   /**
@@ -131,12 +124,14 @@ const User = db.model('User', {
           return Promise.reject(new Error('Your account hasn\'t been verified.'));
         }
 
-        return [user, bcrypt.compare(password, user.get('password'))];
+        return Promise.all([user, bcrypt.compare(password, user.get('password'))]);
       })
       .then(([user, comparisonResult]) => {
         if (!comparisonResult) {
-          return Promise.reject(new Error('The email and password entered don\'t match.'));
+          throw new UnauthorizedError('The email and password entered don\'t match.');
         }
+
+        console.log(comparisonResult);
 
         return user;
       });

@@ -11,7 +11,12 @@ const clone = require('lodash/clone');
 const forEach = require('lodash/forEach');
 const includes = require('lodash/includes');
 
-const errors = require('../modules/errors');
+const {
+  MalformedRequestError,
+  ResourceNotUpdatedError,
+  ResourceNotFoundError,
+  InternalServerError,
+} = require('../modules/errors');
 
 /**
  * Deals with Promises returned as a result of Bookshelf ORM calls and converts
@@ -59,12 +64,12 @@ module.exports = bookshelf => {
 
     resourceErrorHandler(error) {
       if (error instanceof Model.NotFoundError) {
-        return Promise.reject(new errors.ResourceNotFoundError());
+        throw new ResourceNotFoundError();
       } else if (error instanceof Model.NoRowsDeletedError
               || error instanceof Model.NoRowsUpdatedError) {
-        return Promise.reject(new errors.ResourceNotUpdatedError());
+        throw new ResourceNotUpdatedError();
       } else {
-        return Promise.reject(new errors.InternalServerError());
+        throw new InternalServerError();
       }
     },
 

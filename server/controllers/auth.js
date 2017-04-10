@@ -5,7 +5,9 @@
 
 const debug = require('debug')('tbp:auth');
 const jwt = require('jsonwebtoken');
+
 const User = require('../models/User');
+const { MalformedRequestError, UnauthorizedError } = require('../modules/errors');
 
 /**
  * Creates registered claims to sign the JWT with and places the user's admin
@@ -62,41 +64,33 @@ const auth = {
    */
   verify(req, res, next) {
     const authorization = req.headers.authorization;
-    if (!authorization) return res.status(401).json({ error: 'Authorization header not present.' });
+    if (!authorization) {
+      throw new UnauthorizedError('Authorization header not present.');
+    }
 
     const [scheme, token] = authorization.split(' ');
-
     if (scheme !== 'Bearer') {
-      return res.status(400).json({
-        error: 'Incorrect authentication scheme. Required format: "Authorization: Bearer {token}".',
-      });
+      throw new MalformedRequestError(
+        'Invalid authentication scheme. Required format: "Authorization Bearer {token}".'
+      );
     }
 
     // Decodes JWT token given in Authorization headers.
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     if (!decoded) {
-      return res.status(400).json({ message: 'Token is invalid.' });
+      throw new MalformedRequestError('Token is invalid.');
     }
 
-    // ACL checking followes, which requires knowing the user's role.
+    // ACL checking middleware may follow after JWT authentication, which
+    // requires knowing the user's member status.
     req.relations.push('role');
 
-    User.where('id', decoded.sub)
-      .fetch({ withRelated: req.relations, require: true })
-      .then(user => {
-        debug(`found user with ID: ${user.id} from JWT`);
-
-        // Attaches user to request object.
+    new User().findByID(decoded.sub, { embed: req.relations })
+      .then((user) => {
         req.user = user;
         next();
-
-        // Gets rid of Bluebird "promise created but not returned" warning.
-        return null;
       })
-      .catch(User.NotFoundError, () => res.status(400).json({
-        error: 'User with ID decoded from JWT could not be found.',
-      }))
-      .catch(err => res.status(400).json({ message: err.message }));
+      .catch(next);
   },
 
   /**

@@ -6,11 +6,11 @@ const announcements = {
   /** Lists all announcements. */
   index(req, res, next) {
     new Announcement().findAll({
-        embed: req.relations,
-        filters: req.filters,
-      })
-      .then(collection => res.json(collection.toJSON()))
-      .catch(next);
+      embed: req.relations,
+      filters: req.filters,
+    })
+    .then(collection => res.json(collection.toJSON()))
+    .catch(next);
   },
 };
 

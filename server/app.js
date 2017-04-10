@@ -21,9 +21,7 @@ const validators = require('./controllers/validators');
 
 const find = require('lodash/find');
 const errors = require('./modules/errors');
-const constants = require('./modules/constants');
 
-// TODO Prevent SQL from being bubbled up as an error message.
 const app = express();
 
 debug('registering security, compression, body parsing, custom middleware, and routes');
@@ -57,8 +55,8 @@ app.use('/', routes);
 // Index route dynamically lists all registered routes on the API.
 app.get('/', (req, res) => {
   const stack = find(app._router.stack, (layer) => layer.name === 'router').handle.stack;
-  const routes = stack.map((layer) => layer.route.path);
-  res.status(200).send({ endpoints: routes });
+  const paths = stack.map((layer) => layer.route.path);
+  res.status(200).send({ endpoints: paths });
 });
 
 // If nothing else responded, then returns a 404.
@@ -66,19 +64,27 @@ app.use((req, res) => res.status(404).json({ error: 'Endpoint doesn\'t exist.' }
 
 // Global error handler.
 app.use((error, req, res, next) => {
-  debug(`reached global error handler with error message: ${error.message}`);
+  let statusCode = 200;
 
+  // Handles returning the appropriate status code according to exception.
   switch (error.constructor) {
-    case errors.ResourceNotFoundError:
-      res.status(404).send({ message: error.message });
-      break;
     case errors.ResourceNotUpdatedError:
-      res.status(304).send({ message: error.message });
+      statusCode = 304;
+      break;
+    case errors.MalformedRequestError:
+      statusCode = 400;
+      break;
+    case errors.UnauthorizedError:
+      statusCode = 401;
+      break;
+    case errors.ResourceNotFoundError:
+      statusCode = 404;
       break;
     default:
-      res.status(500).send({ message: errors.GENERIC_ERROR_MESSAGE });
+      statusCode = 500;
   }
 
+  res.status(statusCode).send({ message: error.message });
   next();
 });
 
