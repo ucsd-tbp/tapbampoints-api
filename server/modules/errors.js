@@ -40,7 +40,7 @@ MalformedRequestError.prototype.constructor = MalformedRequestError;
 
 function InternalServerError(message) {
   this.name = 'InternalServerError';
-  this.message =  message || constants.GENERIC_ERROR_MESSAGE;
+  this.message = message || constants.GENERIC_ERROR_MESSAGE;
   Error.captureStackTrace(this, InternalServerError);
 }
 

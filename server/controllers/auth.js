@@ -3,7 +3,6 @@
  * authentication middleware.
  */
 
-const debug = require('debug')('tbp:auth');
 const jwt = require('jsonwebtoken');
 
 const User = require('../models/User');

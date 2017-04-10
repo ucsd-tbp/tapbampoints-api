@@ -58,7 +58,7 @@ const users = {
 
       next();
     });
-  }
+  },
 };
 
 module.exports = users;

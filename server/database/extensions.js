@@ -120,14 +120,10 @@ module.exports = bookshelf => {
         }
       });
 
-      if (options.embed) {
-        // All relationships in the embed query string parameter must be valid
-        // relationships defined on the model.
-        if (!validateRelations(options.embed, this)) {
-          return Promise.reject(new Error(
-            'Names of relations to load are invalid.'
-          ));
-        }
+      // All relationships in the embed query string parameter must be valid
+      // relationships defined on the model.
+      if (options.embed && !validateRelations(options.embed, this)) {
+        throw new MalformedRequestError('Names of relations to load are invalid.');
       }
 
       // Creates a series of WHERE clauses according to the objects in
@@ -140,15 +136,15 @@ module.exports = bookshelf => {
         );
       });
 
-      // Returns a collection if `find` was called from `findAll` versus
-      // returning a single model when called from `findByID`.
+      // Returns a collection if `find` was called from `findAll`.
       if (isCollection) {
         return builder.fetchAll({ withRelated: options.embed })
           .catch(this.resourceErrorHandler);
-      } else {
-        return builder.fetch({ withRelated: options.embed, require: true })
-          .catch(this.resourceErrorHandler);
       }
+
+      // Otherwise, returns a single model.
+      return builder.fetch({ withRelated: options.embed, require: true })
+        .catch(this.resourceErrorHandler);
     },
 
     create(body) {

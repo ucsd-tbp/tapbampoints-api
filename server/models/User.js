@@ -1,7 +1,6 @@
 /** @file Defines User model. */
 
 const bcrypt = require('bcrypt');
-const debug = require('debug')('tbp:user-model');
 const isEmpty = require('lodash/isEmpty');
 
 require('./Event');
@@ -130,8 +129,6 @@ const User = db.model('User', {
         if (!comparisonResult) {
           throw new UnauthorizedError('The email and password entered don\'t match.');
         }
-
-        console.log(comparisonResult);
 
         return user;
       });

@@ -11,19 +11,19 @@ const events = {
 
   show(req, res, next) {
     new Event().findByID(req.params.id, {
-        embed: req.relations,
-      })
-      .then(event => res.json(event.toJSON()))
-      .catch(next);
+      embed: req.relations,
+    })
+    .then(event => res.json(event.toJSON()))
+    .catch(next);
   },
 
   index(req, res, next) {
     new Event().findAll({
-        embed: req.relations,
-        filters: req.filters,
-      })
-      .then(collection => res.json(collection.toJSON()))
-      .catch(next);
+      embed: req.relations,
+      filters: req.filters,
+    })
+    .then(collection => res.json(collection.toJSON()))
+    .catch(next);
   },
 
   update(req, res, next) {

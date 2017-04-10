@@ -131,8 +131,8 @@ const verification = {
         return User.where('pid', verificationTokenInfo.pid).fetch({ require: true });
       })
       .then((user) => {
-          req.user = user;
-          return next();
+        req.user = user;
+        return next();
       })
       .catch(error => res.status(400).json({ message: error.message }));
   },
@@ -143,7 +143,7 @@ const verification = {
       return res.status(400).json({ message: 'No token to invalidate.' });
     }
 
-    const deleteVerificationTokenQuery = `DELETE FROM verification_tokens WHERE id = ? LIMIT 1;`;
+    const deleteVerificationTokenQuery = 'DELETE FROM verification_tokens WHERE id = ? LIMIT 1;';
     return db.knex.raw(deleteVerificationTokenQuery, [req.query.id])
       .then(() => next())
       .catch(error => res.status(400).json({ message: error.message }));

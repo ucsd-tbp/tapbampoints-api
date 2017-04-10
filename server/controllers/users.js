@@ -5,19 +5,19 @@ const User = require('../models/User');
 const users = {
   show(req, res, next) {
     new User().findByID(req.params.id, {
-        embed: req.relations,
-      })
-      .then(user => res.json(user.toJSON()))
-      .catch(next);
+      embed: req.relations,
+    })
+    .then(user => res.json(user.toJSON()))
+    .catch(next);
   },
 
   index(req, res, next) {
     new User().findAll({
-        embed: req.relations,
-        filters: req.filters,
-      })
-      .then(collection => res.json(collection.toJSON()))
-      .catch(next);
+      embed: req.relations,
+      filters: req.filters,
+    })
+    .then(collection => res.json(collection.toJSON()))
+    .catch(next);
   },
 
   update(req, res, next) {

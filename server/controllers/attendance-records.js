@@ -50,7 +50,7 @@ const attendanceRecords = {
    * request (i.e. user in `req.user` from decoded JWT) then shows the
    * attendance records of the authenticated user.
    */
-  index(req, res) {
+  index(req, res, next) {
     new AttendanceRecord().findAll({
       embed: req.relations,
       filters: req.filters,
