@@ -4,7 +4,7 @@ const EventType = require('../models/EventType');
 
 const eventTypes = {
   show(req, res, next) {
-    new EventType().findByID(req.params.id, {
+    new EventType().findBy('id', req.params.id, {
       embed: req.relations,
     })
     .then(type => res.json(type.toJSON()))

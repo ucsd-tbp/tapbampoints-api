@@ -78,7 +78,7 @@ const auth = {
     // requires knowing the user's member status.
     req.relations.push('role');
 
-    new User().findByID(decoded.sub, { embed: req.relations })
+    new User().findBy('id', decoded.sub, { embed: req.relations })
       .then((user) => {
         req.user = user;
         next();
@@ -111,7 +111,7 @@ const auth = {
    * @param  {Response} res HTTP response containing the generated token
    */
   login(req, res, next) {
-    new User().login(req.body.email, req.body.password)
+    new User().login(req.body.email, req.body.password, req.relations)
       .then(makeJWT)
       .then(([user, token]) => {
         res.set('token', token);

@@ -79,9 +79,9 @@ module.exports = bookshelf => {
      * @param  {Object} [options={}] Hash of options for querying and fetching.
      * @return {Promise<Model>} Resolves to model with given ID.
      */
-    findByID(id, options = {}) {
+    findBy(attribute, value, options = {}) {
       options.filters = options.filters || [];
-      options.filters.push({ key: 'id', comparison: '=', value: id });
+      options.filters.push({ key: attribute, comparison: '=', value });
 
       return this.find(options);
     },

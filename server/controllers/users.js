@@ -4,7 +4,7 @@ const User = require('../models/User');
 
 const users = {
   show(req, res, next) {
-    new User().findByID(req.params.id, {
+    new User().findBy('id', req.params.id, {
       embed: req.relations,
     })
     .then(user => res.json(user.toJSON()))

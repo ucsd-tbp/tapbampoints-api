@@ -63,9 +63,11 @@ const User = db.model('User', {
 
   /** Registers event listeners. */
   initialize() {
-    this.on('saving', this.hashPassword);
-    this.on('saving', this.convertRoletoID);
-    this.on('saving', this.updatedValidStatus);
+    this.on('saving', () => {
+      return this.hashPassword()
+        .then(this.convertRoletoID())
+        .then(this.updateValidStatus());
+    });
   },
 
   /**
@@ -101,7 +103,7 @@ const User = db.model('User', {
    * If the user doesn't have a password, then the user isn't valid and cannot
    * login, and must request an email verification code to set their password.
    */
-  updatedValidStatus() {
+  updateValidStatus() {
     const password = this.attributes.password ? this.attributes.password : this.get('password');
     this.set('valid', !isEmpty(password));
   },
@@ -115,9 +117,10 @@ const User = db.model('User', {
    * @return {Promise<User>} resolves to newly logged in user if login was
    * successful.
    */
-  login(email, password) {
-    return User.where('email', email)
-      .fetch({ require: true, withRelated: ['role'] })
+  login(email, password, relations = []) {
+    // Role attribute is added to embed since making the JWT needs the correct
+    // role to place in the generated token.
+    return new User().findBy('email', email, { embed: ['role', ...relations] })
       .then((user) => {
         if (!user.get('valid')) {
           throw new UnauthorizedError('Your account hasn\'t been verified.');

@@ -10,7 +10,7 @@ const events = {
   },
 
   show(req, res, next) {
-    new Event().findByID(req.params.id, {
+    new Event().findBy('id', req.params.id, {
       embed: req.relations,
     })
     .then(event => res.json(event.toJSON()))
