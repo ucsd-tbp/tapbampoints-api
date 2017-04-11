@@ -26,8 +26,8 @@ const app = express();
 
 debug('registering security, compression, body parsing, custom middleware, and routes');
 
-// Enables all CORS requests.
-app.use(cors());
+// Authorization header in response contains JWT for client to use.
+app.use(cors({ origin: process.env.CLIENT_ADDRESS, exposedHeaders: 'Authorization' }));
 
 // Adds some security by adding HTTP headers.
 app.use(helmet());
@@ -64,6 +64,8 @@ app.use((req, res) => res.status(404).json({ error: 'Endpoint doesn\'t exist.' }
 
 // Global error handler.
 app.use((error, req, res, next) => {
+  debug(error);
+
   let statusCode;
 
   // Handles returning the appropriate status code according to exception.
@@ -73,6 +75,9 @@ app.use((error, req, res, next) => {
       break;
     case errors.MalformedRequestError:
       statusCode = 400;
+      break;
+    case errors.NotVerifiedError:
+      statusCode = 200;
       break;
     case errors.UnauthorizedError:
       statusCode = 401;

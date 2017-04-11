@@ -63,11 +63,9 @@ const User = db.model('User', {
 
   /** Registers event listeners. */
   initialize() {
-    this.on('saving', () => {
-      return this.hashPassword()
-        .then(this.convertRoletoID())
-        .then(this.updateValidStatus());
-    });
+    this.on('saving', this.hashPassword);
+    this.on('saving', this.convertRoletoID);
+    this.on('saving', this.updateValidStatus);
   },
 
   /**
@@ -76,7 +74,6 @@ const User = db.model('User', {
    */
   hashPassword() {
     if (!this.attributes.password) return;
-
     return bcrypt.hash(this.attributes.password, SALT_ROUNDS)
       .then(hash => this.set('password', hash));
   },

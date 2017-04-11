@@ -29,6 +29,16 @@ function UnauthorizedError(message) {
 UnauthorizedError.prototype = Object.create(Error.prototype);
 UnauthorizedError.prototype.constructor = UnauthorizedError;
 
+function NotVerifiedError(message) {
+  this.name = 'NotVerifiedError';
+  this.message = message || 'This account hasn\'t been verified. Check your email for an email ' +
+    'verification code to claim your account.';
+  Error.captureStackTrace(this, NotVerifiedError);
+}
+
+NotVerifiedError.prototype = Object.create(Error.prototype);
+NotVerifiedError.prototype.constructor = NotVerifiedError;
+
 function MalformedRequestError(message) {
   this.name = 'MalformedRequestError';
   this.message = message || 'Request is malformed.';
@@ -53,4 +63,5 @@ module.exports = {
   ResourceNotFoundError,
   ResourceNotUpdatedError,
   UnauthorizedError,
+  NotVerifiedError,
 };

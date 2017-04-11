@@ -6,7 +6,7 @@
 const jwt = require('bluebird').promisifyAll(require('jsonwebtoken'));
 
 const User = require('../models/User');
-const { MalformedRequestError, UnauthorizedError } = require('../modules/errors');
+const { MalformedRequestError, NotVerifiedError, UnauthorizedError } = require('../modules/errors');
 
 /**
  * Creates registered claims to sign the JWT with and places the user's admin
@@ -19,12 +19,7 @@ const { MalformedRequestError, UnauthorizedError } = require('../modules/errors'
  * @see https://tools.ietf.org/html/rfc7519#section-4.1 (the JWT spec on claims)
  */
 function makeJWT(user) {
-  if (!user.get('valid')) {
-    return {
-      message: 'Your account hasn\'t been verified. Check your email for an email verification ' +
-               'code to claim your account.',
-    };
-  }
+  if (!user.get('valid')) throw new NotVerifiedError();
 
   // TODO Generate additional registered claims, as per the JWT spec.
   const options = {
@@ -97,7 +92,7 @@ const auth = {
     new User().create(req.body)
       .then(makeJWT)
       .then(([user, token]) => {
-        res.set('token', token);
+        res.set(`Authorization': 'Bearer ${token}`);
         res.send(user.toJSON());
       })
       .catch(next);
@@ -114,7 +109,7 @@ const auth = {
     new User().login(req.body.email, req.body.password, req.relations)
       .then(makeJWT)
       .then(([user, token]) => {
-        res.set('token', token);
+        res.set('Authorization', `Bearer ${token}`);
         res.send(user.toJSON());
       })
       .catch(next);

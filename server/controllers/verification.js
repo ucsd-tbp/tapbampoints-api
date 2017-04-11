@@ -13,7 +13,7 @@ const constants = require('../modules/constants');
 const {
   MalformedRequestError,
   UnauthorizedError,
-  ResourceNotFoundError
+  ResourceNotFoundError,
 } = require('../modules/errors');
 
 // TODO Should make an ORM model for verification tokens.
