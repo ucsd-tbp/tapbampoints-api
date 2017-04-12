@@ -62,6 +62,8 @@ module.exports = bookshelf => {
      * error was thrown.
      */
     resourceErrorHandler(error) {
+      console.log(error);
+
       if (error instanceof Model.NotFoundError) {
         throw new ResourceNotFoundError();
       } else if (error instanceof Model.NoRowsDeletedError
@@ -154,7 +156,11 @@ module.exports = bookshelf => {
     update(id, body) {
       return this.where({ id })
         .save(body, { method: 'update', require: true })
-        .catch(this.resourceErrorHandler);
+        .catch(this.resourceErrorHandler)
+        .then((user) => {
+          console.log(user);
+          return user;
+        })
     },
 
     delete(id) {

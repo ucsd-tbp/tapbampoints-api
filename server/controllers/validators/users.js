@@ -21,7 +21,7 @@ const users = {
     req.checkBody('pid', 'PID can\'t be empty.').optional().notEmpty();
 
     req.checkBody('house', 'House must be red, green, or blue.').optional()
-      .isIn([Houses.RED, Houses.GREEN, Houses.BLUE]);
+      .isIn([Houses.RED, Houses.GREEN, Houses.BLUE, Houses.NONE]);
 
     req.checkBody('role', 'Role must be initiate or member.').optional()
       .isIn([Roles.INITIATE, Roles.PENDING_MEMBER]);

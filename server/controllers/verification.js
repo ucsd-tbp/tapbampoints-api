@@ -29,11 +29,11 @@ const verification = {
     }
 
     // The id is used for looking up the hashed verification token.
-    const id = uuid();
+    const tokenID = uuid();
     const token = uuid();
 
     // Checks that an unverified account has been made given the PID.
-    const findUserQuery = 'SELECT email, valid from users where pid = ?';
+    const findUserQuery = 'SELECT id, email, valid from users where pid = ?';
     db.knex.raw(findUserQuery, [req.body.pid])
       // Finds the email that corresponds to PID in request body. This is done
       // first to avoid an expensive token hash if the PID can't be found.
@@ -48,14 +48,14 @@ const verification = {
           throw new UnauthorizedError(`Account with PID ${req.body.pid} has already been claimed.`);
         }
 
-        return unverifiedUser.email;
+        return [unverifiedUser.id, unverifiedUser.email];
       })
 
       // Hashes the verification token.
-      .then(email => Promise.all([email, bcrypt.hash(token, constants.SALT_ROUNDS)]))
+      .then(([id, email])=> Promise.all([id, email, bcrypt.hash(token, constants.SALT_ROUNDS)]))
 
       // Creates the verification token given its ID, hash, user PID.
-      .then(([email, hash]) => {
+      .then(([id, email, hash]) => {
         // TODO Extend CRUD methods in a Bookshelf base class – otherwise simple
         // CRUD queries via an ORM become too verbose.
         const createTokenQuery = `
@@ -66,15 +66,15 @@ const verification = {
         const expiration = format(addDays(new Date(), 1), constants.DATABASE_DATE_FORMAT);
 
         return Promise.all([
-          email, db.knex.raw(createTokenQuery, [id, hash, req.body.pid, expiration]),
+          id, email, db.knex.raw(createTokenQuery, [tokenID, hash, req.body.pid, expiration]),
         ]);
       })
 
       // Sends an email containing a link with which the user can claim their
       // account.
-      .then(([email]) => {
+      .then(([id, email]) => {
         const transporter = mailer.createTransport(constants.EMAIL_TRANSPORT_CONFIG);
-        const verificationLink = `${process.env.CLIENT_ADDRESS}/claim?id=${id}&token=${token}`;
+        const verificationLink = `${process.env.CLIENT_ADDRESS}/claim/${id}?id=${tokenID}&token=${token}`;
 
         const EMAIL_TEMPLATE = `
           <h3>Thanks for coming!</h3>
